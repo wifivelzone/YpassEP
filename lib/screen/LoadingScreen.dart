@@ -15,13 +15,13 @@ class LoadingScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Bar(barSize: 10.0),
-            Container(
+            const Bar(barSize: 10.0),
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.height * 0.2,
               child: Image.asset('asset/img/wifive.png'),
             ),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.height * 0.2,
               child: Image.asset('asset/img/y5logo.png'),
@@ -34,10 +34,10 @@ class LoadingScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: Icon(Icons.ac_unit),
+              icon: const Icon(Icons.ac_unit),
             ),
 
-            Bar(barSize: 10.0),
+            const Bar(barSize: 10.0),
           ],
         ),
       ),

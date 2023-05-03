@@ -4,7 +4,7 @@ import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 class UpdateUserDataScreen extends StatelessWidget {
-  UpdateUserDataScreen({Key? key}) : super(key: key);
+  const UpdateUserDataScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class UpdateUserDataScreen extends StatelessWidget {
             children: [
               const Bar(barSize: 10.0),
               const TopBar(title: '사용자 정보 수정'), // 상단 타이틀바
-              Middle(),
+              _Middle(),
             ],
           ),
         ),
@@ -27,11 +27,11 @@ class UpdateUserDataScreen extends StatelessWidget {
 
 
 
-class Middle extends StatelessWidget {
+class _Middle extends StatelessWidget {
   TextEditingController phoneNumber = TextEditingController();
   TextEditingController authenticatioNumber = TextEditingController();
 
-  Middle({Key? key}) : super(key: key);
+  _Middle({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -48,20 +48,20 @@ class Middle extends StatelessWidget {
             inputTitle: "전화번호",
             fieldText: phoneNumber,
           ),
-          Container(
+          SizedBox(
             width: MediaQuery.of(context).size.width,
             height: 50,
             child: ElevatedButton(
               onPressed: () {
                 print(phoneNumber.text);
               },
-              child: const Text('인증 번호 요청'),
               style: ElevatedButton.styleFrom(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                 backgroundColor: UPDATE_USER_DATA_BUTTON_COLOR,
               ),
+              child: const Text('인증 번호 요청'),
             ),
           ),
           const Padding(padding: EdgeInsets.all(10)),
@@ -76,13 +76,13 @@ class Middle extends StatelessWidget {
               onPressed: () {
                 print(authenticatioNumber.text);
               },
-              child: const Text('정보수정'),
               style: ElevatedButton.styleFrom(
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(10))
                   ),
                   backgroundColor: BAR_COLOR,
               ),
+              child: const Text('정보수정'),
             ),
           ),
         ],

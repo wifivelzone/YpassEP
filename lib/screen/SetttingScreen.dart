@@ -38,7 +38,7 @@ class _MiddleState extends State<_Middle> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(30),
+      padding: const EdgeInsets.all(30),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,12 +51,12 @@ class _MiddleState extends State<_Middle> {
           const LinePadding(value: 10),
           Text(
             '현재 설정된 단계는 : ${widget.stateNumber}',
-            style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR),
+            style: const TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR),
           ),
           const LinePadding(value: 20),
           Row(
             children: [
-              Text('0'),
+              const Text('0'),
               Expanded(
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
@@ -82,7 +82,7 @@ class _MiddleState extends State<_Middle> {
                   ),
                 ),
               ),
-              Text('20')
+              const Text('20')
             ],
           ),
           const LinePadding(value: 10),

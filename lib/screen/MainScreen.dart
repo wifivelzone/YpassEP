@@ -23,11 +23,11 @@ class _MainScreenState extends State<MainScreen> {
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
+          children: const [
             Bar(barSize: 5.0),
             Top(),
             Bar(barSize: 5.0),
-            Middle(),
+            _Middle(),
             Bar(barSize: 5.0),
             Bottom(),
           ],
@@ -91,8 +91,8 @@ class _TopState extends State<Top> {
 /** --------------------   중간 부분  --------------------- */
 /// -------------------------------------------------------
 
-class Middle extends StatelessWidget {
-  const Middle({Key? key}) : super(key: key);
+class _Middle extends StatelessWidget {
+  const _Middle({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -104,17 +104,17 @@ class Middle extends StatelessWidget {
             image: DecorationImage(
                 image: AssetImage('asset/img/icon_bg.png'), fit: BoxFit.cover),
           ),
-          child: MiddleButtonImg(),
+          child: _MiddleButtonImg(),
         ),
       ),
     );
   }
 }
 
-class MiddleButtonImg extends StatelessWidget {
+class _MiddleButtonImg extends StatelessWidget {
   BuildContext? context;
 
-  MiddleButtonImg({Key? key}) : super(key: key);
+  _MiddleButtonImg({Key? key}) : super(key: key);
 
 
   @override
@@ -184,9 +184,9 @@ class MiddleButtonImg extends StatelessWidget {
 
   // 사용자 정보 수정 버튼 클릭시
   _clickedUpdateUserDataBtn() {
-    if (this.context != null) {
+    if (context != null) {
       Navigator.push(
-        this.context!,
+        context!,
           MaterialPageRoute(
             builder: (BuildContext contex) => UpdateUserDataScreen(),
         ),
@@ -196,9 +196,9 @@ class MiddleButtonImg extends StatelessWidget {
 
   // 설정 버튼 클릭시
   void clickedSettingBtn() {
-    if (this.context != null) {
+    if (context != null) {
       Navigator.push(
-        this.context!,
+        context!,
         MaterialPageRoute(
           builder: (BuildContext contex) => const SettingScreen(),
         ),
@@ -222,7 +222,7 @@ class Bottom extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return const Padding(
       padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
       child: Text("v.10\n22"),
     );
