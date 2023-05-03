@@ -10,7 +10,6 @@ class Bar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       color: BAR_COLOR,
       width: MediaQuery.of(context).size.width.toDouble(),
