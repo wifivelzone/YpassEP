@@ -1,12 +1,72 @@
-import 'dart:ffi';
 import 'dart:io';
+import 'dart:isolate';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+
 import 'package:ypass/screen/SetttingScreen.dart';
 import 'package:ypass/screen/UpdateUserDataScreen.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 
 import '../constant/color.dart';
+
+@pragma('vm:entry-point')
+void startCallback() {
+  FlutterForegroundTask.setTaskHandler(MyTaskHandler());
+}
+class MyTaskHandler extends TaskHandler {
+  SendPort? _sendPort;
+  //bool _isInsideAtOn = false;
+  int _eventCount = 0;
+
+  @override
+  Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
+    _sendPort = sendPort;
+
+    final customData =
+    await FlutterForegroundTask.getData<String>(key: 'customData');
+    //_isInsideAtOn = (await FlutterForegroundTask.getData<bool>(key: 'isInsideAtOn'))!;
+    debugPrint('customData: $customData');
+  }
+
+  @override
+  Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
+    FlutterForegroundTask.updateService(
+      notificationTitle: 'MyTaskHandler',
+    );
+
+    if(kDebugMode && Platform.isAndroid){
+      debugPrint("IsAndroid from Foreground");
+    } else {
+      debugPrint("IsiOS from Foreground");
+    }
+
+    sendPort?.send(_eventCount);
+
+    _eventCount++;
+    debugPrint("Is Running?");
+  }
+
+  @override
+  Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
+    await FlutterForegroundTask.clearAllData();
+
+  }
+
+  @override
+  void onButtonPressed(String id) {
+    debugPrint('onButtonPressed >> $id');
+  }
+
+  @override
+  void onNotificationPressed() {
+    if (Platform.isAndroid) {
+      //FlutterForegroundTask.launchApp("/home");
+    }
+    _sendPort?.send('onNotificationPressed');
+  }
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -50,6 +110,130 @@ class Top extends StatefulWidget {
 }
 
 class _TopState extends State<Top> {
+  ReceivePort? _receivePort;
+  bool isAnd = Platform.isAndroid;
+  bool foreIsRun = false;
+
+  void _initForegroundTask() {
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'notification_channel_id',
+        channelName: 'Foreground Notification',
+        channelDescription: 'This notification appears when the foreground service is running.',
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.LOW,
+        iconData: const NotificationIconData(
+          resType: ResourceType.mipmap,
+          resPrefix: ResourcePrefix.ic,
+          name: 'launcher',
+        ),
+        enableVibration: true,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: true,
+        playSound: false,
+      ),
+      foregroundTaskOptions: const ForegroundTaskOptions(
+        interval: 5000,
+        isOnceEvent: false,
+        autoRunOnBoot: true,
+        allowWakeLock: true,
+        allowWifiLock: true,
+      ),
+    );
+  }
+
+  Future<bool> _startForegroundTask() async {
+    if (!await FlutterForegroundTask.canDrawOverlays) {
+      final isGranted =
+      await FlutterForegroundTask.openSystemAlertWindowSettings();
+      if (!isGranted) {
+        debugPrint('SYSTEM_ALERT_WINDOW permission denied!');
+        return false;
+      }
+    }
+
+    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
+
+    final customData =
+    await FlutterForegroundTask.getData<String>(key: 'customData');
+    debugPrint('customData: $customData');
+
+    final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
+    final bool isRegistered = _registerReceivePort(receivePort);
+    if (!isRegistered) {
+      debugPrint('Failed to register receivePort!');
+      return false;
+    }
+
+    if (await FlutterForegroundTask.isRunningService) {
+      debugPrint("Foreground Already Running");
+      return FlutterForegroundTask.startService(
+        notificationTitle: 'Foreground Service is running',
+        notificationText: 'Tap to return to the app',
+        callback: startCallback,
+      );
+    } else {
+      debugPrint("Foreground Start Running");
+      return FlutterForegroundTask.startService(
+        notificationTitle: 'Foreground Service is running',
+        notificationText: 'Tap to return to the app',
+        callback: startCallback,
+      );
+    }
+  }
+
+  Future<bool> _stopForegroundTask() {
+    return FlutterForegroundTask.stopService();
+  }
+
+  bool _registerReceivePort(ReceivePort? newReceivePort) {
+    if (newReceivePort == null) {
+      return false;
+    }
+
+    _closeReceivePort();
+
+    _receivePort = newReceivePort;
+    _receivePort?.listen((message) {
+      if (message is int) {
+        debugPrint('eventCount: $message');
+      } else if (message is String) {
+        if (message == 'onNotificationPressed') {
+          Navigator.of(context).pushNamed('/home');
+        }
+      } else if (message is DateTime) {
+        debugPrint('timestamp: ${message.toString()}');
+      }
+    });
+
+    return _receivePort != null;
+  }
+
+  void _closeReceivePort() {
+    _receivePort?.close();
+    _receivePort = null;
+  }
+
+  T? _ambiguate<T>(T? value) => value;
+
+  @override
+  void initState() {
+    super.initState();
+    _initForegroundTask();
+    _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
+      if (await FlutterForegroundTask.isRunningService) {
+        final newReceivePort = FlutterForegroundTask.receivePort;
+        _registerReceivePort(newReceivePort);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -73,7 +257,12 @@ class _TopState extends State<Top> {
               width: MediaQuery.of(context).size.width.toDouble() * 0.3,
               child: TextButton(
                 onPressed: () {
-                  print('222');
+                  if (foreIsRun) {
+                    _stopForegroundTask();
+                  } else {
+                    _startForegroundTask();
+                  }
+                  debugPrint('222');
                 },
                 child: Image.asset('asset/img/off_ios.png'),
               ),
@@ -179,7 +368,7 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 엘레베이터 집으로 호출 버튼 클릭시
   clickedEvCallBtn() {
-    print(1);
+    debugPrint("1");
   }
 
   // 사용자 정보 수정 버튼 클릭시
@@ -188,7 +377,7 @@ class _MiddleButtonImg extends StatelessWidget {
       Navigator.push(
         context!,
           MaterialPageRoute(
-            builder: (BuildContext contex) => UpdateUserDataScreen(),
+            builder: (BuildContext contex) => const UpdateUserDataScreen(),
         ),
       );
     }
@@ -208,7 +397,7 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 문의 버튼 클릭시
   clickedQuestionBtn() {
-    print(4);
+    debugPrint("4");
   }
 }
 
