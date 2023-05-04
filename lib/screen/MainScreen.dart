@@ -1,13 +1,12 @@
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
-import 'package:ypass/screen/SetttingScreen.dart';
-import 'package:ypass/screen/UpdateUserDataScreen.dart';
 import 'package:ypass/screen/serve/Bar.dart';
+import 'package:ypass/sensor/BleScan.dart';
+//import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/color.dart';
 
@@ -17,8 +16,12 @@ void startCallback() {
 }
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;
-  //bool _isInsideAtOn = false;
   int _eventCount = 0;
+  bool isAnd = Platform.isAndroid;
+
+  BleScanService ble = BleScanService();
+  //gps는 더미 코드
+  //LocationService gps = LocationService();
 
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
@@ -26,20 +29,31 @@ class MyTaskHandler extends TaskHandler {
 
     final customData =
     await FlutterForegroundTask.getData<String>(key: 'customData');
-    //_isInsideAtOn = (await FlutterForegroundTask.getData<bool>(key: 'isInsideAtOn'))!;
     debugPrint('customData: $customData');
+    ble.initBle();
   }
 
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     FlutterForegroundTask.updateService(
       notificationTitle: 'MyTaskHandler',
+      notificationText: 'eventCount: $_eventCount',
     );
+    //gps 더미 코드
+    //gps.getLocation();
+    await ble.scan();
+    await ble.searchClober();
 
-    if(kDebugMode && Platform.isAndroid){
-      debugPrint("IsAndroid from Foreground");
+    if (ble.findClober()) {
+      if (isAnd) {
+        debugPrint("IsAndroid from Foreground");
+        ble.writeBle();
+      } else {
+        debugPrint("IsiOS from Foreground");
+        ble.connect();
+      }
     } else {
-      debugPrint("IsiOS from Foreground");
+      debugPrint("Clober not Found");
     }
 
     sendPort?.send(_eventCount);
@@ -62,7 +76,7 @@ class MyTaskHandler extends TaskHandler {
   @override
   void onNotificationPressed() {
     if (Platform.isAndroid) {
-      //FlutterForegroundTask.launchApp("/home");
+      FlutterForegroundTask.launchApp("/");
     }
     _sendPort?.send('onNotificationPressed');
   }
@@ -200,7 +214,7 @@ class _TopState extends State<Top> {
         debugPrint('eventCount: $message');
       } else if (message is String) {
         if (message == 'onNotificationPressed') {
-          Navigator.of(context).pushNamed('/home');
+          Navigator.of(context).pushNamed('/');
         }
       } else if (message is DateTime) {
         debugPrint('timestamp: ${message.toString()}');
@@ -259,8 +273,10 @@ class _TopState extends State<Top> {
                 onPressed: () {
                   if (foreIsRun) {
                     _stopForegroundTask();
+                    foreIsRun = true;
                   } else {
                     _startForegroundTask();
+                    foreIsRun = false;
                   }
                   debugPrint('222');
                 },
@@ -374,24 +390,26 @@ class _MiddleButtonImg extends StatelessWidget {
   // 사용자 정보 수정 버튼 클릭시
   _clickedUpdateUserDataBtn() {
     if (context != null) {
-      Navigator.push(
+      Navigator.of(context!).pushNamed('/updateUser');
+      /*Navigator.push(
         context!,
           MaterialPageRoute(
             builder: (BuildContext contex) => const UpdateUserDataScreen(),
         ),
-      );
+      );*/
     }
   }
 
   // 설정 버튼 클릭시
   void clickedSettingBtn() {
     if (context != null) {
-      Navigator.push(
+      Navigator.of(context!).pushNamed('/setting');
+      /*Navigator.push(
         context!,
         MaterialPageRoute(
           builder: (BuildContext contex) => const SettingScreen(),
         ),
-      );
+      );*/
     }
   }
 

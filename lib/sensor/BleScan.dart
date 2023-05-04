@@ -11,6 +11,13 @@ class BleScanService {
   late num rssi;
   late String bat;
 
+  late String maxCid;
+  late num maxRssi;
+  late String maxBat;
+  late ScanResult maxR;
+
+  final String notFound = "none";
+
   initBle() {
     flutterBlue.isScanning.listen((isScanning) {
       _isScanning = isScanning;
@@ -30,7 +37,7 @@ class BleScanService {
   }
 
   Future<void> searchClober() async {
-    //userdata.maxRssi = -100;
+    clearMax();
     for (ScanResult res in scanResultList) {
       var manu = res.advertisementData.manufacturerData;
 
@@ -69,14 +76,44 @@ class BleScanService {
         debugPrint("==================");
         debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");
         debugPrint("==================");
-        /*if (rssi > userdata.maxRssi) {
-          userdata.maxRssi = rssi;
-          userdata.maxCid = cid;
-          userdata.maxBat = bat;
-        }*/
+        if (rssi > maxRssi) {
+          maxCid = cid;
+          maxRssi = rssi;
+          maxBat = bat;
+          maxR = res;
+        }
       }
-
     }
+  }
 
+  bool findClober() {
+    if (maxCid == notFound) {
+      return false;
+    }
+    return true;
+  }
+
+  void clearMax() {
+    maxCid = 'none';
+    maxRssi = -100;
+    maxBat = 'none';
+  }
+
+  Future<bool> connect() async {
+    Future<bool>? returnValue;
+    await maxR.device
+        .connect(autoConnect: false)
+        .timeout(const Duration(milliseconds: 2000), onTimeout: () {
+          debugPrint('Fail BLE Connect');
+          returnValue = Future.value(false);
+    });
+    debugPrint('connect');
+    returnValue = Future.value(true);
+
+    return returnValue ?? Future.value(false);
+  }
+
+  void writeBle() {
+    debugPrint('write BLE');
   }
 }
