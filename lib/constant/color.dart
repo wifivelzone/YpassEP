@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-const Color PRIMARI_COLOR = Color(0xFF008577);
-const Color PRIMARI_DARK_COLOR = Color(0xFF00574B);
+const Color PRIMARY_COLOR = Color(0xFF008577);
+const Color PRIMARY_DARK_COLOR = Color(0xFF00574B);
 const Color ACCENT_COLOR = Color(0xFFD81B60);
 const Color CHECKED_TRUE_COLOR = Color(0xFF45ADA8);
 const Color TRACK_LINE_COLOR = Color(0xFFc5c5c5);
