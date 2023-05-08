@@ -47,7 +47,9 @@ class MyTaskHandler extends TaskHandler {
     if (ble.findClober()) {
       if (isAnd) {
         debugPrint("IsAndroid from Foreground");
-        ble.writeBle();
+        //일단 둘다 connect
+        //ble.writeBle();
+        ble.connect();
       } else {
         debugPrint("IsiOS from Foreground");
         ble.connect();

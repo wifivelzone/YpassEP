@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
-//import 'package:device_info_plus/device_info_plus.dart';
 
 class LocationService {
   double? mLatitude;
@@ -8,7 +7,6 @@ class LocationService {
   double? mAltitude;
   double? mAccuracy;
 
-  //DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   final GeolocatorPlatform _geolocatorPlatform = GeolocatorPlatform.instance;
   late Position position;
 
