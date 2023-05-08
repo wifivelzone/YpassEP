@@ -36,13 +36,21 @@ class MyTaskHandler extends TaskHandler {
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     FlutterForegroundTask.updateService(
-      notificationTitle: 'MyTaskHandler',
+      notificationTitle: 'YPass',
       notificationText: 'eventCount: $_eventCount',
     );
     //gps 더미 코드
     //gps.getLocation();
-    await ble.scan();
-    await ble.searchClober();
+    bool scanR = await ble.scan();
+    if (scanR) {
+      debugPrint("BLE Scan Success!!");
+      bool cloberR = await ble.searchClober();
+      if (cloberR) {
+        debugPrint("Found Clober");
+      }
+    } else {
+      debugPrint("BLE Scan Fail!!");
+    }
 
     if (ble.findClober()) {
       if (isAnd) {

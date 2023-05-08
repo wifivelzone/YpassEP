@@ -24,19 +24,25 @@ class BleScanService {
     });
   }
 
-  Future<void> scan() async {
+  Future<bool> scan() async {
+    Future<bool>? returnValue;
     if (!_isScanning) {
       scanResultList.clear();
       flutterBlue.startScan(scanMode: ScanMode.balanced ,withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")], timeout: const Duration(seconds: 4));
       flutterBlue.scanResults.listen((results) {
         scanResultList = results;
       });
+      returnValue = Future.value(true);
     } else {
       flutterBlue.stopScan();
+      returnValue = Future.value(false);
     }
+
+    return returnValue;
   }
 
-  Future<void> searchClober() async {
+  Future<bool> searchClober() async {
+    Future<bool>? returnValue;
     clearMax();
     for (ScanResult res in scanResultList) {
       var manu = res.advertisementData.manufacturerData;
@@ -50,6 +56,7 @@ class BleScanService {
           debugPrint("yes Clober");
         } else {
           debugPrint("no Clober");
+          returnValue = Future.value(false);
         }
 
         List code2 = [manu[a]?[2], manu[a]?[3]];
@@ -90,9 +97,14 @@ class BleScanService {
           maxRssi = rssi;
           maxBat = bat;
           maxR = res;
+          returnValue = Future.value(true);
         }
+      } else {
+        returnValue = Future.value(false);
       }
     }
+
+    return returnValue ?? Future.value(false);
   }
 
   bool findClober() {
@@ -120,19 +132,37 @@ class BleScanService {
     returnValue = Future.value(true);
 
     List<BluetoothService> services = await maxR.device.discoverServices();
-    debugPrint("service data 체크: ${maxR.advertisementData.serviceData.toString()}");
-    debugPrint("services 구조: ${services.toString()}");
+    Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
+    int a = readData.keys.toList().first;
+    late BluetoothCharacteristic char1;
     for (var service in services) {
       var characteristics = service.characteristics;
-      debugPrint("characteristics 구조: ${characteristics.toString()}");
-      for (BluetoothCharacteristic c in characteristics) {
-        List<int> value = await c.read();
-        debugPrint('$value');
 
-        if (c.uuid == Guid('')) {
-          debugPrint('Find it!');
-          //List<int> start = [0x1, 0x1, 0x1, 0x3, 0x53, 0x54, 0x41, 0x52, 0x54];
-          //await c.write(start);
+      List<String> temp = service.uuid.toString().split("-");
+      debugPrint(temp[0]);
+      if (temp[0] == "00003559") {
+        debugPrint("목표 Service");
+        debugPrint('Service 구조 : ${service.toString()}');
+      } else {
+        continue;
+      }
+
+      for (BluetoothCharacteristic c in characteristics) {
+        debugPrint('Character 구조 : ${c.toString()}');
+        debugPrint('Character UUID : ${c.uuid}');
+
+        List<String> temp2 = c.uuid.toString().split("-");
+        debugPrint(temp2[0]);
+        if (temp2[0] == "00000002") {
+          debugPrint("목표 Charateristic");
+          List<int> start = [0x1, 0x1, 0x1, 0x3, 0x53, 0x54, 0x41, 0x52, 0x54];
+          await char1.write(start, withoutResponse: true);
+          debugPrint('Read Check : ${readData[a]}');
+          debugPrint('Key1 Check : ${readData[a]![8]}');
+          debugPrint('Key2 Check : ${readData[a]![9]}');
+        } else {
+          debugPrint("Write Charateristic");
+          char1 = c;
         }
       }
     }
