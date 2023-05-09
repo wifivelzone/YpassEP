@@ -12,6 +12,7 @@ import '../constant/color.dart';
 
 @pragma('vm:entry-point')
 void startCallback() {
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
 class MyTaskHandler extends TaskHandler {
@@ -42,6 +43,7 @@ class MyTaskHandler extends TaskHandler {
     //gps 더미 코드
     //gps.getLocation();
     bool scanR = await ble.scan();
+    await Future.delayed(const Duration(milliseconds: 4500));
     if (scanR) {
       debugPrint("BLE Scan Success!!");
       bool cloberR = await ble.searchClober();
@@ -57,10 +59,14 @@ class MyTaskHandler extends TaskHandler {
         debugPrint("IsAndroid from Foreground");
         //일단 둘다 connect
         //ble.writeBle();
-        ble.connect();
+        ble.connect().then((value) {
+          ble.disconnect();
+        });
       } else {
         debugPrint("IsiOS from Foreground");
-        ble.connect();
+        ble.connect().then((value) {
+          ble.disconnect();
+        });
       }
     } else {
       debugPrint("Clober not Found");
@@ -74,6 +80,8 @@ class MyTaskHandler extends TaskHandler {
 
   @override
   Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
+    ble.stopScan();
+    ble.disposeBle();
     await FlutterForegroundTask.clearAllData();
 
   }
@@ -158,7 +166,7 @@ class _TopState extends State<Top> {
         playSound: false,
       ),
       foregroundTaskOptions: const ForegroundTaskOptions(
-        interval: 5000,
+        interval: 10000,
         isOnceEvent: false,
         autoRunOnBoot: true,
         allowWakeLock: true,

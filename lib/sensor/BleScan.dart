@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BleScanService {
   FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
   List<ScanResult> scanResultList = [];
+  late StreamSubscription subscription;
   List cloberList = [];
   bool _isScanning = false;
 
@@ -19,16 +22,25 @@ class BleScanService {
   final String notFound = "none";
 
   initBle() {
-    flutterBlue.isScanning.listen((isScanning) {
+    subscription = flutterBlue.isScanning.listen((isScanning) {
       _isScanning = isScanning;
     });
+  }
+
+  disposeBle() {
+    subscription.cancel();
   }
 
   Future<bool> scan() async {
     Future<bool>? returnValue;
     if (!_isScanning) {
       scanResultList.clear();
-      flutterBlue.startScan(scanMode: ScanMode.balanced ,withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")], timeout: const Duration(seconds: 4));
+      flutterBlue.startScan(
+          scanMode: ScanMode.lowLatency,
+          allowDuplicates: true,
+          withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
+          timeout: const Duration(seconds: 4)
+      );
       flutterBlue.scanResults.listen((results) {
         scanResultList = results;
       });
@@ -39,6 +51,10 @@ class BleScanService {
     }
 
     return returnValue;
+  }
+
+  void stopScan() {
+    flutterBlue.stopScan();
   }
 
   Future<bool> searchClober() async {
@@ -115,9 +131,9 @@ class BleScanService {
   }
 
   void clearMax() {
-    maxCid = 'none';
+    maxCid = notFound;
     maxRssi = -79.9;
-    maxBat = 'none';
+    maxBat = notFound;
   }
 
   Future<bool> connect() async {
@@ -141,8 +157,7 @@ class BleScanService {
       List<String> temp = service.uuid.toString().split("-");
       debugPrint(temp[0]);
       if (temp[0] == "00003559") {
-        debugPrint("목표 Service");
-        debugPrint('Service 구조 : ${service.toString()}');
+        debugPrint("목표 Service");;
       } else {
         continue;
       }
@@ -168,6 +183,10 @@ class BleScanService {
     }
 
     return returnValue ?? Future.value(false);
+  }
+
+  void disconnect() {
+    maxR.device.disconnect();
   }
 
   void writeBle() {
