@@ -3,8 +3,15 @@ import 'package:ypass/constant/color.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
-class UpdateUserDataScreen extends StatelessWidget {
+class UpdateUserDataScreen extends StatefulWidget {
   const UpdateUserDataScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UpdateUserDataScreen> createState() => _UpdateUserDataScreenState();
+}
+
+class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
+
 
   @override
   Widget build(BuildContext context) {
