@@ -38,6 +38,16 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  geolocator: ^9.0.2
+  flutter_blue_plus: ^1.4.0
+  flutter_foreground_task: ^4.1.0
+
+dependency_overrides:
+  geolocator_android:
+    git:
+      url: https://github.com/Wackymax/flutter-geolocator.git
+      ref: 5f6e0aaae61c1178ebf93dfcaa80edef286de962
+      path: geolocator_android/
 
 dev_dependencies:
   flutter_test:
