@@ -57,6 +57,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Future<void> checkPermission() async {
     // 위치 정보
     await Permission.location.request();
+    await Permission.locationAlways.request();
 
     // 블루투스
     await Permission.bluetooth.request();
