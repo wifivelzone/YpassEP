@@ -10,32 +10,42 @@ import 'package:ypass/sensor/BleScan.dart';
 
 import '../constant/color.dart';
 
+//foreground task 시작
 @pragma('vm:entry-point')
 void startCallback() {
+  //Foreground task는 main app 작동과 분리되므로 여기도 instance 초기화 보장 한번 더
+  //안하면 ble 스캔 안됨
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
+//foreground 작동
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;
   int _eventCount = 0;
   bool isAnd = Platform.isAndroid;
 
+  //ble 시작
   BleScanService ble = BleScanService();
   //gps는 더미 코드
   //LocationService gps = LocationService();
 
+  //알림창 기본 설정
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
 
+    //foreground task 자체에 저장된 데이터 가져오기 (예시 코드)
     final customData =
     await FlutterForegroundTask.getData<String>(key: 'customData');
     debugPrint('customData: $customData');
+    //ble init
     ble.initBle();
   }
 
+  //push가 올 때마다 실행
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
+    //표시되는 push 창 업데이트
     FlutterForegroundTask.updateService(
       notificationTitle: 'YPass',
       notificationText: 'eventCount: $_eventCount',
@@ -43,7 +53,9 @@ class MyTaskHandler extends TaskHandler {
     //gps 더미 코드
     //gps.getLocation();
     bool scanR = await ble.scan();
+    //ble 스캔 끝나고 작동하게 delay
     await Future.delayed(const Duration(milliseconds: 4500));
+    //스캔 결과 따라 Clober search
     if (scanR) {
       debugPrint("BLE Scan Success!!");
       bool cloberR = await ble.searchClober();
@@ -54,6 +66,7 @@ class MyTaskHandler extends TaskHandler {
       debugPrint("BLE Scan Fail!!");
     }
 
+    //clober search 결과 따라
     if (ble.findClober()) {
       if (isAnd) {
         debugPrint("IsAndroid from Foreground");
@@ -78,22 +91,28 @@ class MyTaskHandler extends TaskHandler {
     debugPrint("Is Running?");
   }
 
+  //foreground task가 끝날 때
   @override
   Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
+    //진행 중이던 스캔 정지 (안하면 listener가 더미로 남음)
     ble.stopScan();
+    //ble 연결 도중이면 끊기 (안하면 연결 상태가 더미로 남음)
     ble.disposeBle();
     await FlutterForegroundTask.clearAllData();
 
   }
 
+  //push안에 버튼을 눌렀을 때 (여기선 버튼 구현 안함)
   @override
   void onButtonPressed(String id) {
     debugPrint('onButtonPressed >> $id');
   }
 
+  //push를 직접 눌렀을 때
   @override
   void onNotificationPressed() {
     if (Platform.isAndroid) {
+      //앱이 워하는 route로 실행됨 (materialApp에서 route설정 해야함)
       FlutterForegroundTask.launchApp("/");
     }
     _sendPort?.send('onNotificationPressed');
@@ -146,14 +165,17 @@ class _TopState extends State<Top> {
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = false;
 
+  //foureground task 기본 설정
   void _initForegroundTask() {
     FlutterForegroundTask.init(
+      //안드로이드 설정
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
         channelDescription: 'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
+        //push 아이콘은 앱 아이콘 따라감(기본설정)
         iconData: const NotificationIconData(
           resType: ResourceType.mipmap,
           resPrefix: ResourcePrefix.ic,
@@ -161,12 +183,16 @@ class _TopState extends State<Top> {
         ),
         enableVibration: true,
       ),
+      //iOS 설정
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: true,
         playSound: false,
       ),
+      //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
+        //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
         interval: 10000,
+        //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,
         allowWakeLock: true,
@@ -175,7 +201,9 @@ class _TopState extends State<Top> {
     );
   }
 
+  //foreground task 시작 함수
   Future<bool> _startForegroundTask() async {
+    //permission check
     if (!await FlutterForegroundTask.canDrawOverlays) {
       final isGranted =
       await FlutterForegroundTask.openSystemAlertWindowSettings();
@@ -185,12 +213,14 @@ class _TopState extends State<Top> {
       }
     }
 
+    //foreground task 자체로 data 저장 기능 지원 (영구 저장은 아님)
     await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
 
     final customData =
     await FlutterForegroundTask.getData<String>(key: 'customData');
     debugPrint('customData: $customData');
 
+    //foreground task랑 통신 가능한 port (수신)
     final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
     final bool isRegistered = _registerReceivePort(receivePort);
     if (!isRegistered) {
@@ -198,6 +228,7 @@ class _TopState extends State<Top> {
       return false;
     }
 
+    //foreground task가 이미 작동 중인지 check
     if (await FlutterForegroundTask.isRunningService) {
       debugPrint("Foreground Already Running");
       return FlutterForegroundTask.startService(
@@ -215,10 +246,12 @@ class _TopState extends State<Top> {
     }
   }
 
+  //foreground task 정지
   Future<bool> _stopForegroundTask() {
     return FlutterForegroundTask.stopService();
   }
 
+  //통신 port 수신 데이터 처리
   bool _registerReceivePort(ReceivePort? newReceivePort) {
     if (newReceivePort == null) {
       return false;
@@ -242,17 +275,21 @@ class _TopState extends State<Top> {
     return _receivePort != null;
   }
 
+  //통신 port 종료
   void _closeReceivePort() {
     _receivePort?.close();
     _receivePort = null;
   }
 
+  //정확한 작동 원리는 파악 안됨
   T? _ambiguate<T>(T? value) => value;
 
   @override
   void initState() {
     super.initState();
+    //foreground task 기본 설정
     _initForegroundTask();
+    //port 설정 + foreground task 재시작 시 기존 port 가져오기
     _ambiguate(WidgetsBinding.instance)?.addPostFrameCallback((_) async {
       if (await FlutterForegroundTask.isRunningService) {
         final newReceivePort = FlutterForegroundTask.receivePort;
