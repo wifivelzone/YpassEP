@@ -485,29 +485,45 @@ class Bottom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const SizedBox(height: 5,),
+      const SizedBox(
+        height: 5,
+      ),
       Text('1.0.0v'),
-      const SizedBox(height: 5,),
+      const SizedBox(
+        height: 5,
+      ),
       const Text('© 2019 WiFive Inc. All rights reserved'),
-      const SizedBox(height: 5,),
+      const SizedBox(
+        height: 5,
+      ),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         TextButton(
             onPressed: () => {
                   //TODO: 약관 화면 표시
                 },
-            style: TextButton.styleFrom(padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap, minimumSize: Size.zero),
+            style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                minimumSize: Size.zero),
             child: const Text('개인정보 제 3자 제공 동의 약관',
                 style: TextStyle(color: Colors.black))),
-        const SizedBox(width: 10,),
+        const SizedBox(
+          width: 10,
+        ),
         TextButton(
           onPressed: () => {
             //TODO: 약관 화면 표시
           },
-          style: TextButton.styleFrom(padding: EdgeInsets.zero, tapTargetSize: MaterialTapTargetSize.shrinkWrap, minimumSize: Size.zero),
+          style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              minimumSize: Size.zero),
           child: const Text('와이패스 이용약관', style: TextStyle(color: Colors.black)),
         )
       ]),
-      const SizedBox(height: 15,)
+      const SizedBox(
+        height: 15,
+      )
     ]);
   }
 }
