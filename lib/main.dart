@@ -10,12 +10,12 @@ void main() async {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
 
-    initialRoute: '/loading',
+    initialRoute: '/',
     routes: {
-      '/' : (BuildContext context) => const MainScreen(),
+      '/main' : (BuildContext context) => const MainScreen(),
       '/setting' : (BuildContext context) => const SettingScreen(),
       '/updateUser' : (BuildContext context) => const UpdateUserDataScreen(),
-      '/loading' : (BuildContext context) => const LoadingScreen(),
+      '/' : (BuildContext context) => const LoadingScreen(),
     },
   ));
 }

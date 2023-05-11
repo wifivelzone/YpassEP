@@ -113,7 +113,7 @@ class MyTaskHandler extends TaskHandler {
   void onNotificationPressed() {
     if (Platform.isAndroid) {
       //앱이 워하는 route로 실행됨 (materialApp에서 route설정 해야함)
-      FlutterForegroundTask.launchApp("/");
+      FlutterForegroundTask.launchApp("/loading");
     }
     _sendPort?.send('onNotificationPressed');
   }
@@ -328,10 +328,10 @@ class _TopState extends State<Top> {
                 onPressed: () {
                   if (foreIsRun) {
                     _stopForegroundTask();
-                    foreIsRun = true;
+                    foreIsRun = false;
                   } else {
                     _startForegroundTask();
-                    foreIsRun = false;
+                    foreIsRun = true;
                   }
                   debugPrint('222');
                 },

@@ -111,12 +111,14 @@ class BleScanService {
 
         //clober 종류 확인 (출입용 + 방향)
         List code2 = [manu[a]?[2], manu[a]?[3]];
+        debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
           debugPrint("Input North");
           //정면
         } else if (listEquals(code2, [1, 2])) {
           debugPrint("Input South");
           //후면
+          continue;
         }
         cid = "";
         rssi = res.rssi;
@@ -146,14 +148,18 @@ class BleScanService {
         debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");
         debugPrint("==================");
         //RSSI 최대값 비교
-        if (rssi > maxRssi) {
+        if ((rssi > maxRssi) && code2[0] == 1) {
+          debugPrint("New Max");
           maxCid = cid;
           maxRssi = rssi;
           maxBat = bat;
           maxR = res;
           returnValue = Future.value(true);
+        } else {
+          debugPrint("Not Max");
         }
       } else {
+        debugPrint("Pass");
         returnValue = Future.value(false);
       }
     }
@@ -172,7 +178,7 @@ class BleScanService {
   //max 초기값
   void clearMax() {
     maxCid = notFound;
-    maxRssi = -79.9;
+    maxRssi = -100;
     maxBat = notFound;
   }
 

@@ -41,6 +41,8 @@ dependencies:
   geolocator: ^9.0.2
   flutter_blue_plus: ^1.4.0
   flutter_foreground_task: ^4.1.0
+  http: ^0.13.6
+  connectivity_plus: ^4.0.0
 
 dependency_overrides:
   geolocator_android:

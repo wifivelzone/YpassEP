@@ -28,6 +28,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
   Widget build(BuildContext context) {
     Permission.location.isGranted;
 
+
     return Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
       body: SafeArea(
@@ -73,11 +74,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   // 페이지 이동
   void goToMainPage() {
+    debugPrint('로딩페이지');
     // 페이지 이동
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (BuildContext contex) => MainScreen(),
-      ),
+    Navigator.pushReplacementNamed(
+      context, '/main'
     );
   }
 }
