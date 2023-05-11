@@ -115,7 +115,7 @@ class BleScanService {
         if(listEquals(code2, [1, 1])) {
           debugPrint("Input North");
           //정면
-        } else if (listEquals(code2, [1, 2])) {
+        } else if (listEquals(code2, [1, 3])) {
           debugPrint("Input South");
           //후면
           continue;
