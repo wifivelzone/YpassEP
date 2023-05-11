@@ -3,9 +3,9 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
+
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/color.dart';
@@ -18,6 +18,7 @@ void startCallback() {
   WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MyTaskHandler());
 }
+
 //foreground 작동
 class MyTaskHandler extends TaskHandler {
   SendPort? _sendPort;
@@ -26,6 +27,7 @@ class MyTaskHandler extends TaskHandler {
 
   //ble 시작
   BleScanService ble = BleScanService();
+
   //gps는 더미 코드
   //LocationService gps = LocationService();
 
@@ -36,7 +38,7 @@ class MyTaskHandler extends TaskHandler {
 
     //foreground task 자체에 저장된 데이터 가져오기 (예시 코드)
     final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
+        await FlutterForegroundTask.getData<String>(key: 'customData');
     debugPrint('customData: $customData');
     //ble init
     ble.initBle();
@@ -99,7 +101,6 @@ class MyTaskHandler extends TaskHandler {
     //ble 연결 도중이면 끊기 (안하면 연결 상태가 더미로 남음)
     ble.disposeBle();
     await FlutterForegroundTask.clearAllData();
-
   }
 
   //push안에 버튼을 눌렀을 때 (여기선 버튼 구현 안함)
@@ -148,9 +149,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-
 /** ---------------------------------------------------- */
 /** --------------------   상단 부분  --------------------- */
+
 /// -------------------------------------------------------
 
 class Top extends StatefulWidget {
@@ -172,7 +173,8 @@ class _TopState extends State<Top> {
       androidNotificationOptions: AndroidNotificationOptions(
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
-        channelDescription: 'This notification appears when the foreground service is running.',
+        channelDescription:
+            'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         //push 아이콘은 앱 아이콘 따라감(기본설정)
@@ -182,13 +184,11 @@ class _TopState extends State<Top> {
           name: 'launcher',
         ),
         enableVibration: true,
-      ),
-      //iOS 설정
+      ), //iOS 설정
       iosNotificationOptions: const IOSNotificationOptions(
         showNotification: true,
         playSound: false,
-      ),
-      //push 관련 설정
+      ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
         interval: 10000,
@@ -206,7 +206,7 @@ class _TopState extends State<Top> {
     //permission check
     if (!await FlutterForegroundTask.canDrawOverlays) {
       final isGranted =
-      await FlutterForegroundTask.openSystemAlertWindowSettings();
+          await FlutterForegroundTask.openSystemAlertWindowSettings();
       if (!isGranted) {
         debugPrint('SYSTEM_ALERT_WINDOW permission denied!');
         return false;
@@ -217,7 +217,7 @@ class _TopState extends State<Top> {
     await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
 
     final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
+        await FlutterForegroundTask.getData<String>(key: 'customData');
     debugPrint('customData: $customData');
 
     //foreground task랑 통신 가능한 port (수신)
@@ -334,8 +334,11 @@ class _TopState extends State<Top> {
                     foreIsRun = true;
                   }
                   debugPrint('222');
+                  setState(() {});
                 },
-                child: Image.asset('asset/img/off_ios.png'),
+                child: foreIsRun
+                    ? Image.asset('asset/img/off_ios.png')
+                    : Image.asset('asset/img/on_ios.png'),
               ),
             ),
           ),
@@ -343,12 +346,11 @@ class _TopState extends State<Top> {
       ),
     );
   }
-
-
 }
 
 /** ---------------------------------------------------- */
 /** --------------------   중간 부분  --------------------- */
+
 /// -------------------------------------------------------
 
 class _Middle extends StatelessWidget {
@@ -360,7 +362,8 @@ class _Middle extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(25, 3, 25, 3),
         child: Container(
-          decoration: const BoxDecoration( // 배경 이미지 (십자가) 설정
+          decoration: const BoxDecoration(
+            // 배경 이미지 (십자가) 설정
             image: DecorationImage(
                 image: AssetImage('asset/img/icon_bg.png'), fit: BoxFit.cover),
           ),
@@ -376,65 +379,60 @@ class _MiddleButtonImg extends StatelessWidget {
 
   _MiddleButtonImg({Key? key}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
     this.context = context;
 
-    return Column(
-        children: [
+    return Column(children: [
+      Expanded(
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Expanded(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(  // 집으로 호출 버튼
-                    child: Container(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
-                      child: TextButton(
-                        onPressed: clickedEvCallBtn,
-                        child: Image.asset('asset/img/ev.png'),
-                      ),
-                    ),
-                  ),
-                  Expanded(  //  사용자 정보 수정 버튼
-                    child: Container(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
-                      child: TextButton(
-                        onPressed: _clickedUpdateUserDataBtn,
-                        child: Image.asset('asset/img/user.png'),
-                      ),
-                    ),
-                  ),
-                ]
+            // 집으로 호출 버튼
+            child: Container(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+              child: TextButton(
+                onPressed: clickedEvCallBtn,
+                child: Image.asset('asset/img/ev.png'),
+              ),
             ),
           ),
           Expanded(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded( // 셋팅 버튼
-                    child: Container(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
-                      child: TextButton(
-                        onPressed: clickedSettingBtn,
-                        child: Image.asset('asset/img/setting.png'),
-                      ),
-                    ),
-                  ),
-                  Expanded( // 집으로 호출 버튼
-                    child: Container(
-                      padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
-                      child: TextButton(
-                          onPressed: clickedQuestionBtn,
-                          child: Image.asset('asset/img/question.png'),
-                      ),
-                    ),
-                  ),
-                ]
+            //  사용자 정보 수정 버튼
+            child: Container(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+              child: TextButton(
+                onPressed: _clickedUpdateUserDataBtn,
+                child: Image.asset('asset/img/user.png'),
+              ),
             ),
           ),
-        ]
-    );
+        ]),
+      ),
+      Expanded(
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Expanded(
+            // 셋팅 버튼
+            child: Container(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+              child: TextButton(
+                onPressed: clickedSettingBtn,
+                child: Image.asset('asset/img/setting.png'),
+              ),
+            ),
+          ),
+          Expanded(
+            // 집으로 호출 버튼
+            child: Container(
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+              child: TextButton(
+                onPressed: clickedQuestionBtn,
+                child: Image.asset('asset/img/question.png'),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    ]);
   }
 
   // 엘레베이터 집으로 호출 버튼 클릭시
@@ -474,9 +472,9 @@ class _MiddleButtonImg extends StatelessWidget {
   }
 }
 
-
 /** ---------------------------------------------------- */
 /** --------------------   하단 부분  --------------------- */
+
 /// -------------------------------------------------------
 
 class Bottom extends StatelessWidget {
@@ -527,4 +525,3 @@ class Bottom extends StatelessWidget {
     ]);
   }
 }
-
