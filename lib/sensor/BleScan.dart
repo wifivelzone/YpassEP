@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
+import 'package:ypass/http/HttpPostData.dart' as http;
+
 class BleScanService {
   //instance 가져오기
   FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
@@ -205,7 +207,19 @@ class BleScanService {
     returnValue = Future.value(true);
 
     //device 내 service 검색
-    List<BluetoothService> services = await maxR.device.discoverServices().timeout(const Duration(milliseconds: 1000));
+    late List<BluetoothService> services;
+    try {
+      services = await maxR.device.discoverServices()
+          .timeout(const Duration(milliseconds: 1500));
+    } on TimeoutException catch (_) {
+      debugPrint('Fail Service Search');
+      returnValue = Future.value(false);
+      isFail = true;
+    }
+    if (isFail) {
+      return returnValue ?? Future.value(false);
+    }
+
     //key값 가져오기용 manufacturerData 미리 가져오기 (19, 20byte에 key 값)
     Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
     //map의 key값 가져오기
@@ -257,6 +271,10 @@ class BleScanService {
           k2 = readData[a]![9];
           debugPrint('Key1 Check : ${readData[a]![8]}');
           debugPrint('Key2 Check : ${readData[a]![9]}');
+          /*String httpResult;
+          //전화 번호 필요 UserData 구축 전까진 주석처리
+          httpResult = await http.evCall(cid, phoneNumber);*/
+          debugPrint('Read Value : ${c.lastValue}');
         } else {
           //1일 때는 write용이므로 일단 char1에 저장해두고 read용인 2찾으러가기
           debugPrint("Write Charateristic");
