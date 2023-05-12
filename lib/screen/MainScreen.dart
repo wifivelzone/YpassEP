@@ -72,14 +72,24 @@ class MyTaskHandler extends TaskHandler {
         debugPrint("IsAndroid from Foreground");
         //일단 둘다 connect
         //ble.writeBle();
-        ble.connect().then((value) {
+        try {
+          ble.connect().then((value) {
+            ble.disconnect();
+          });
+        } catch (e){
           ble.disconnect();
-        });
+          debugPrint("Connect Error");
+        }
       } else {
         debugPrint("IsiOS from Foreground");
-        ble.connect().then((value) {
+        try {
+          ble.connect().then((value) {
+            ble.disconnect();
+          });
+        } catch (e){
           ble.disconnect();
-        });
+          debugPrint("Connect Error");
+        }
       }
     } else {
       debugPrint("Clober not Found");
@@ -113,7 +123,7 @@ class MyTaskHandler extends TaskHandler {
   void onNotificationPressed() {
     if (Platform.isAndroid) {
       //앱이 워하는 route로 실행됨 (materialApp에서 route설정 해야함)
-      FlutterForegroundTask.launchApp("/loading");
+      FlutterForegroundTask.launchApp("/");
     }
     _sendPort?.send('onNotificationPressed');
   }
@@ -191,7 +201,7 @@ class _TopState extends State<Top> {
       //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 10000,
+        interval: 12000,
         //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,
@@ -215,6 +225,8 @@ class _TopState extends State<Top> {
 
     //foreground task 자체로 data 저장 기능 지원 (영구 저장은 아님)
     await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
+    await FlutterForegroundTask.saveData(key: 'isRun', value: true);
+    foreIsRun = true;
 
     final customData =
     await FlutterForegroundTask.getData<String>(key: 'customData');
@@ -248,6 +260,8 @@ class _TopState extends State<Top> {
 
   //foreground task 정지
   Future<bool> _stopForegroundTask() {
+    FlutterForegroundTask.saveData(key: 'isRun', value: false);
+    foreIsRun = false;
     return FlutterForegroundTask.stopService();
   }
 
@@ -325,13 +339,11 @@ class _TopState extends State<Top> {
             child: SizedBox(
               width: MediaQuery.of(context).size.width.toDouble() * 0.3,
               child: TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (foreIsRun) {
                     _stopForegroundTask();
-                    foreIsRun = false;
                   } else {
                     _startForegroundTask();
-                    foreIsRun = true;
                   }
                   debugPrint('222');
                 },

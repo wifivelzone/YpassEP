@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
+import 'package:ypass/http/StatisticsReporter.dart';
 
 var client = HttpClient();
+StatisticsReporter reporter = StatisticsReporter();
 const String postUrl = "https://ppssmposition.posco.co.kr:6003/access/posco_http";
 const String userUrl = "https://ppssmposition.posco.co.kr:6003/access/workerinfo";
 const String sosUrl = "https://ppssmposition.posco.co.kr:6003/access/send_signal";
@@ -25,32 +27,49 @@ Map<String,String> HOME_ADDRESS_LIST = {
 };
 
 late int httpType;
-const int getUser = 0;
-const int postDATA = 1;
-const int postSOS = 2;
+const int addUser = 0;
+const int inoutUser = 1;
+const int tempUser = 2;
+const int getLicense = 3;
+const int getUserData = 4;
+const int evHome = 5;
 
 late final int data;
 late String netState;
 
-Future<String> getUserPost(String writetel, String phonetel) async {
+Future<String> cloberPass(int type, int scanType) {
+  return Future.value("false");
+}
+
+Future<String> setTempUser(int type, int scanType) {
+  return Future.value("false");
+}
+
+Future<String> userInit(int type, int scanType) {
+  return Future.value("false");
+}
+
+//
+Future<String> getUrl(int type, int scanType) {
+  return Future.value("false");
+}
+
+//집에서 호출
+Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = getUser;
+    String url = "";
+    httpType = evHome;
 
-    //phonetel = phonetel.replaceAll("-", "");
-    phonetel = writetel;
-
-    http.Response response = await http.post(
-        Uri.parse(userUrl),
-        body: <String, String> {
-          "tel" : writetel,
-          "Ptel" : phonetel
-        }
-    ).timeout(const Duration(seconds: 1));
+    final response = await http.get(Uri.parse("$url/$dong/$ho"));
     if (response.statusCode == 200) {
+      //log 남기기 통신
+      //reporter.sendReport(phoneNumber, dong, ho);
       return response.body;
     } else {
+      //log 남기기 통신
+      //reporter.sendError(cid, phoneNumber);
       return "통신error";
     }
   } else {
@@ -58,62 +77,23 @@ Future<String> getUserPost(String writetel, String phonetel) async {
   }
 }
 
-Future<String> postUserData(String wid, String lat, String lon, String step, String cid, String rssi, String bat, String model, String acc, String alt) async {
-  ns.checkNetwork().then((value) {
-    netState = value;
-  });
+//밖에서 호출
+Future<String> evCall(String cid, String phoneNumber) async {
+  netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = postDATA;
+    String url = "";
+    //httpType = getUser;
 
-    http.Response response = await http.post(
-        Uri.parse(userUrl),
-        body: <String, String> {
-          "wid" : wid,
-          "lat" : lat,
-          "lon" : lon,
-          "step" : step,
-          "cid" : cid,
-          "rssi" : rssi,
-          "bat" : bat,
-          "modelName" : model,
-          "acc" : acc,
-          "alt" : alt
-        }
-    ).timeout(const Duration(seconds: 1));
+    final response = await http.get(Uri.parse("$url/$cid"));
     if (response.statusCode == 200) {
+      //log 남기기 통신
+      //reporter.sendReport(phoneNumber, dong, ho);
       return response.body;
     } else {
-      return "error";
-    }
-  } else {
-    return "네트워크 연결 실패";
-  }
-}
-
-Future<String> postSOSData(String wid, String lat, String lon, String cid, String rssi, String bat) async {
-  ns.checkNetwork().then((value) {
-    netState = value;
-  });
-
-  if (netState != '인터넷 연결 안됨') {
-    httpType = postSOS;
-
-    http.Response response = await http.post(
-        Uri.parse(userUrl),
-        body: <String, String>{
-          "wid": wid,
-          "lat": lat,
-          "lon": lon,
-          "cid": cid,
-          "rssi": rssi,
-          "bat": bat,
-        }
-    ).timeout(const Duration(seconds: 1));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      return "error";
+      //log 남기기 통신
+      //reporter.sendError(cid, phoneNumber);
+      return "통신error";
     }
   } else {
     return "네트워크 연결 실패";

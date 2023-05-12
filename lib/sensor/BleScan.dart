@@ -27,6 +27,9 @@ class BleScanService {
   //RSSI MAX인 device 정보
   late ScanResult maxR;
 
+  late int k1;
+  late int k2;
+
   final String notFound = "none";
 
   //현재 스캔 중인지 확인함
@@ -185,6 +188,7 @@ class BleScanService {
   //BLE 연결
   Future<bool> connect() async {
     Future<bool>? returnValue;
+    bool isFail = false;
     //연결 시도 (ScanResult.device에서 .connect로 함)
     await maxR.device
         .connect(autoConnect: false)
@@ -192,12 +196,16 @@ class BleScanService {
         .timeout(const Duration(milliseconds: 2000), onTimeout: () {
           debugPrint('Fail BLE Connect');
           returnValue = Future.value(false);
+          isFail = true;
     });
+    if (isFail) {
+      return returnValue ?? Future.value(false);
+    }
     debugPrint('connect');
     returnValue = Future.value(true);
 
     //device 내 service 검색
-    List<BluetoothService> services = await maxR.device.discoverServices();
+    List<BluetoothService> services = await maxR.device.discoverServices().timeout(const Duration(milliseconds: 1000));
     //key값 가져오기용 manufacturerData 미리 가져오기 (19, 20byte에 key 값)
     Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
     //map의 key값 가져오기
@@ -245,6 +253,8 @@ class BleScanService {
 
           //Android식으로 Key값을 manufacturerData에서 읽어옴
           debugPrint('Read Check : ${readData[a]}');
+          k1 = readData[a]![8];
+          k2 = readData[a]![9];
           debugPrint('Key1 Check : ${readData[a]![8]}');
           debugPrint('Key2 Check : ${readData[a]![9]}');
         } else {
