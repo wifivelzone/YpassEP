@@ -59,17 +59,17 @@ class UserDataRequest {
 
         // 유저 데이터 저장
         realmUser.write(() {
+          realmUser.deleteAll<UserData>(); // 기존 데이터 삭제
           realmUser.add(UserData(listArr['num'], listArr['addr'] , listArr['type'], listArr['sDate'], listArr['eDate']));
         });
 
         //  IdArr cloberid, userid, pk 저장
         realmIdArr.write(() {
           for (var idArrValue in listArr['idArr']) {
+            realmIdArr.deleteAll<IdArr>(); // 기존 데이터 삭제
             realmIdArr.add(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
           }
         });
-
-        realmUser.all<UserData>()[0];
 
 
       } else {
@@ -83,12 +83,4 @@ class UserDataRequest {
   }
 
 
-}
-
-class UserPhoneNumber {
-  late String phone;
-
-  UserPhoneNumber.init(String phone) {
-    this.phone = phone;
-  }
 }
