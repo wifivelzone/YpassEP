@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
 import 'package:ypass/http/StatisticsReporter.dart';
@@ -46,10 +48,10 @@ Future<String> setUserDataPost(String phoneNumber) async {
 
     http.Response response = await http.post(
         Uri.parse("$url/clober-approval"),
-        body: <String, Map> {
+        body: <String, String> {
           "data" : <String, String> {
             "phone" : phoneNumber
-          }
+          }.toString()
         }
     ).timeout(const Duration(seconds: 1));
     if (response.statusCode == 200) {
@@ -113,14 +115,14 @@ Future<String> setTempUser(String vphone, String vaddr, String sDate, String eDa
 
     http.Response response = await http.post(
         Uri.parse("$url/put-visitguest"),
-        body: <String, Map> {
+        body: <String, String> {
           "data" : <String, String> {
             "phone" : phoneNumber,
             "v_phone" : vphone,
             "v_addr" : vaddr,
             "sDate" : sDate,
             "eDate" : eDate
-          }
+          }.toString()
         }
     ).timeout(const Duration(seconds: 1));
     if (response.statusCode == 200) {
@@ -142,20 +144,28 @@ Future<String> userLicense(int type, int scanType) {
 Future<String> getUserDataPost(String phoneNumber) async {
   netState = await ns.checkNetwork();
 
+  const Map<String, String> _JSON_HEADERS = {
+    "content-type": "application/json"
+  };
+
   if (netState != '인터넷 연결 안됨') {
     httpType = getUserData;
 
+    String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
+    Map<String, dynamic> sendData = {"data":"{'phone':'$userPhoneNumber'}"};
+    debugPrint('Sending Data : ${sendData.toString()}');
+    debugPrint('Encoded : ${json.encode(sendData)}');
     http.Response response = await http.post(
-        Uri.parse("$url/clober-approval"),
-        body: <String, Map> {
-          "data" : <String, String> {
-            "phone" : phoneNumber
-          }
-        }
-    ).timeout(const Duration(seconds: 1));
+      Uri.parse("https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval"),
+      body: json.encode(sendData),
+      headers: _JSON_HEADERS
+    ).timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) {
+      debugPrint('Response Body : ${response.body}');
       return response.body;
     } else {
+      debugPrint('Response Status : ${response.statusCode}');
+      debugPrint('Response Body : ${response.body}');
       return "통신error";
     }
   } else {

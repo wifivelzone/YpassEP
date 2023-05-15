@@ -450,12 +450,14 @@ class _MiddleButtonImg extends StatelessWidget {
   }
 
   // 엘레베이터 집으로 호출 버튼 클릭시
-  clickedEvCallBtn() {
+  clickedEvCallBtn() async {
     //UserData 구축전엔 주석처리
     //http.homeEvCall(phoneNumber, dong, ho);
     debugPrint("1");
-    UserDataRequest a = UserDataRequest();
-    a.getUserData('01027283301');
+    /*UserDataRequest a = UserDataRequest();
+    a.getUserData('01027283301');*/
+    var res = await http.getUserDataPost('01027283301');
+    debugPrint('Response: $res');
   }
 
   // 사용자 정보 수정 버튼 클릭시

@@ -28,15 +28,15 @@ class UserDataRequest {
     String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
     print(userPhoneNumber);
     var url = Uri.parse('https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval');
-    // String jsonData =; {'phone': '$userPhoneNumber'}.toString()
-    final items =
-      [{'id': 1, 'title': 'Item 1'}];
+    String jsonData = {'phone': '$userPhoneNumber'}.toString();
+    /*final items =
+      [{'id': '1', 'title': 'Item 1'}];*/
 
-    print(json.encode(items).runtimeType);
+    //print(json.encode(items).runtimeType);
 
     // print(json_data);
 
-    var response = await http.post(url, body: items);
+    var response = await http.post(url, body: jsonData);
 
     print(response.statusCode);
     print(response.body);
