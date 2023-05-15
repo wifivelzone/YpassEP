@@ -161,11 +161,11 @@ Future<String> getUserDataPost(String phoneNumber) async {
       headers: _JSON_HEADERS
     ).timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) {
-      debugPrint('Response Body : ${response.body}');
+      // debugPrint('Response Body : ${response.body}');
       return response.body;
     } else {
       debugPrint('Response Status : ${response.statusCode}');
-      debugPrint('Response Body : ${response.body}');
+      // debugPrint('Response Body : ${response.body}');
       return "통신error";
     }
   } else {

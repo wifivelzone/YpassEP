@@ -43,6 +43,7 @@ dependencies:
   flutter_foreground_task: ^4.1.0
   http: ^0.13.6
   connectivity_plus: ^4.0.0
+  realm: ^1.0.3
 
 dependency_overrides:
   geolocator_android:

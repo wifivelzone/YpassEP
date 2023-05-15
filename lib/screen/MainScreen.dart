@@ -10,6 +10,7 @@ import 'package:ypass/http/HttpPostData.dart' as http;
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/color.dart';
+import '../http/HttpPostData.dart';
 import '../http/UserDataRequest.dart';
 
 //foreground task 시작
@@ -456,8 +457,7 @@ class _MiddleButtonImg extends StatelessWidget {
     debugPrint("1");
     /*UserDataRequest a = UserDataRequest();
     a.getUserData('01027283301');*/
-    var res = await http.getUserDataPost('01027283301');
-    debugPrint('Response: $res');
+    var res = await UserDataRequest().setUserData('01027283301');
   }
 
   // 사용자 정보 수정 버튼 클릭시
