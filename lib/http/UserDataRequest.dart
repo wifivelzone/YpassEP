@@ -65,8 +65,8 @@ class UserDataRequest {
 
         //  IdArr cloberid, userid, pk 저장
         realmIdArr.write(() {
+          realmIdArr.deleteAll<IdArr>(); // 기존 데이터 삭제
           for (var idArrValue in listArr['idArr']) {
-            realmIdArr.deleteAll<IdArr>(); // 기존 데이터 삭제
             realmIdArr.add(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
           }
         });
