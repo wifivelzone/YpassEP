@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
 import 'package:ypass/http/StatisticsReporter.dart';
+import 'package:ypass/http/HttpType.dart';
 
 var client = HttpClient();
 StatisticsReporter reporter = StatisticsReporter();
@@ -29,12 +30,6 @@ Map<String,String> HOME_ADDRESS_LIST = {
 String url = "https://xphub.xperp.co.kr/_clober/xpclober_api.svc";
 
 late int httpType;
-const int addUser = 0;
-const int inoutUser = 1;
-const int tempUser = 2;
-const int getLicense = 3;
-const int getUserData = 4;
-const int evHome = 5;
 
 late final int data;
 late String netState;
@@ -44,7 +39,7 @@ Future<String> setUserDataPost(String phoneNumber) async {
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = addUser;
+    httpType = HttpType.addUser;
 
     http.Response response = await http.post(
         Uri.parse("$url/clober-approval"),
@@ -70,7 +65,7 @@ Future<String> cloberPass(int type, int scanType) async {
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = tempUser;
+    httpType = HttpType.tempUser;
     String userid = 'userData id가져와야함';
     //평균 RSSI = BLE 스캔시 얻은 max RSSI 값
     //마지막 0은 뭔지 확인 필요
@@ -110,7 +105,7 @@ Future<String> setTempUser(String vphone, String vaddr, String sDate, String eDa
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = tempUser;
+    httpType = HttpType.tempUser;
     String phoneNumber = 'userData 번호가져와야함';
 
     http.Response response = await http.post(
@@ -149,7 +144,7 @@ Future<String> getUserDataPost(String phoneNumber) async {
   };
 
   if (netState != '인터넷 연결 안됨') {
-    httpType = getUserData;
+    httpType = HttpType.getUserData;
 
     String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
     Map<String, dynamic> sendData = {"data":"{'phone':'$userPhoneNumber'}"};
@@ -182,7 +177,7 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
 
   if (netState != '인터넷 연결 안됨') {
     String url = "";
-    httpType = evHome;
+    httpType = HttpType.evHome;
 
     //url = HOME_ADDRESS_LIST['유저주소'];
     final response = await http.get(Uri.parse("$url/$dong/$ho"));
