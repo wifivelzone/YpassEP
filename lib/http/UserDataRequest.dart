@@ -8,6 +8,8 @@ import 'package:ypass/realm/UserData.dart';
 import 'NetworkState.dart';
 import 'package:http/http.dart' as http;
 
+
+
 // 싱글톤
 class UserDataRequest {
   static final UserDataRequest _dataRequest = UserDataRequest._internal();
@@ -84,3 +86,6 @@ class UserDataRequest {
 
 
 }
+
+
+
