@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
-import 'package:ypass/http/HttpPostData.dart' as http;
+import 'package:ypass/realm/DbUtil.dart';
 
 //import 'package:ypass/sensor/GpsScan.dart';
 
@@ -30,6 +30,7 @@ class MyTaskHandler extends TaskHandler {
 
   //ble 시작
   BleScanService ble = BleScanService();
+  DbUtil db = DbUtil();
 
   //gps는 더미 코드
   //LocationService gps = LocationService();
@@ -45,6 +46,7 @@ class MyTaskHandler extends TaskHandler {
     debugPrint('customData: $customData');
     //ble init
     ble.initBle();
+    db.getDB();
   }
 
   //push가 올 때마다 실행
@@ -57,6 +59,8 @@ class MyTaskHandler extends TaskHandler {
     );
     //gps 더미 코드
     //gps.getLocation();
+    var find = db.getUser();
+    debugPrint("Foreground DB 체크 : ${find.phoneNumber}");
     bool scanR = await ble.scan();
     //ble 스캔 끝나고 작동하게 delay
     await Future.delayed(const Duration(milliseconds: 4500));
@@ -78,29 +82,33 @@ class MyTaskHandler extends TaskHandler {
         //일단 둘다 connect
         //ble.writeBle();
         try {
-          ble.connect().then((value) {
+          await ble.connect().then((value) {
             ble.disconnect();
           });
         } catch (e){
           ble.disconnect();
-          debugPrint("Connect Error");
+          debugPrint("Connect Error!!!");
+          debugPrint("Error log : ${e.toString()}");
         }
       } else {
         debugPrint("IsiOS from Foreground");
         try {
-          ble.connect().then((value) {
+          await ble.connect().then((value) {
             ble.disconnect();
           });
         } catch (e){
           ble.disconnect();
-          debugPrint("Connect Error");
+          debugPrint("Connect Error!!!");
         }
       }
     } else {
       debugPrint("Clober not Found");
     }
 
-    sendPort?.send(_eventCount);
+    var finds2 = db.findCloberByCID(ble.maxCid);
+    debugPrint("Enc Find Clober in DB(CID) : ${finds2.cloberid}");
+    debugPrint("Enc Find Clober in DB(PK) : ${finds2.pk}");
+    debugPrint("Enc Find Clober in DB(ID) : ${finds2.userid}");
 
     _eventCount++;
     debugPrint("Is Running?");
@@ -204,7 +212,7 @@ class _TopState extends State<Top> {
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 12000,
+        interval: 15000,  //12000
         //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,
