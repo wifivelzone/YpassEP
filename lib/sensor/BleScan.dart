@@ -188,6 +188,8 @@ class BleScanService {
   //max 초기값
   void clearMax() {
     maxCid = notFound;
+    //신호 세기 조절
+    //-100이 신호 최소치 Android 소스코드 기준 옵션으로 -75 ~ -95 로 조절 가능
     maxRssi = -100;
     maxBat = notFound;
   }
@@ -196,9 +198,10 @@ class BleScanService {
   Future<bool> connect() async {
     Future<bool>? returnValue;
     bool isFail = false;
+    bool loading = true;
     //연결 시도 (ScanResult.device에서 .connect로 함)
     await maxR.device
-        .connect(autoConnect: false)
+        .connect(autoConnect: true)
     //시간제한 설정
         .timeout(const Duration(milliseconds: 2000), onTimeout: () {
           debugPrint('Fail BLE Connect');
@@ -229,11 +232,12 @@ class BleScanService {
     Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
     //map의 key값 가져오기
     int a = readData.keys.toList().first;
+    debugPrint("manu Check : ${readData[a]}");
     //출입용 Clober의 1번 안테나 저장용
+    //1번 안테나 write용, 2번 안테나 read용
     late BluetoothCharacteristic char1;
     for (var service in services) {
-      List<BluetoothService> conDev;
-      var listenValue;
+      List<int> listenValue;
       var characteristics = service.characteristics;
 
       //Service UUID로 목표 Service 찾기
@@ -264,26 +268,28 @@ class BleScanService {
           debugPrint("Readable Check : ${c.properties.read}");
           debugPrint("Notify Check : ${c.properties.notify}");
           await c.setNotifyValue(true);
-          c.value.listen((value) async {
-            debugPrint('!!!!!Value first check : ${await c.value.first}');
+          //write 이후 characteristic의 response를 얻는 listener
+          c.onValueChangedStream.listen((value) async {
+            loading = false;
+            debugPrint('!!!!!Value Changed');
             listenValue = value;
             debugPrint('!!!!!Value check : $listenValue');
-            conDev = await (await flutterBlue.connectedDevices).first.discoverServices();
           });
-          //연결은 이미 되어 있으므로 목표 Characteristic에 START라는 신호를 write해줌
-          //START 신호 생성 (정확히는 1113START)
-          debugPrint("Start Write 시작");
-          List<int> start = [0x1, 0x1, 0x1, 0x3, 0x53, 0x54, 0x41, 0x52, 0x54];
-          //저장되 있던 write용 Characteristic에 write 진행
-          await char1.write(start, withoutResponse: true);
-          await Future.delayed(const Duration(milliseconds: 1000));
-          //key값 가져오기. iOS기준 Characteristic2에서 read해오면 값이 나오는 듯 하나
-          //사무실에 Test용 Clober는 read 권한이 설정 안되어있어서 (code문제인지 package문제인지 Clober문제인지 확인 필요)
 
-          //(Android 방식도 작동은 해서 수정 필요한지는 보류)
+          //연결은 이미 되어 있으므로 목표 Characteristic에 START라는 신호를 write해줌
+          //START 신호 생성 (정확히는 cloberID 4자리 + START)
+          debugPrint("Start Write 시작");
+          List<int> start = [readData[a]![4], readData[a]![5], readData[a]![6], readData[a]![7], 0x53, 0x54, 0x41, 0x52, 0x54];
+          //저장돼 있던 write용 Characteristic에 write 진행
+          await char1.write(start, withoutResponse: true);
+          while (loading) {
+            debugPrint("Waiting Reponse...");
+            await Future.delayed(const Duration(milliseconds: 1000));
+          }
+          loading = true;
+          //위의 onValueChangedStream에서 Response를 읽어옴
 
           //Android식으로 Key값을 manufacturerData에서 읽어옴
-          debugPrint('Read Check (adver) : ${readData[a]}');
           k1 = readData[a]![8];
           k2 = readData[a]![9];
           debugPrint('Key1 Check : ${readData[a]![8]}');
@@ -291,11 +297,7 @@ class BleScanService {
           /*String httpResult;
           //전화 번호 필요 UserData 구축 전까진 주석처리
           httpResult = await http.evCall(cid, phoneNumber);*/
-          debugPrint('Clober ID : ${maxCid}');
-
-          AdvertisementData testData = maxR.advertisementData;
-          debugPrint('test Adver : ${testData.manufacturerData}');
-          debugPrint('test Adver : ${testData.serviceData}');
+          debugPrint('Clober ID : $maxCid');
 
           debugPrint("Notifying Check : ${c.isNotifying}");
 
@@ -304,10 +306,22 @@ class BleScanService {
           enc = Encryption(finds2.userid, maxCid, finds2.pk, k1, k2);
           enc.init();
           enc.startEncryption();
-          debugPrint("Start Write 시작");
+          debugPrint("Encryption Write 시작");
+          debugPrint("Encryption 확인 : ${enc.temp1}");
+          debugPrint("Encryption 확인 : ${enc.temp2}");
+          debugPrint("Encryption 확인 : ${enc.temp3}");
+          debugPrint("Encryption 확인 : ${enc.temp4}");
+          debugPrint("Encryption 확인 : ${enc.temp5}");
+          debugPrint("Encryption 확인 : ${enc.result}");
+
           await char1.write(enc.result, withoutResponse: true);
-          await Future.delayed(const Duration(milliseconds: 1000));
           debugPrint('Read Value : ${c.lastValue}');
+          while (loading) {
+            debugPrint("Waiting Reponse...");
+            await Future.delayed(const Duration(milliseconds: 1000));
+          }
+          debugPrint("암호화 성공 : ${!loading}");
+          loading = true;
           /*debugPrint("Charac Read 시작");
           List<int> value = await c.read();
           debugPrint('Read Check (char) : $value');*/
