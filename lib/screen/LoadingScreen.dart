@@ -81,7 +81,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     String nextRoute;
     DbUtil db = DbUtil();
     db.getSetting();
-    if (db.isValidSetting()) {
+    if (!db.isValidSetting()) {
       nextRoute = '/termsOfService';
     } else {
       nextRoute = '/main';
