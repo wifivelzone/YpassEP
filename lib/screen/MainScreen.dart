@@ -151,12 +151,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             Bar(barSize: 5.0),
             Top(),
             Bar(barSize: 5.0),
@@ -514,7 +514,7 @@ class Bottom extends StatelessWidget {
       const SizedBox(
         height: 5,
       ),
-      Text('1.0.0v'),
+      const Text('1.0.0v'),
       const SizedBox(
         height: 5,
       ),
