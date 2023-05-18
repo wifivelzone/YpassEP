@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:realm/realm.dart';
 import 'package:ypass/constant/color.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'dart:io';
 
+import '../realm/SettingData.dart';
 import 'MainScreen.dart';
 
 class LoadingScreen extends StatefulWidget {
@@ -76,8 +78,17 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void goToMainPage() {
     debugPrint('로딩페이지');
     // 페이지 이동
+    // 이용 약관 수락한적 있으면 메인페이지로
+    // 이용 약관 수락한적 없으면 이용약관 페이지로
+    String nextRoute;
+    var realm = Realm(Configuration.local([SettingData.schema]));
+    if (realm.all<SettingData>().length == 0) {
+      nextRoute = '/termsOfService';
+    } else {
+      nextRoute = '/main';
+    }
     Navigator.pushReplacementNamed(
-      context, '/main'
+      context, nextRoute
     );
   }
 }

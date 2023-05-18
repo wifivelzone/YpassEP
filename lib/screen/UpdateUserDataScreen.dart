@@ -138,6 +138,7 @@ class _MiddleState extends State<_Middle> {
       String num = textFieldPhoneNumber.text.substring(1); // 010AAAABBBB -> 10AAAABBBB
       phoneNumbe = textFieldPhoneNumber.text; // 전화 번호 저장
 
+      // 문자 요청
       await auth.verifyPhoneNumber(
         phoneNumber: "+82 $num", // 인증 요청할 전화번호
         timeout: const Duration(seconds: 120),// 2분 안에 인증 코드를 입력해야됨
@@ -167,7 +168,9 @@ class _MiddleState extends State<_Middle> {
 
   // 문지 전송 실패시
   sendSMSFail(FirebaseAuthException e) {
+    debugPrint('문자 전송 에러 메세지');
     debugPrint(e.toString());
+    debugPrint('------------------');
     CustomToast().showToast('잘못된 전화번호 입니다.');
     waitPhoneAuth = true;
   }
@@ -177,7 +180,6 @@ class _MiddleState extends State<_Middle> {
     setState(() {
       _verificationId = verificationId;
       sendSMS = true;
-      waitPhoneAuth = true;
     });
   }
 
@@ -200,7 +202,7 @@ class _MiddleState extends State<_Middle> {
   // 인증코드 동일한지 비교
   Future<bool> compareVerificationID() async {
     try {
-      // 사용자가 입력학 인증코드와 실제 인증코드가 동일한지 비교
+      // 사용자가 입력한 인증코드와 실제 인증코드가 동일한지 비교
       PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(verificationId: _verificationId, smsCode: authenticatioNumber.text);
       await auth.signInWithCredential(phoneAuthCredential);
 

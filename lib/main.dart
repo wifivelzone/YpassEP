@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ypass/screen/LoadingScreen.dart';
 import 'package:ypass/screen/MainScreen.dart';
 import 'package:ypass/screen/SetttingScreen.dart';
+import 'package:ypass/screen/TermsOfServiceScreen.dart';
 import 'package:ypass/screen/UpdateUserDataScreen.dart';
 
 void main() async {
@@ -17,6 +18,7 @@ void main() async {
       '/main' : (BuildContext context) => const MainScreen(),
       '/setting' : (BuildContext context) => const SettingScreen(),
       '/updateUser' : (BuildContext context) => const UpdateUserDataScreen(),
+      '/termsOfService' : (BuildContext context) => const TermsOfServiceScreen(),
       '/' : (BuildContext context) => const LoadingScreen(),
     },
   ));
