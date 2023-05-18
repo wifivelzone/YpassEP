@@ -6,11 +6,12 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
 import 'package:ypass/realm/DbUtil.dart';
+import 'package:ypass/screen/serve/Toast.dart';
 
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/color.dart';
-import '../http/HttpPostData.dart';
+//import '../http/HttpPostData.dart';
 import '../http/UserDataRequest.dart';
 
 //foreground task 시작
@@ -186,6 +187,7 @@ class _TopState extends State<Top> {
   ReceivePort? _receivePort;
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = false;
+  DbUtil db = DbUtil();
 
   //foureground task 기본 설정
   void _initForegroundTask() {
@@ -312,6 +314,7 @@ class _TopState extends State<Top> {
   @override
   void initState() {
     super.initState();
+    db.getDB();
     //foreground task 기본 설정
     _initForegroundTask();
     //port 설정 + foreground task 재시작 시 기존 port 가져오기
@@ -351,10 +354,17 @@ class _TopState extends State<Top> {
               width: MediaQuery.of(context).size.width.toDouble() * 0.3,
               child: TextButton(
                 onPressed: () async {
-                  if (foreIsRun) {
-                    _stopForegroundTask();
+                  List<bool> valid = db.isValid();
+                  if (valid[0] && valid[1]) {
+                    if (foreIsRun) {
+                      _stopForegroundTask();
+                    } else {
+                      _startForegroundTask();
+                    }
                   } else {
-                    _startForegroundTask();
+                    CustomToast().showToast("User 추가가 필요합니다.");
+                    debugPrint("DB 없다");
+                    
                   }
                   debugPrint('222');
                   setState(() {});
@@ -465,7 +475,7 @@ class _MiddleButtonImg extends StatelessWidget {
     debugPrint("1");
     /*UserDataRequest a = UserDataRequest();
     a.getUserData('01027283301');*/
-    var res = await UserDataRequest().setUserData('01027283301');
+    await UserDataRequest().setUserData('01027283301');
   }
 
   // 사용자 정보 수정 버튼 클릭시
@@ -483,6 +493,7 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 설정 버튼 클릭시
   void clickedSettingBtn() {
+
     if (context != null) {
       Navigator.of(context!).pushNamed('/setting');
       /*Navigator.push(
@@ -525,6 +536,7 @@ class Bottom extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         TextButton(
             onPressed: () => {
+
                   //TODO: 약관 화면 표시
                 },
             style: TextButton.styleFrom(

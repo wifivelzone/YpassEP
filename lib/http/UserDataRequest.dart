@@ -29,7 +29,7 @@ class UserDataRequest {
   Future<void> setUserData(String phoneNumber) async {
     var netState = await checkNetwork();
 
-    const Map<String, String> _JSON_HEADERS = {
+    const Map<String, String> JSON_HEADERS = {
       "content-type": "application/json"
     };
 
@@ -43,7 +43,7 @@ class UserDataRequest {
       http.Response response = await http.post(
           Uri.parse("https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval"),
           body: json.encode(sendData),
-          headers: _JSON_HEADERS
+          headers: JSON_HEADERS
       ).timeout(const Duration(seconds: 10));
 
       // POST 요청이 성공 했을 경우
@@ -52,7 +52,7 @@ class UserDataRequest {
         // var test2 = test.toString().replaceAll('\'', '\"');
         // var test3 = jsonDecode(test2) as Map<String, dynamic>;
         // 위 내용과 jsonData과 동일
-        var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '\"'))) as Map<String, dynamic>;
+        var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
         var listArr = jsonData['listArr'][0];
 
         // Realm 불러오기
