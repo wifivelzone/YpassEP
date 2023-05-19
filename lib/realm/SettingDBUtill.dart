@@ -12,7 +12,7 @@ class SettingDataUtill {
     return _dataRequest;
   }
 
-  final _realm = Realm(Configuration.local([SettingData.schema])); // DB 설정
+  final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: 1)); // DB 설정
   late SettingData _settingData; // DB에 저장된 SettingData 값
 
 

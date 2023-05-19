@@ -6,7 +6,7 @@ import 'package:ypass/screen/serve/LinePadding.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 import '../constant/color.dart';
-import '../realm/DbUtil.dart';
+import '../realm/UserDBUtil.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({Key? key}) : super(key: key);

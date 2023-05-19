@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
-import 'package:ypass/realm/DbUtil.dart';
+import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 
 //import 'package:ypass/sensor/GpsScan.dart';

@@ -6,7 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import 'dart:io';
 
-import '../realm/DbUtil.dart';
+import '../realm/UserDBUtil.dart';
 import '../realm/SettingDBUtill.dart';
 import '../realm/SettingData.dart';
 import 'MainScreen.dart';

@@ -5,7 +5,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'package:ypass/http/HttpPostData.dart' as http;
 import 'package:ypass/http/Encryption.dart';
-import 'package:ypass/realm/DbUtil.dart';
+import 'package:ypass/realm/UserDBUtil.dart';
 
 class BleScanService {
   //instance 가져오기

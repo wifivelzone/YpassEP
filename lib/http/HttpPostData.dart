@@ -219,6 +219,46 @@ Future<String> evCall(String cid, String phoneNumber) async {
   }
 }
 
+Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberId, String ho) async {
+  netState = await ns.checkNetwork();
+
+  if (netState != '인터넷 연결 안됨') {
+    String url = "";
+    httpType = HttpType.evHome;
+
+    String inClober = "";
+    if (isInward) {
+      url = "http://113.52.211.196:4001/TCPCARCALL";
+      final response =
+          await http.get(Uri.parse("$url/$inClober/$cloberId/$ho"));
+      if (response.statusCode == 200) {
+        //log 남기기 통신
+        //reporter.sendReport(phoneNumber, dong, ho);
+        return response.body;
+      } else {
+        //log 남기기 통신
+        //reporter.sendError(cid, phoneNumber);
+        return "통신error";
+      }
+    } else {
+      url = "http://113.52.211.196:4001/TCPCARCALL2";
+      final response =
+      await http.get(Uri.parse("$url/$inClober/$cloberId"));
+      if (response.statusCode == 200) {
+        //log 남기기 통신
+        //reporter.sendReport(phoneNumber, dong, ho);
+        return response.body;
+      } else {
+        //log 남기기 통신
+        //reporter.sendError(cid, phoneNumber);
+        return "통신error";
+      }
+    }
+  } else {
+    return "네트워크 연결 실패";
+  }
+}
+
 /* 더미 코드 (아마? 필요하면 구현)
 Future<String> getUrl(int type, int scanType) {
   return Future.value("false");

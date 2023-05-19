@@ -12,20 +12,14 @@ class DbUtil {
     return _dataRequest;
   }
 
-  var realmUser = Realm(Configuration.local([UserData.schema]));
-  var realmIdArr = Realm(Configuration.local([IdArr.schema]));
-  var realmSetting = Realm(Configuration.local([SettingData.schema]));
+  var realmUser = Realm(Configuration.local([UserData.schema], schemaVersion: 1));
+  var realmIdArr = Realm(Configuration.local([IdArr.schema], schemaVersion: 1));
   late RealmResults<UserData> temp1;
   late RealmResults<IdArr> temp2;
-  late RealmResults<SettingData> temp3;
 
   void getDB() {
     temp1 = realmUser.all<UserData>();
     temp2 = realmIdArr.all<IdArr>();
-  }
-
-  void getSetting() {
-    temp3 = realmSetting.all<SettingData>();
   }
 
   IdArr findCloberByCID(String cid) {
@@ -53,10 +47,6 @@ class DbUtil {
 
   List<bool> isValid() {
     List<bool> result = [temp1.isNotEmpty, temp2.isNotEmpty];
-    return result;
-  }
-  bool isValidSetting() {
-    bool result = temp3.isNotEmpty;
     return result;
   }
 
