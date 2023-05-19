@@ -194,7 +194,7 @@ class _agreeyButton extends StatelessWidget {
             // realm DB에 역관 동의 확인 여부 및 인증 범위 저장
             var realm = Realm(Configuration.local([SettingData.schema]));
             realm.write(() {
-              realm.add(SettingData(true, 20));
+              realm.add(SettingData(true, 20, false));
             });
             Navigator.pushReplacementNamed(context, '/main');
           } else {

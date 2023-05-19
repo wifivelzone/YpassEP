@@ -11,9 +11,11 @@ class SettingData extends _SettingData
   SettingData(
     bool termsOfService,
     int userSetRange,
+    bool autoFlowSelectState,
   ) {
     RealmObjectBase.set(this, 'termsOfService', termsOfService);
     RealmObjectBase.set(this, 'userSetRange', userSetRange);
+    RealmObjectBase.set(this, 'autoFlowSelectState', autoFlowSelectState);
   }
 
   SettingData._();
@@ -32,6 +34,13 @@ class SettingData extends _SettingData
       RealmObjectBase.set(this, 'userSetRange', value);
 
   @override
+  bool get autoFlowSelectState =>
+      RealmObjectBase.get<bool>(this, 'autoFlowSelectState') as bool;
+  @override
+  set autoFlowSelectState(bool value) =>
+      RealmObjectBase.set(this, 'autoFlowSelectState', value);
+
+  @override
   Stream<RealmObjectChanges<SettingData>> get changes =>
       RealmObjectBase.getChanges<SettingData>(this);
 
@@ -46,6 +55,7 @@ class SettingData extends _SettingData
         ObjectType.realmObject, SettingData, 'SettingData', [
       SchemaProperty('termsOfService', RealmPropertyType.bool),
       SchemaProperty('userSetRange', RealmPropertyType.int),
+      SchemaProperty('autoFlowSelectState', RealmPropertyType.bool),
     ]);
   }
 }

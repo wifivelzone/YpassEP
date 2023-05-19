@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
+import 'package:ypass/realm/SettingDBUtill.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/LinePadding.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 import '../constant/color.dart';
+import '../realm/DbUtil.dart';
 
 class SettingScreen extends StatelessWidget {
   const SettingScreen({Key? key}) : super(key: key);
@@ -27,6 +30,7 @@ class SettingScreen extends StatelessWidget {
 
 class _Middle extends StatefulWidget {
   double stateNumber = 20;
+  bool isGyeongSan = DbUtil().getUser().addr == '대전시 서구 관저중로 33';
 
   _Middle({Key? key}) : super(key: key);
 
@@ -90,7 +94,9 @@ class _MiddleState extends State<_Middle> {
             '인증단계가 높을수록 멀리서 인증됩니다.',
             style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR),
           ),
-          const LinePadding(value: 60),
+          const LinePadding(value: 30),
+
+
           SizedBox(
             width: MediaQuery.of(context).size.width,
             height: 50,
@@ -108,6 +114,44 @@ class _MiddleState extends State<_Middle> {
           ),
         ],
       ),
+    );
+  }
+}
+
+
+class autoFlowButton extends StatefulWidget {
+  final bool autoFlowState = false; // 층 버튼 자동 눌림 상태
+
+  const autoFlowButton({Key? key}) : super(key: key);
+
+  @override
+  State<autoFlowButton> createState() => _autoFlowButtonState();
+}
+
+class _autoFlowButtonState extends State<autoFlowButton> {
+  SettingDataUtill settingData = SettingDataUtill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text('층 버튼 자동 눌림', style: TextStyle(fontSize: 20)),
+        FlutterSwitch(
+          width: 125.0,
+          height: 55.0,
+          valueFontSize: 25.0,
+          toggleSize: 45.0,
+          value: settingData.getAutoFlowSelectState(),
+          borderRadius: 30.0,
+          padding: 8.0,
+          showOnOff: true,
+          onToggle: (value) {
+            setState(() {
+              settingData.setTermsOfService(value);
+            });
+          },
+        ),
+      ],
     );
   }
 }

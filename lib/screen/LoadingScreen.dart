@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:realm/realm.dart';
 import 'package:ypass/constant/color.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:ypass/realm/DbUtil.dart';
 
 import 'dart:io';
 
+import '../realm/DbUtil.dart';
+import '../realm/SettingDBUtill.dart';
+import '../realm/SettingData.dart';
+import 'MainScreen.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -79,9 +83,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // 이용 약관 수락한적 있으면 메인페이지로
     // 이용 약관 수락한적 없으면 이용약관 페이지로
     String nextRoute;
-    DbUtil db = DbUtil();
-    db.getSetting();
-    if (!db.isValidSetting()) {
+    if (SettingDataUtill().isEmpty()) {
       nextRoute = '/termsOfService';
     } else {
       nextRoute = '/main';
