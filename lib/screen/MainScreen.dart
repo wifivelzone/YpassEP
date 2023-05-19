@@ -62,6 +62,7 @@ class MyTaskHandler extends TaskHandler {
     //gps.getLocation();
     var find = db.getUser();
     debugPrint("Foreground DB 체크 : ${find.phoneNumber}");
+    debugPrint("Foreground DB 체크 : ${find.addr}");
     bool scanR = await ble.scan();
     //ble 스캔 끝나고 작동하게 delay
     await Future.delayed(const Duration(milliseconds: 4500));
@@ -187,6 +188,7 @@ class _TopState extends State<Top> {
   ReceivePort? _receivePort;
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = false;
+  bool inActive = false;
   DbUtil db = DbUtil();
 
   //foureground task 기본 설정
@@ -239,7 +241,6 @@ class _TopState extends State<Top> {
     //foreground task 자체로 data 저장 기능 지원 (영구 저장은 아님)
     await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
     await FlutterForegroundTask.saveData(key: 'isRun', value: true);
-    foreIsRun = true;
 
     final customData =
         await FlutterForegroundTask.getData<String>(key: 'customData');
@@ -274,7 +275,6 @@ class _TopState extends State<Top> {
   //foreground task 정지
   Future<bool> _stopForegroundTask() {
     FlutterForegroundTask.saveData(key: 'isRun', value: false);
-    foreIsRun = false;
     return FlutterForegroundTask.stopService();
   }
 
@@ -356,18 +356,27 @@ class _TopState extends State<Top> {
                 onPressed: () async {
                   List<bool> valid = db.isValid();
                   if (valid[0] && valid[1]) {
-                    if (foreIsRun) {
-                      _stopForegroundTask();
+                    if (!inActive) {
+                      inActive = true;
+                      if (foreIsRun) {
+                        foreIsRun = false;
+                        _stopForegroundTask();
+                      } else {
+                        foreIsRun = true;
+                        _startForegroundTask();
+                      }
+                      setState(() {});
+                      await Future.delayed(const Duration(milliseconds: 1000));
+                      inActive = false;
                     } else {
-                      _startForegroundTask();
+                      CustomToast().showToast("잠시만 기다려 주십시오.");
+                      debugPrint("On/Off 시간초 제한 중");
                     }
                   } else {
                     CustomToast().showToast("User 추가가 필요합니다.");
                     debugPrint("DB 없다");
-                    
                   }
                   debugPrint('222');
-                  setState(() {});
                 },
                 child: foreIsRun
                     ? Image.asset('asset/img/on_ios.png')

@@ -197,6 +197,7 @@ class BleScanService {
   //BLE 연결
   Future<bool> connect() async {
     Future<bool>? returnValue;
+    StreamSubscription<List<int>> valueStream;
     bool isFail = false;
     bool loading = true;
     //연결 시도 (ScanResult.device에서 .connect로 함)
@@ -269,7 +270,7 @@ class BleScanService {
           debugPrint("Notify Check : ${c.properties.notify}");
           await c.setNotifyValue(true);
           //write 이후 characteristic의 response를 얻는 listener
-          c.onValueChangedStream.listen((value) async {
+          valueStream = c.onValueChangedStream.listen((value) async {
             loading = false;
             debugPrint('!!!!!Value Changed');
             listenValue = value;
@@ -325,6 +326,8 @@ class BleScanService {
           /*debugPrint("Charac Read 시작");
           List<int> value = await c.read();
           debugPrint('Read Check (char) : $value');*/
+
+          valueStream.cancel();
         } else {
           //1일 때는 write용이므로 일단 char1에 저장해두고 read용인 2찾으러가기
           debugPrint("Write Charateristic");
@@ -338,6 +341,7 @@ class BleScanService {
 
   //connect된 BLE 끊기
   void disconnect() {
+    debugPrint("Disconnecting...");
     maxR.device.disconnect();
   }
 

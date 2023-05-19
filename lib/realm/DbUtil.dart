@@ -4,6 +4,14 @@ import 'package:ypass/realm/UserData.dart';
 import 'package:ypass/realm/SettingData.dart';
 
 class DbUtil {
+  static final DbUtil _dataRequest = DbUtil._internal();
+
+  DbUtil._internal();
+
+  factory DbUtil() {
+    return _dataRequest;
+  }
+
   var realmUser = Realm(Configuration.local([UserData.schema]));
   var realmIdArr = Realm(Configuration.local([IdArr.schema]));
   var realmSetting = Realm(Configuration.local([SettingData.schema]));
@@ -27,6 +35,20 @@ class DbUtil {
 
   UserData getUser() {
     return temp1[0];
+  }
+
+  List<String> getAddr() {
+    String addStr = getUser().addr;
+    List<String> addrArr = addStr.split("::");
+    //                        addrArr[0] += " 101동 301호"; //test Code
+    List<String> split = addrArr[0].split(" ");
+    String dong = "";
+    String ho = "";
+    if (split.length - 2 > 0 && split[split.length - 2].contains("동")) {
+      dong = split[split.length - 2].replaceAll("동", "");
+      ho = split[split.length - 1].replaceAll("호", "");
+    }
+    return [dong, ho];
   }
 
   List<bool> isValid() {

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 class Encryption {
   String userid;
@@ -51,8 +50,6 @@ class Encryption {
     List convetedList = listUserid.map((number) => int.parse(number, radix: 16).toString()).toList();
     temp1 = convetedList[0]+convetedList[1]+pk[int.parse(modK1)].codeUnitAt(0).toString()+convetedList[2];
     temp2 = convetedList[3]+pk[int.parse(modK2)].codeUnitAt(0).toString()+convetedList[4]+convetedList[5];
-    /*temp1 = listUserid[0]+listUserid[1]+modK1.codeUnitAt(0).toString()+listUserid[2];
-    temp2 = listUserid[3]+modK2.codeUnitAt(0).toString()+listUserid[4]+listUserid[5];*/
 
     temp3 = convert62(temp1);
     temp4 = convert62(temp2);
@@ -71,11 +68,7 @@ class Encryption {
 
     List<int> list = ascii.encode(temp5);
     List<int> hexId = listUserid.map((number) => int.parse(number, radix: 16)).toList();
-    //List convetedList = list.map((number) => number.toRadixString(16)).toList();
-    //result = [list[0], int.parse(listUserid[0], radix: 16), list[1], list[2], k1, int.parse(listUserid[1]), list[3], list[4], int.parse(listUserid[2]), list[5], list[6], int.parse(listUserid[3]), list[7], list[8], int.parse(listUserid[4]), k2, list[9], list[10], int.parse(listUserid[5]), list[11]];
     result = [list[0], hexId[0], list[1], list[2], k1, hexId[1], list[3], list[4], hexId[2], list[5], list[6], hexId[3], list[7], list[8], hexId[4], k2, list[9], list[10], hexId[5], list[11]];
-    //result = list;
-    //resTest = idList;
   }
 
   String convert62(String num) {
