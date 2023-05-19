@@ -14,8 +14,10 @@ class BleScanService {
   List<ScanResult> scanResultList = [];
   //스캔 중인지 확인하는 stram
   late StreamSubscription subscription;
+  late StreamSubscription resStream;
   //찾은 clober 저장하는 list
-  List cloberList = [];
+  Map<String, List> cloberList = {};
+
   //지금 스캔 중인가?
   bool _isScanning = false;
 
@@ -49,11 +51,13 @@ class BleScanService {
   //initble의 스캔 여부 확인하는 listen 종료 (안해주면 더미로 남음)
   disposeBle() {
     subscription.cancel();
+    resStream.cancel();
   }
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
   Future<bool> scan() async {
     Future<bool>? returnValue;
+    clearMax();
     //이미 스캔 중인지 확인
     if (!_isScanning) {
       //기존 scan list 초기화
@@ -67,11 +71,23 @@ class BleScanService {
           //UUID filter 설정
           withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
           //시간초 설정 (4초)
-          timeout: const Duration(seconds: 4)
+          timeout: const Duration(seconds: 1)
       );
       //스캔 결과 (list형태)가 나오면 가져와서 저장
-      flutterBlue.scanResults.listen((results) {
+      int counter = 0;
+      resStream = flutterBlue.scanResults.listen((results) {
+        counter++;
+        debugPrint("Scan Counter : ${counter}");
         scanResultList = results;
+        debugPrint("Scan Length : ${scanResultList.length}");
+        for(ScanResult res in scanResultList) {
+          if (cloberList[res.device.id.toString()] == null) {
+            cloberList.addEntries({"${res.device.id}" : [res.rssi]}.entries);
+          } else {
+            cloberList[res.device.id.toString()]?.add(res.rssi);
+          }
+        }
+        //searchClober();
       });
       returnValue = Future.value(true);
     } else {
@@ -86,13 +102,15 @@ class BleScanService {
   //스캔 중단
   void stopScan() {
     flutterBlue.stopScan();
+    resStream.cancel();
   }
 
   //scan 결과 중에 clober 찾기
   Future<bool> searchClober() async {
     Future<bool>? returnValue;
+    int forwardRssi = -100;
+    int backRssi = -100;
     //기존 RSSI MAX 값들 초기화
-    clearMax();
     for (ScanResult res in scanResultList) {
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
       var manu = res.advertisementData.manufacturerData;
@@ -123,15 +141,36 @@ class BleScanService {
         List code2 = [manu[a]?[2], manu[a]?[3]];
         debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
+          debugPrint("ID Check : ${res.device.id}");
+          debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
+          int sum = 0;
+          List? tempList = cloberList[res.device.id.toString()];
+          if (tempList != null) {
+            for (int a in tempList) {
+              sum += a;
+            }
+          }
+          forwardRssi = sum~/tempList!.length;
           debugPrint("Input North");
           //정면
         } else if (listEquals(code2, [1, 3])) {
+          debugPrint("ID Check : ${res.device.id}");
+          debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
+          int sum = 0;
+          List? tempList = cloberList[res.device.id.toString()];
+          if (tempList != null) {
+            for (int a in tempList) {
+              sum += a;
+            }
+          }
+          backRssi = sum~/tempList!.length;
           debugPrint("Input South");
           //후면
+        } else {
+          debugPrint("Not Input Pass");
           continue;
         }
         cid = "";
-        rssi = res.rssi;
         bat = manu[a]![8].toString();
         List cidlist = [manu[a]?[4], manu[a]?[5], manu[a]?[6], manu[a]?[7]];
 
@@ -153,6 +192,7 @@ class BleScanService {
         }
         cid += cidlist[3].toRadixString(16).toString();
 
+        rssi = (forwardRssi + backRssi)/2;
         //스캔된 device 값 확인 (clober라면)
         debugPrint("==================");
         debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");

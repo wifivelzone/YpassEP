@@ -65,9 +65,11 @@ class MyTaskHandler extends TaskHandler {
     debugPrint("Foreground DB 체크 : ${find.addr}");
     bool scanR = await ble.scan();
     //ble 스캔 끝나고 작동하게 delay
-    await Future.delayed(const Duration(milliseconds: 4500));
+    await Future.delayed(const Duration(milliseconds: 1500));
     //스캔 결과 따라 Clober search
+    debugPrint("List Check : ${ble.cloberList}");
     if (scanR) {
+      ble.stopScan();
       debugPrint("BLE Scan Success!!");
       bool cloberR = await ble.searchClober();
       if (cloberR) {
@@ -216,7 +218,7 @@ class _TopState extends State<Top> {
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 15000,  //12000
+        interval: 8000,  //12000
         //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,
