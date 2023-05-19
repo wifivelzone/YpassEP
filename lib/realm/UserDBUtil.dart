@@ -1,7 +1,8 @@
 import 'package:realm/realm.dart';
-import 'package:ypass/realm/IdArr.dart';
-import 'package:ypass/realm/UserData.dart';
-import 'package:ypass/realm/SettingData.dart';
+import 'package:ypass/constant/MgrationVersion.dart';
+import 'package:ypass/realm/db/IdArr.dart';
+import 'package:ypass/realm/db/UserData.dart';
+import 'package:ypass/realm/db/SettingData.dart';
 
 class DbUtil {
   static final DbUtil _dataRequest = DbUtil._internal();
@@ -12,8 +13,8 @@ class DbUtil {
     return _dataRequest;
   }
 
-  var realmUser = Realm(Configuration.local([UserData.schema], schemaVersion: 1));
-  var realmIdArr = Realm(Configuration.local([IdArr.schema], schemaVersion: 1));
+  var realmUser = Realm(Configuration.local([UserData.schema], schemaVersion: USER_DATA_VERSION));
+  var realmIdArr = Realm(Configuration.local([IdArr.schema], schemaVersion: ID_ARR_VERSION));
   late RealmResults<UserData> temp1;
   late RealmResults<IdArr> temp2;
 

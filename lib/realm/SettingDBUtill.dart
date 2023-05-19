@@ -1,5 +1,6 @@
 import 'package:realm/realm.dart';
-import 'package:ypass/realm/SettingData.dart';
+import 'package:ypass/constant/MgrationVersion.dart';
+import 'package:ypass/realm/db/SettingData.dart';
 
 
 // 싱글톤
@@ -12,7 +13,7 @@ class SettingDataUtill {
     return _dataRequest;
   }
 
-  final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: 1)); // DB 설정
+  final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: SETTING_DATA_VERSION)); // DB 설정
   late SettingData _settingData; // DB에 저장된 SettingData 값
 
 
@@ -20,7 +21,7 @@ class SettingDataUtill {
   void createSettingData(bool termsOfService, int userSetRange, bool autoFlowState) {
     _realm.write(() {
       deleteSettingData();
-      _realm.add(SettingData(termsOfService, userSetRange, autoFlowState));
+      _realm.add(SettingData(termsOfService, userSetRange, autoFlowState, false));
     });
     _settingData = _realm.all<SettingData>()[0];
   }

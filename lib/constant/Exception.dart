@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-
-
 
 // 만료된 인증 코드
 const String EXPIRED_SMS_CODE = '[firebase_auth/session-expired] The sms code has expired. Please re-send the verification code to try again.';

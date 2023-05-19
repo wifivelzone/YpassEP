@@ -2,14 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ypass/constant/color.dart';
+import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 
-import '../constant/exception.dart';
+import '../constant/Exception.dart';
 import '../http/UserDataRequest.dart';
 
 // 사용자 정보 수정 페이지

@@ -7,8 +7,8 @@ import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
-import '../constant/color.dart';
-import '../realm/SettingData.dart';
+import '../constant/CustomColor.dart';
+import '../realm/db/SettingData.dart';
 
 // 이용 약관 페이지
 // 처음 한번만 보여줌
@@ -194,7 +194,7 @@ class _agreeyButton extends StatelessWidget {
             // realm DB에 역관 동의 확인 여부 및 인증 범위 저장
             var realm = Realm(Configuration.local([SettingData.schema]));
             realm.write(() {
-              realm.add(SettingData(true, 20, false));
+              realm.add(SettingData(true, 20, false, false));
             });
             Navigator.pushReplacementNamed(context, '/main');
           } else {

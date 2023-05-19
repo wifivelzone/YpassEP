@@ -12,10 +12,12 @@ class SettingData extends _SettingData
     bool termsOfService,
     int userSetRange,
     bool autoFlowSelectState,
+    bool stateOnOff,
   ) {
     RealmObjectBase.set(this, 'termsOfService', termsOfService);
     RealmObjectBase.set(this, 'userSetRange', userSetRange);
     RealmObjectBase.set(this, 'autoFlowSelectState', autoFlowSelectState);
+    RealmObjectBase.set(this, 'stateOnOff', stateOnOff);
   }
 
   SettingData._();
@@ -41,6 +43,11 @@ class SettingData extends _SettingData
       RealmObjectBase.set(this, 'autoFlowSelectState', value);
 
   @override
+  bool get stateOnOff => RealmObjectBase.get<bool>(this, 'stateOnOff') as bool;
+  @override
+  set stateOnOff(bool value) => RealmObjectBase.set(this, 'stateOnOff', value);
+
+  @override
   Stream<RealmObjectChanges<SettingData>> get changes =>
       RealmObjectBase.getChanges<SettingData>(this);
 
@@ -56,6 +63,7 @@ class SettingData extends _SettingData
       SchemaProperty('termsOfService', RealmPropertyType.bool),
       SchemaProperty('userSetRange', RealmPropertyType.int),
       SchemaProperty('autoFlowSelectState', RealmPropertyType.bool),
+      SchemaProperty('stateOnOff', RealmPropertyType.bool),
     ]);
   }
 }

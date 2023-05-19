@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
-import 'package:ypass/constant/color.dart';
+import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -8,7 +8,7 @@ import 'dart:io';
 
 import '../realm/UserDBUtil.dart';
 import '../realm/SettingDBUtill.dart';
-import '../realm/SettingData.dart';
+import '../realm/db/SettingData.dart';
 import 'MainScreen.dart';
 
 class LoadingScreen extends StatefulWidget {

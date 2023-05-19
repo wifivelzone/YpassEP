@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:realm/realm.dart';
-import 'package:ypass/realm/IdArr.dart';
-import 'package:ypass/realm/UserData.dart';
+import 'package:ypass/realm/db/IdArr.dart';
+import 'package:ypass/realm/db/UserData.dart';
 
 import 'NetworkState.dart';
 import 'package:http/http.dart' as http;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constant/color.dart';
+import '../../constant/CustomColor.dart';
 
 
 class Bar extends StatelessWidget {

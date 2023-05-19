@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constant/color.dart';
+import '../../constant/CustomColor.dart';
 
 class TopBar extends StatelessWidget {
   final String title; // 페이지 이름

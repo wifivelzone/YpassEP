@@ -10,7 +10,7 @@ import 'package:ypass/screen/serve/Toast.dart';
 
 //import 'package:ypass/sensor/GpsScan.dart';
 
-import '../constant/color.dart';
+import '../constant/CustomColor.dart';
 //import '../http/HttpPostData.dart';
 import '../http/UserDataRequest.dart';
 

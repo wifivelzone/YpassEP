@@ -5,7 +5,7 @@ import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/LinePadding.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
-import '../constant/color.dart';
+import '../constant/CustomColor.dart';
 import '../realm/UserDBUtil.dart';
 
 class SettingScreen extends StatelessWidget {
