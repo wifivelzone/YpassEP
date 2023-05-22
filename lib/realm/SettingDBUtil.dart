@@ -4,16 +4,16 @@ import 'package:ypass/realm/db/SettingData.dart';
 
 
 // 싱글톤
-class SettingDataUtill {
-  static final SettingDataUtill _dataRequest = SettingDataUtill._internal();
+class SettingDataUtil {
+  static final SettingDataUtil _dataRequest = SettingDataUtil._internal();
 
-  SettingDataUtill._internal();
+  SettingDataUtil._internal();
 
-  factory SettingDataUtill() {
+  factory SettingDataUtil() {
     return _dataRequest;
   }
 
-  final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: SETTING_DATA_VERSION)); // DB 설정
+  final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: REALM_DB_VERSION)); // DB 설정
   late SettingData _settingData; // DB에 저장된 SettingData 값
 
 
@@ -44,6 +44,10 @@ class SettingDataUtill {
     return _settingData.autoFlowSelectState;
   }
 
+  String getLastInCloberID() {
+    return _settingData.lastInCloberID;
+  }
+
 
   /// Update
   void setTermsOfService(bool termsOfService) {
@@ -56,6 +60,10 @@ class SettingDataUtill {
 
   void setAutoFlowSelectState(bool autoFlowSelectState) {
     _realm.write(() => _settingData.autoFlowSelectState = autoFlowSelectState);
+  }
+
+  void setLastInCloberID(String lastInCloberID) {
+    _realm.write(() => _settingData.lastInCloberID = lastInCloberID);
   }
 
 
