@@ -17,6 +17,7 @@ class BleScanService {
   late StreamSubscription resStream;
   //찾은 clober 저장하는 list
   Map<String, List> cloberList = {};
+  Map<String, List> outCloberList = {};
 
   //지금 스캔 중인가?
   bool _isScanning = false;
@@ -111,7 +112,10 @@ class BleScanService {
     int forwardRssi = -100;
     int backRssi = -100;
     //기존 RSSI MAX 값들 초기화
-    for (ScanResult res in scanResultList) {
+    clearMax();
+    for (int i = 0; i < scanResultList.length; i++) {
+      debugPrint("Length Check : ${scanResultList.length}");
+      ScanResult res = scanResultList[i];
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
       var manu = res.advertisementData.manufacturerData;
 
@@ -135,6 +139,8 @@ class BleScanService {
         } else {
           debugPrint("no Clober");
           returnValue = Future.value(false);
+          debugPrint("==================");
+          continue;
         }
 
         //clober 종류 확인 (출입용 + 방향)
@@ -150,8 +156,18 @@ class BleScanService {
               sum += a;
             }
           }
-          forwardRssi = sum~/tempList!.length;
-          debugPrint("Input North");
+
+          if (outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"] == null) {
+            scanResultList.add(res);
+            debugPrint("Before Input South!!");
+            debugPrint("==================");
+            continue;
+          } else {
+            forwardRssi = sum~/tempList!.length;
+            backRssi = outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"]?.first;
+            debugPrint("Input North");
+            debugPrint("Fore : $forwardRssi, Back : $backRssi");
+          }
           //정면
         } else if (listEquals(code2, [1, 3])) {
           debugPrint("ID Check : ${res.device.id}");
@@ -165,9 +181,13 @@ class BleScanService {
           }
           backRssi = sum~/tempList!.length;
           debugPrint("Input South");
+          outCloberList.addEntries({"${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}" : [backRssi]}.entries);
+          debugPrint("==================");
+          continue;
           //후면
         } else {
           debugPrint("Not Input Pass");
+          debugPrint("==================");
           continue;
         }
         cid = "";
@@ -240,6 +260,8 @@ class BleScanService {
     StreamSubscription<List<int>> valueStream;
     bool isFail = false;
     bool loading = true;
+    bool callev = false;
+    bool startSuccess = false;
     //연결 시도 (ScanResult.device에서 .connect로 함)
     await maxR.device
         .connect(autoConnect: true)
@@ -315,6 +337,17 @@ class BleScanService {
             debugPrint('!!!!!Value Changed');
             listenValue = value;
             debugPrint('!!!!!Value check : $listenValue');
+            if (listenValue.isEmpty && !startSuccess) {
+              debugPrint("StartWrite 실패");
+            } else if (!startSuccess){
+              startSuccess = true;
+              debugPrint("StartWrite 성공");
+            } else if (listenValue.first == 80) {
+              callev = true;
+              debugPrint("암호화 성공 : $callev");
+            } else {
+              debugPrint("암호화 실패");
+            }
           });
 
           //연결은 이미 되어 있으므로 목표 Characteristic에 START라는 신호를 write해줌
@@ -327,6 +360,11 @@ class BleScanService {
             debugPrint("Waiting Reponse...");
             await Future.delayed(const Duration(milliseconds: 1000));
           }
+          if (!startSuccess) {
+            valueStream.cancel();
+            debugPrint("Start Write를 실패했습니다.");
+            return Future.value(false);
+          }
           loading = true;
           //위의 onValueChangedStream에서 Response를 읽어옴
 
@@ -335,9 +373,6 @@ class BleScanService {
           k2 = readData[a]![9];
           debugPrint('Key1 Check : ${readData[a]![8]}');
           debugPrint('Key2 Check : ${readData[a]![9]}');
-          /*String httpResult;
-          //전화 번호 필요 UserData 구축 전까진 주석처리
-          httpResult = await http.evCall(cid, phoneNumber);*/
           debugPrint('Clober ID : $maxCid');
 
           debugPrint("Notifying Check : ${c.isNotifying}");
@@ -348,11 +383,6 @@ class BleScanService {
           enc.init();
           enc.startEncryption();
           debugPrint("Encryption Write 시작");
-          debugPrint("Encryption 확인 : ${enc.temp1}");
-          debugPrint("Encryption 확인 : ${enc.temp2}");
-          debugPrint("Encryption 확인 : ${enc.temp3}");
-          debugPrint("Encryption 확인 : ${enc.temp4}");
-          debugPrint("Encryption 확인 : ${enc.temp5}");
           debugPrint("Encryption 확인 : ${enc.result}");
 
           await char1.write(enc.result, withoutResponse: true);
@@ -361,12 +391,22 @@ class BleScanService {
             debugPrint("Waiting Reponse...");
             await Future.delayed(const Duration(milliseconds: 1000));
           }
-          debugPrint("암호화 성공 : ${!loading}");
           loading = true;
-          /*debugPrint("Charac Read 시작");
-          List<int> value = await c.read();
-          debugPrint('Read Check (char) : $value');*/
 
+          if (callev) {
+            DbUtil db = DbUtil();
+            db.getDB();
+            String httpResult;
+            String phoneNumber = db.getUser().phoneNumber;
+            //전화 번호 필요 UserData 구축 전까진 주석처리
+
+            /*httpResult = await http.evCall(cid, phoneNumber);
+            debugPrint(httpResult);*/
+          } else {
+            valueStream.cancel();
+            debugPrint("암호화를 실패했습니다.");
+            return Future.value(false);
+          }
           valueStream.cancel();
         } else {
           //1일 때는 write용이므로 일단 char1에 저장해두고 read용인 2찾으러가기

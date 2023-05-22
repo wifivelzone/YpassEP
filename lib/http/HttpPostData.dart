@@ -201,7 +201,6 @@ Future<String> evCall(String cid, String phoneNumber) async {
 
   if (netState != '인터넷 연결 안됨') {
     String url = "";
-    //httpType = getUser;
 
     //url = ADDRESS_LIST['유저주소'];
     final response = await http.get(Uri.parse("$url/$cid"));

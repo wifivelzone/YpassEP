@@ -32,7 +32,7 @@ class DbUtil {
     return temp1[0];
   }
 
-  List<String> getAddr() {
+  List<String> getDong() {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
     //                        addrArr[0] += " 101동 301호"; //test Code
@@ -44,6 +44,18 @@ class DbUtil {
       ho = split[split.length - 1].replaceAll("호", "");
     }
     return [dong, ho];
+  }
+
+  String getAddr() {
+    String result = "";
+    String addStr = getUser().addr;
+    List<String> addrArr = addStr.split("::");
+    //                        addrArr[0] += " 101동 301호"; //test Code
+    List<String> split = addrArr[0].split(" ");
+    for (int i = 0; i < split.length-2; i++) {
+      result += split[i];
+    }
+    return result;
   }
 
   List<bool> isValid() {
