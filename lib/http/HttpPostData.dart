@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
 import 'package:ypass/http/StatisticsReporter.dart';
 import 'package:ypass/http/HttpType.dart';
+import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 
 var client = HttpClient();
@@ -69,7 +70,7 @@ Future<String> cloberPass(int type, int scanType) async {
     return "네트워크 연결 실패";
   }
 }
-
+/*
 //tempUser = 2
 Future<String> setTempUser(String vphone, String vaddr, String sDate, String eDate) async {
   //유저 등록 확인 필요
@@ -101,7 +102,7 @@ Future<String> setTempUser(String vphone, String vaddr, String sDate, String eDa
   } else {
     return "네트워크 연결 실패";
   }
-}
+}*/
 
 //getLicense = 3
 Future<String> userLicense(int type, int scanType) {
@@ -154,7 +155,7 @@ Future<String> evCall(String cid, String phoneNumber) async {
     //reporter.sendError(cid, phoneNumber);
     return "통신error";
   }
-    return "통신 테스트";
+    //return "통신 테스트";
   } else {
     return "네트워크 연결 실패";
   }
@@ -167,7 +168,13 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
     String url = "";
     httpType = HttpType.evHome;
 
-    String inClober = "";
+    UserDBUtil userDB = UserDBUtil();
+    userDB.getDB();
+    SettingDataUtil db = SettingDataUtil();
+    String inClober = db.getLastInCloberID();
+    if (inClober == "") {
+      inClober = userDB.getFirstClober();
+    }
     if (isInward) {
       url = "http://113.52.211.196:4001/TCPCARCALL";
       final response =
@@ -199,13 +206,3 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
     return "네트워크 연결 실패";
   }
 }
-
-/* 더미 코드 (아마? 필요하면 구현)
-Future<String> getUrl(int type, int scanType) {
-  return Future.value("false");
-}*/
-
-/* 보류
-Future<String> userInit(int type, int scanType) {
-  return Future.value("false");
-}*/
