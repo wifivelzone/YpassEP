@@ -35,25 +35,31 @@ late final int data;
 late String netState;
 
 //inoutUser = 1
-Future<String> cloberPass(int type, int scanType) async {
+Future<String> cloberPass(int pass, String cid) async {
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
     httpType = HttpType.tempUser;
-    String userid = 'userData id가져와야함';
+    UserDBUtil db = UserDBUtil();
+    db.getDB();
+    SettingDataUtil set = SettingDataUtil();
+    var find = db.findCloberByCID(cid);
+    var user = db.getUser();
+    String userid = find.cloberid;
     //평균 RSSI = BLE 스캔시 얻은 max RSSI 값
     //마지막 0은 뭔지 확인 필요
     String rssi = '평균RSSI,MODEL,설정RSSI,0';
-    String setRssi = '설정RSSI';
+    String setRssi = set.getUserSetRange().toString();
     String model = '휴대폰 기종';
     String brand = '확인중 휴대폰 브랜드 예상';
 
+    //type은 pass 성공하면 0으로
     //kind도 확인 예정 And, iOS 구분 예상
     http.Response response = await http.post(
         Uri.parse("$url/put-visitguest"),
         body: <String, String> {
           "id" : userid,
-          "type" : type.toString(),
+          "type" : (pass-1).toString(),
           "rssi" : rssi,
           "setRssi" : setRssi,
           "phone" : model,

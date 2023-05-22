@@ -5,6 +5,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 import 'package:ypass/http/HttpPostData.dart' as http;
 import 'package:ypass/http/Encryption.dart';
+import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 
 class BleScanService {
@@ -34,8 +35,14 @@ class BleScanService {
   //RSSI MAX인 device 정보
   late ScanResult maxR;
 
+  //Clober Key
   late int k1;
   late int k2;
+
+  //경산용 Ev 처리
+  bool isEv = false;
+  //초기값 2000년 1월 1일 0시 0분 0초
+  DateTime lastEv = DateTime(2000);
 
   final String notFound = "none";
   late Encryption enc;
@@ -78,7 +85,7 @@ class BleScanService {
       int counter = 0;
       resStream = flutterBlue.scanResults.listen((results) {
         counter++;
-        debugPrint("Scan Counter : ${counter}");
+        debugPrint("Scan Counter : $counter");
         scanResultList = results;
         debugPrint("Scan Length : ${scanResultList.length}");
         for(ScanResult res in scanResultList) {
@@ -109,6 +116,7 @@ class BleScanService {
   //scan 결과 중에 clober 찾기
   Future<bool> searchClober() async {
     Future<bool>? returnValue;
+    isEv = false;
     int forwardRssi = -100;
     int backRssi = -100;
     //기존 RSSI MAX 값들 초기화
@@ -159,12 +167,40 @@ class BleScanService {
             }
           }
 
+          //후면 Clober RSSI가 저장되어 있는지 확인
           if (outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"] == null) {
+            //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
             scanResultList.add(res);
             debugPrint("Before Input South!!");
             debugPrint("==================");
-            continue;
+            //단 경산용 EV Clober는 따로 처리 (정면 밖에 없음)
+            //Clober ID로 EV용 구별
+            if (manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45) {
+              debugPrint("But EvClober");
+              //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
+              if (lastEv.millisecondsSinceEpoch < 3*60*1000){
+                debugPrint("But Cooldown ... (3 minute)");
+                continue;
+              }
+              //유저 설정 확인
+              SettingDataUtil db = SettingDataUtil();
+              bool auto = db.getAutoFlowSelectState();
+
+              //유저가 거부 해놨으면 pass
+              if (auto) {
+                //후면 RSSI도 있다고 치고 정면이랑 같은 값 넣어줌
+                //EV Clober가 가장 가까이 있으면 결국 이게 MAX RSSI가 될 것
+                forwardRssi = sum ~/ tempList!.length;
+                backRssi = forwardRssi;
+                isEv = true;
+              } else {
+                continue;
+              }
+            } else {
+              continue;
+            }
           } else {
+            //후면 RSSI 평균이 있으면 읽어와서 back에 넣어줌 forward는 계산
             forwardRssi = sum~/tempList!.length;
             backRssi = outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"]?.first;
             debugPrint("Input North");
@@ -190,6 +226,7 @@ class BleScanService {
           continue;
           //후면
         } else {
+          //출입용 아니면 그냥 pass
           debugPrint("Not Input Pass");
           debugPrint("==================");
           continue;
@@ -222,12 +259,23 @@ class BleScanService {
         debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");
         debugPrint("==================");
         //RSSI 최대값 비교
-        if ((rssi > maxRssi) && code2[0] == 1) {
+        //우선 isEv를 읽어 이게 EV용 Clober인지 확인
+        if (isEv && rssi > maxRssi && rssi > -75.5 - SettingDataUtil().getUserSetRange()) {
+          debugPrint("New Max with Ev");
+          maxCid = cid;
+          maxRssi = rssi;
+          maxBat = bat;
+          maxR = res;
+          returnValue = Future.value(true);
+        } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > -75.5 - SettingDataUtil().getUserSetRange()) {
+          //EV용 Clober가 이미 인식되어 있더라도
+          //다른 Clober가 max 갱신되면 isEv = false
           debugPrint("New Max");
           maxCid = cid;
           maxRssi = rssi;
           maxBat = bat;
           maxR = res;
+          isEv = false;
           returnValue = Future.value(true);
         } else {
           debugPrint("Not Max");
@@ -239,6 +287,24 @@ class BleScanService {
     }
 
     return returnValue ?? Future.value(false);
+  }
+
+  Future<bool> callEvGyeongSan() async {
+    //경산 EvCall한 시간 갱신
+    lastEv = DateTime.now();
+    //전화 번호
+    db.getDB();
+    String phoneNumber = db.getUser().phoneNumber;
+    //호수
+    String ho = db.getDong()[1];
+    //통신 (밖에서 부르는 것이므로 isInward false로)
+    String result;
+    result = await http.evCallGyeongSan(phoneNumber, false, maxCid, ho);
+    if (result == "통신error") {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   //maxCid 설정 여부로 clober 검색 여부 확인
@@ -337,16 +403,22 @@ class BleScanService {
           await c.setNotifyValue(true);
           //write 이후 characteristic의 response를 얻는 listener
           valueStream = c.onValueChangedStream.listen((value) async {
+            //loading은 바로 해제
             loading = false;
             debugPrint('!!!!!Value Changed');
             listenValue = value;
             debugPrint('!!!!!Value check : $listenValue');
+            //write 실패시 []가 읽혀옴
+            //startSuccess 값으로 순서 구분
             if (listenValue.isEmpty && !startSuccess) {
               debugPrint("StartWrite 실패");
             } else if (!startSuccess){
               startSuccess = true;
               debugPrint("StartWrite 성공");
+              //startSuccess가 true이면 암호화 단계로 인식
+              //암호화 성공시 [80]이 읽힘
             } else if (listenValue.first == 80) {
+              //EV 불러오는 것을 허가
               callev = true;
               debugPrint("암호화 성공 : $callev");
             } else {
@@ -381,6 +453,7 @@ class BleScanService {
 
           debugPrint("Notifying Check : ${c.isNotifying}");
 
+          //암호화 시작 부분
           debugPrint("암호화 시작");
           var finds2 = db.findCloberByCID(maxCid);
           enc = Encryption(finds2.userid, maxCid, finds2.pk, k1, k2);
@@ -397,14 +470,18 @@ class BleScanService {
           }
           loading = true;
 
+          //암호화 성공했으면 EV Call 실행
           if (callev) {
-            UserDBUtil db = UserDBUtil();
+            //전화 번호
             db.getDB();
-            String httpResult;
             String phoneNumber = db.getUser().phoneNumber;
+            String httpResult;
 
-            httpResult = await http.evCall(cid, phoneNumber);
-            debugPrint("통신 결과 : ${httpResult}");
+            httpResult = await http.evCall(maxCid, phoneNumber);
+            debugPrint("통신 결과 : $httpResult");
+            //최신 lastInCloberID 갱신
+            SettingDataUtil set = SettingDataUtil();
+            set.setLastInCloberID(maxCid);
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
