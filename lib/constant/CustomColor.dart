@@ -8,3 +8,4 @@ const Color TRACK_LINE_COLOR = Color(0xFFc5c5c5);
 const Color BAR_COLOR = Color(0xFFe05533);
 const Color MAIN_BACKGROUND_COLOR = Color(0xFFf0f0f0);
 const Color UPDATE_USER_DATA_BUTTON_COLOR = Color(0xFF5d5d5d);
+const Color TRANSPARENT_COLOR = Color.fromRGBO(0, 0, 0, 0.0);

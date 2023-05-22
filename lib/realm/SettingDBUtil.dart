@@ -14,7 +14,6 @@ class SettingDataUtil {
   }
 
   final _realm = Realm(Configuration.local([SettingData.schema], schemaVersion: REALM_DB_VERSION)); // DB 설정
-  late SettingData _settingData; // DB에 저장된 SettingData 값
 
 
   /// Create
@@ -23,47 +22,46 @@ class SettingDataUtil {
       deleteSettingData();
       _realm.add(SettingData(termsOfService, userSetRange, autoFlowState, stateOnOff, lastInCloberID));
     });
-    _settingData = _realm.all<SettingData>()[0];
   }
 
 
   /// Read
   SettingData getSettingData() {
-    return _settingData;
+    return _realm.all<SettingData>()[0];
   }
 
   bool getTermsOfService() {
-    return _settingData.termsOfService;
+    return _realm.all<SettingData>()[0].termsOfService;
   }
 
   int getUserSetRange() {
-    return _settingData.userSetRange;
+    return _realm.all<SettingData>()[0].userSetRange;
   }
 
   bool getAutoFlowSelectState() {
-    return _settingData.autoFlowSelectState;
+    return _realm.all<SettingData>()[0].autoFlowSelectState;
   }
 
   String getLastInCloberID() {
-    return _settingData.lastInCloberID;
+    return _realm.all<SettingData>()[0].lastInCloberID;
   }
 
 
   /// Update
   void setTermsOfService(bool termsOfService) {
-    _realm.write(() => _settingData.termsOfService = termsOfService);
+    _realm.write(() => _realm.all<SettingData>()[0].termsOfService = termsOfService);
   }
 
   void setUserSetRange(int userSetRange) {
-    _realm.write(() => _settingData.userSetRange = userSetRange);
+    _realm.write(() => _realm.all<SettingData>()[0].userSetRange = userSetRange);
   }
 
   void setAutoFlowSelectState(bool autoFlowSelectState) {
-    _realm.write(() => _settingData.autoFlowSelectState = autoFlowSelectState);
+    _realm.write(() => _realm.all<SettingData>()[0].autoFlowSelectState = autoFlowSelectState);
   }
 
   void setLastInCloberID(String lastInCloberID) {
-    _realm.write(() => _settingData.lastInCloberID = lastInCloberID);
+    _realm.write(() => _realm.all<SettingData>()[0].lastInCloberID = lastInCloberID);
   }
 
 
@@ -72,7 +70,6 @@ class SettingDataUtil {
   void deleteSettingData() {
     _realm.write(() => _realm.deleteAll<SettingData>());
   }
-
 
 
   /// 기타

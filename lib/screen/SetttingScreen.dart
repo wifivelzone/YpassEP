@@ -20,7 +20,8 @@ class SettingScreen extends StatelessWidget {
           children: [
             const Bar(barSize: 10.0),
             const TopBar(title: '설정'), // 상단 타이틀바
-            _Middle()
+            _Middle(),
+
           ],
         ),
       ),
@@ -29,8 +30,8 @@ class SettingScreen extends StatelessWidget {
 }
 
 class _Middle extends StatefulWidget {
-  double stateNumber = 20;
-  bool isGyeongSan = UserDBUtil().getUser().addr == '대전시 서구 관저중로 33';
+  double stateNumber = SettingDataUtil().getUserSetRange().toDouble();
+  bool isGyeongSan = UserDBUtil().getUser().addr == '대전시 서구 관저중로 33 ';
 
   _Middle({Key? key}) : super(key: key);
 
@@ -96,14 +97,15 @@ class _MiddleState extends State<_Middle> {
           ),
           const LinePadding(value: 20),
 
-          widget.isGyeongSan ? autoFlowButton() : autoFlowButton(),
+          widget.isGyeongSan ? autoFlowButton() : const LinePadding(value: 5),// 경산 층 버튼용
 
           SizedBox(
             width: MediaQuery.of(context).size.width,
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                print('');
+                SettingDataUtil().setUserSetRange(widget.stateNumber.toInt());
+                Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
                 shape: const RoundedRectangleBorder(
@@ -122,9 +124,8 @@ class _MiddleState extends State<_Middle> {
 
 // 경산 전용 층 버튼 자동 눌임
 class autoFlowButton extends StatefulWidget {
-  final bool autoFlowState = false; // 층 버튼 자동 눌림 상태
 
-  const autoFlowButton({Key? key}) : super(key: key);
+  autoFlowButton({Key? key}) : super(key: key);
 
   @override
   State<autoFlowButton> createState() => _autoFlowButtonState();
@@ -136,29 +137,42 @@ class _autoFlowButtonState extends State<autoFlowButton> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('층 버튼 자동 눌림', style: TextStyle(fontSize: 20)),
             FlutterSwitch(
-              width: 10.0,
-              // height: 55.0,
-              valueFontSize: 25.0,
-              toggleSize: 45.0,
+              width: 60.0,
+              height: 35.0,
+              valueFontSize: 10.0,
+              toggleSize: 25.0,
               value: settingData.getAutoFlowSelectState(),
               borderRadius: 30.0,
-              padding: 8.0,
               showOnOff: true,
+              activeColor: BAR_COLOR,
+              activeTextColor: TRANSPARENT_COLOR,
+              inactiveTextColor: TRANSPARENT_COLOR,
               onToggle: (value) {
                 setState(() {
-                  settingData.setTermsOfService(value);
+                  if (!SettingDataUtil().isEmpty()) {
+                    settingData.setAutoFlowSelectState(value);
+                  }
+                  // if (settingData)
                 });
               },
             ),
+
           ],
         ),
-        Text('엘리베이터 탑승 시, 현재 거주층 또는 마지막으로 출입했던 층을 자동으로 눌러주는 기능입니다.'),
-        Text(' * 이 기능은 시범적으로 제공하는 기능으로 안정화 될때까지\n    이용 하실 입주민분만 스위치 on하여 사용해주시기 바랍니다.')
+        LinePadding(value: 5),
+        const Text('엘리베이터 탑승 시, 현재 거주층 또는 마지막으로 출입했던 층을 자동으로 눌러주는 기능입니다.',
+          style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR),),
+        LinePadding(value: 3),
+        const Text(' * 이 기능은 시범적으로 제공하는 기능으로 안정화 될때까지\n    이용 하실 입주민분만 스위치 on하여 사용해주시기 바랍니다.',
+          style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR, fontSize: 10)),
+        LinePadding(value: 20),
       ],
     );
   }
