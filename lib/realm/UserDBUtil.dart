@@ -18,6 +18,24 @@ class DbUtil {
   late RealmResults<UserData> temp1;
   late RealmResults<IdArr> temp2;
 
+
+
+  /// Create
+  void createUserData(String phoneNumber, String addr, String type, String sDate, String eDate) {
+    realmUser.write(() {
+      realmUser.deleteAll<UserData>(); // 기존 데이터 삭제
+      realmUser.add(UserData(phoneNumber, addr , type, sDate, eDate));
+    });
+  }
+
+  void createIDArr(IdArr idArr) {
+    realmIdArr.write(() {
+      realmIdArr.add(idArr);
+    });
+  }
+
+
+  /// Read
   void getDB() {
     temp1 = realmUser.all<UserData>();
     temp2 = realmIdArr.all<IdArr>();
@@ -64,11 +82,8 @@ class DbUtil {
     return result;
   }
 
-  List<bool> isValid() {
-    List<bool> result = [temp1.isNotEmpty, temp2.isNotEmpty];
-    return result;
-  }
 
+  /// Delete
   void deleteDB() {
     realmUser.write(() {
       realmUser.deleteAll<UserData>();
@@ -77,4 +92,16 @@ class DbUtil {
       realmIdArr.deleteAll<IdArr>();
     });
   }
+
+  /// 기타
+  bool isEmpty() {
+    return temp1.isEmpty && temp2.isEmpty;
+  }
+
+
+
+
+
+
+
 }

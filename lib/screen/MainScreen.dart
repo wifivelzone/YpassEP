@@ -356,8 +356,10 @@ class _TopState extends State<Top> {
               width: MediaQuery.of(context).size.width.toDouble() * 0.3,
               child: TextButton(
                 onPressed: () async {
-                  List<bool> valid = db.isValid();
-                  if (valid[0] && valid[1]) {
+                  if (db.isEmpty()) {
+                    CustomToast().showToast("User 추가가 필요합니다.");
+                    debugPrint("DB 없다");
+                  } else {
                     if (!inActive) {
                       inActive = true;
                       if (foreIsRun) {
@@ -374,9 +376,6 @@ class _TopState extends State<Top> {
                       CustomToast().showToast("잠시만 기다려 주십시오.");
                       debugPrint("On/Off 시간초 제한 중");
                     }
-                  } else {
-                    CustomToast().showToast("User 추가가 필요합니다.");
-                    debugPrint("DB 없다");
                   }
                   debugPrint('222');
                 },
@@ -394,7 +393,6 @@ class _TopState extends State<Top> {
 
 /** ---------------------------------------------------- */
 /** --------------------   중간 부분  --------------------- */
-
 /// -------------------------------------------------------
 
 class _Middle extends StatelessWidget {
@@ -517,14 +515,17 @@ class _MiddleButtonImg extends StatelessWidget {
   }
 
   // 문의 버튼 클릭시
-  clickedQuestionBtn() {
-    debugPrint("4");
+  Future<void> clickedQuestionBtn() async {
+    // Uri url = await TalkApi.instance.addChannelUrl('_ZeUTxl');
+    // debugPrint("4");
   }
+
+
+
 }
 
 /** ---------------------------------------------------- */
 /** --------------------   하단 부분  --------------------- */
-
 /// -------------------------------------------------------
 
 class Bottom extends StatelessWidget {

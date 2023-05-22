@@ -7,7 +7,7 @@
 // 개발 및 테스트용
 const USER_DATA_VERSION = 0;
 const ID_ARR_VERSION = 0;
-const SETTING_DATA_VERSION = 0;
+const SETTING_DATA_VERSION = 1;
 
 
 
