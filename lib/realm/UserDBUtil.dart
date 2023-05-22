@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:realm/realm.dart';
 import 'package:ypass/constant/MgrationVersion.dart';
 import 'package:ypass/realm/db/IdArr.dart';
@@ -50,10 +50,13 @@ class UserDBUtil {
     return temp1[0];
   }
 
+  //주소 ccc a동 b호 에서 동,호 숫자만[a,b] 가져오기
   List<String> getDong() {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-                            addrArr[0] += "101동 301호"; //test Code
+    if (kDebugMode){
+      addrArr[0] += "101동 301호"; //test Code
+    }
     List<String> split = addrArr[0].split(" ");
     String dong = "";
     String ho = "";
@@ -64,11 +67,14 @@ class UserDBUtil {
     return [dong, ho];
   }
 
+  //주소 ccc a동 b호 에서 동,호를 뺀 주소만 가져오기 (ccc)
   String getAddr() {
     String result = "";
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-                            addrArr[0] += "101동 301호"; //test Code
+    if (kDebugMode){
+      addrArr[0] += "101동 301호"; //test Code
+    }
     debugPrint("Addr Array Check : ${addrArr}");
     List<String> split = addrArr[0].split(" ");
     debugPrint("Addr Check : ${split}");
@@ -80,6 +86,11 @@ class UserDBUtil {
       }
     }
     return result;
+  }
+
+  //user가 사용 가능한 출입 Clober list의 첫번째 Clober 가져오기
+  String getFirstClober() {
+    return temp2[0].cloberid;
   }
 
 
