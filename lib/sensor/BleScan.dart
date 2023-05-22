@@ -147,6 +147,8 @@ class BleScanService {
         List code2 = [manu[a]?[2], manu[a]?[3]];
         debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
+          //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue
+          //이미 후면 Clober RSSI가 있는 정면 Clober만 진행시킴으로 Clober가 여러개여도 구분 가능
           debugPrint("ID Check : ${res.device.id}");
           debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
           int sum = 0;
@@ -170,6 +172,8 @@ class BleScanService {
           }
           //정면
         } else if (listEquals(code2, [1, 3])) {
+          //후면 Clober는 RSSI 평균 값만 저장하고 continue
+          //outCloberList에 Clober ID를 key값으로 RSSI 평균을 저장함(정면, 후면 Clober ID가 같음)
           debugPrint("ID Check : ${res.device.id}");
           debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
           int sum = 0;
@@ -398,10 +402,9 @@ class BleScanService {
             db.getDB();
             String httpResult;
             String phoneNumber = db.getUser().phoneNumber;
-            //전화 번호 필요 UserData 구축 전까진 주석처리
 
-            /*httpResult = await http.evCall(cid, phoneNumber);
-            debugPrint(httpResult);*/
+            httpResult = await http.evCall(cid, phoneNumber);
+            debugPrint("통신 결과 : ${httpResult}");
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");

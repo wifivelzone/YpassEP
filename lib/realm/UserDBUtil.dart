@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:realm/realm.dart';
 import 'package:ypass/constant/MgrationVersion.dart';
 import 'package:ypass/realm/db/IdArr.dart';
 import 'package:ypass/realm/db/UserData.dart';
-import 'package:ypass/realm/db/SettingData.dart';
 
 class DbUtil {
   static final DbUtil _dataRequest = DbUtil._internal();
@@ -35,7 +35,7 @@ class DbUtil {
   List<String> getDong() {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-    //                        addrArr[0] += " 101동 301호"; //test Code
+                            addrArr[0] += "101동 301호"; //test Code
     List<String> split = addrArr[0].split(" ");
     String dong = "";
     String ho = "";
@@ -50,10 +50,16 @@ class DbUtil {
     String result = "";
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-    //                        addrArr[0] += " 101동 301호"; //test Code
+                            addrArr[0] += "101동 301호"; //test Code
+    debugPrint("Addr Array Check : ${addrArr}");
     List<String> split = addrArr[0].split(" ");
+    debugPrint("Addr Check : ${split}");
     for (int i = 0; i < split.length-2; i++) {
+      debugPrint("Addr Check : ${split[i]}");
       result += split[i];
+      if (i!=split.length-3) {
+        result += " ";
+      }
     }
     return result;
   }

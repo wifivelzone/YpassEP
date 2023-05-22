@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
 import 'package:ypass/http/StatisticsReporter.dart';
 import 'package:ypass/http/HttpType.dart';
+import 'package:ypass/realm/UserDBUtil.dart';
 
 var client = HttpClient();
 StatisticsReporter reporter = StatisticsReporter();
@@ -33,32 +32,6 @@ late int httpType;
 
 late final int data;
 late String netState;
-
-//addUser = 0
-Future<String> setUserDataPost(String phoneNumber) async {
-  netState = await ns.checkNetwork();
-
-  if (netState != '인터넷 연결 안됨') {
-    httpType = HttpType.addUser;
-
-    http.Response response = await http.post(
-        Uri.parse("$url/clober-approval"),
-        body: <String, String> {
-          "data" : <String, String> {
-            "phone" : phoneNumber
-          }.toString()
-        }
-    ).timeout(const Duration(seconds: 1));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      return "통신error";
-    }
-  } else {
-    return "네트워크 연결 실패";
-  }
-}
-
 
 //inoutUser = 1
 Future<String> cloberPass(int type, int scanType) async {
@@ -135,41 +108,6 @@ Future<String> userLicense(int type, int scanType) {
   return Future.value("false");
 }
 
-//getUserData = 4
-Future<String> getUserDataPost(String phoneNumber) async {
-  netState = await ns.checkNetwork();
-
-  const Map<String, String> _JSON_HEADERS = {
-    "content-type": "application/json"
-  };
-
-  if (netState != '인터넷 연결 안됨') {
-    httpType = HttpType.getUserData;
-
-    String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
-    Map<String, dynamic> sendData = {"data":"{'phone':'$userPhoneNumber'}"};
-    debugPrint('Sending Data : ${sendData.toString()}');
-    debugPrint('Encoded : ${json.encode(sendData)}');
-    http.Response response = await http.post(
-      Uri.parse("https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval"),
-      body: json.encode(sendData),
-      headers: _JSON_HEADERS
-    ).timeout(const Duration(seconds: 10));
-    if (response.statusCode == 200) {
-      // debugPrint('Response Body : ${response.body}');
-      return response.body;
-    } else {
-      debugPrint('Response Status : ${response.statusCode}');
-      // debugPrint('Response Body : ${response.body}');
-      return "통신error";
-    }
-  } else {
-    return "네트워크 연결 실패";
-  }
-}
-
-
-
 //evHome = 5
 //집에서 호출
 Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
@@ -199,20 +137,24 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
 Future<String> evCall(String cid, String phoneNumber) async {
   netState = await ns.checkNetwork();
 
+  DbUtil db = DbUtil();
+  db.getDB();
   if (netState != '인터넷 연결 안됨') {
-    String url = "";
+    String? url = "";
 
-    //url = ADDRESS_LIST['유저주소'];
+    String userAddr = db.getAddr();
+    url = ADDRESS_LIST[userAddr];
     final response = await http.get(Uri.parse("$url/$cid"));
-    if (response.statusCode == 200) {
-      //log 남기기 통신
-      //reporter.sendReport(phoneNumber, dong, ho);
-      return response.body;
-    } else {
-      //log 남기기 통신
-      //reporter.sendError(cid, phoneNumber);
-      return "통신error";
-    }
+  if (response.statusCode == 200) {
+    //log 남기기 통신
+    //reporter.sendReport(phoneNumber, dong, ho);
+    return response.body;
+  } else {
+    //log 남기기 통신
+    //reporter.sendError(cid, phoneNumber);
+    return "통신error";
+  }
+    return "통신 테스트";
   } else {
     return "네트워크 연결 실패";
   }
