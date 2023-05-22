@@ -74,6 +74,7 @@ class SettingDataUtil {
   }
 
 
+
   /// 기타
   bool isEmpty() {
     return _realm.all<SettingData>().isEmpty;
