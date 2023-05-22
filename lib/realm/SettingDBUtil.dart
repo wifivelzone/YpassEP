@@ -19,7 +19,6 @@ class SettingDataUtil {
   /// Create
   void createSettingData(bool termsOfService, int userSetRange, bool autoFlowState, bool stateOnOff, String lastInCloberID) {
     _realm.write(() {
-      deleteSettingData();
       _realm.add(SettingData(termsOfService, userSetRange, autoFlowState, stateOnOff, lastInCloberID));
     });
   }

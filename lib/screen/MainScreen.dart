@@ -11,7 +11,7 @@ import 'package:ypass/screen/serve/Toast.dart';
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/CustomColor.dart';
-import '../http/HttpPostData.dart';
+//import '../http/HttpPostData.dart';
 import '../http/UserDataRequest.dart';
 
 //foreground task 시작
@@ -85,34 +85,24 @@ class MyTaskHandler extends TaskHandler {
         debugPrint("IsAndroid from Foreground");
         //일단 둘다 connect
         //ble.writeBle();
-        if (ble.isEv) {
-          ble.callEvGyeongSan();
-          debugPrint("Call EV from 경산");
-        } else {
-          try {
-            await ble.connect().then((value) {
-              ble.disconnect();
-            });
-          } catch (e) {
+        try {
+          await ble.connect().then((value) {
             ble.disconnect();
-            debugPrint("Connect Error!!!");
-            debugPrint("Error log : ${e.toString()}");
-          }
+          });
+        } catch (e){
+          ble.disconnect();
+          debugPrint("Connect Error!!!");
+          debugPrint("Error log : ${e.toString()}");
         }
       } else {
         debugPrint("IsiOS from Foreground");
-        if (ble.isEv) {
-          ble.callEvGyeongSan();
-          debugPrint("Call EV from 경산");
-        } else {
-          try {
-            await ble.connect().then((value) {
-              ble.disconnect();
-            });
-          } catch (e) {
+        try {
+          await ble.connect().then((value) {
             ble.disconnect();
-            debugPrint("Connect Error!!!");
-          }
+          });
+        } catch (e){
+          ble.disconnect();
+          debugPrint("Connect Error!!!");
         }
       }
     } else {
