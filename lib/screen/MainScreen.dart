@@ -31,7 +31,7 @@ class MyTaskHandler extends TaskHandler {
 
   //ble 시작
   BleScanService ble = BleScanService();
-  DbUtil db = DbUtil();
+  UserDBUtil db = UserDBUtil();
 
   //gps는 더미 코드
   //LocationService gps = LocationService();
@@ -191,7 +191,7 @@ class _TopState extends State<Top> {
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = false;
   bool inActive = false;
-  DbUtil db = DbUtil();
+  UserDBUtil db = UserDBUtil();
 
   //foureground task 기본 설정
   void _initForegroundTask() {
@@ -357,7 +357,7 @@ class _TopState extends State<Top> {
               child: TextButton(
                 onPressed: () async {
                   if (db.isEmpty()) {
-                    CustomToast().showToast("User 추가가 필요합니다.");
+                    CustomToast().showToast("사용자 정보 추가가 필요합니다.");
                     debugPrint("DB 없다");
                   } else {
                     if (!inActive) {
@@ -418,6 +418,7 @@ class _Middle extends StatelessWidget {
 
 class _MiddleButtonImg extends StatelessWidget {
   BuildContext? context;
+  UserDBUtil userDBUtil = UserDBUtil();
 
   _MiddleButtonImg({Key? key}) : super(key: key);
 
@@ -479,6 +480,9 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 엘레베이터 집으로 호출 버튼 클릭시
   clickedEvCallBtn() async {
+    if (userDBUtil.isEmpty()) {
+      CustomToast().showToast("사용자 정보 추가가 필요합니다.");
+    }
     //UserData 구축전엔 주석처리
     //http.homeEvCall(phoneNumber, dong, ho);
     debugPrint("1");
@@ -491,26 +495,17 @@ class _MiddleButtonImg extends StatelessWidget {
   _clickedUpdateUserDataBtn() {
     if (context != null) {
       Navigator.of(context!).pushNamed('/updateUser');
-      /*Navigator.push(
-        context!,
-          MaterialPageRoute(
-            builder: (BuildContext contex) => const UpdateUserDataScreen(),
-        ),
-      );*/
     }
   }
 
   // 설정 버튼 클릭시
   void clickedSettingBtn() {
-
-    if (context != null) {
-      Navigator.of(context!).pushNamed('/setting');
-      /*Navigator.push(
-        context!,
-        MaterialPageRoute(
-          builder: (BuildContext contex) => const SettingScreen(),
-        ),
-      );*/
+    if (userDBUtil.isEmpty()) {
+      CustomToast().showToast("사용자 정보 추가가 필요합니다.");
+    } else {
+      if (context != null) {
+        Navigator.of(context!).pushNamed('/setting');
+      }
     }
   }
 

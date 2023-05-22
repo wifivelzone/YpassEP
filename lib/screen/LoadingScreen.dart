@@ -7,7 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 
 import '../realm/UserDBUtil.dart';
-import '../realm/SettingDBUtill.dart';
+import '../realm/SettingDBUtil.dart';
 import '../realm/db/SettingData.dart';
 import 'MainScreen.dart';
 
@@ -83,7 +83,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // 이용 약관 수락한적 있으면 메인페이지로
     // 이용 약관 수락한적 없으면 이용약관 페이지로
     String nextRoute;
-    if (SettingDataUtill().isEmpty()) {
+    if (SettingDataUtil().isEmpty()) {
       nextRoute = '/termsOfService';
     } else {
       nextRoute = '/main';

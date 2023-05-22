@@ -137,7 +137,7 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
 Future<String> evCall(String cid, String phoneNumber) async {
   netState = await ns.checkNetwork();
 
-  DbUtil db = DbUtil();
+  UserDBUtil db = UserDBUtil();
   db.getDB();
   if (netState != '인터넷 연결 안됨') {
     String? url = "";

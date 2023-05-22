@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:realm/realm.dart';
+import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/realm/db/IdArr.dart';
 import 'package:ypass/realm/db/UserData.dart';
 
@@ -55,24 +56,15 @@ class UserDataRequest {
         var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
         var listArr = jsonData['listArr'][0];
 
-        // Realm 불러오기
-        var realmUser = Realm(configUser);
-        var realmIdArr = Realm(configIdArr);
+        // User Realm 불러오기
+        UserDBUtil userDB = UserDBUtil();
 
-        // 유저 데이터 저장
-        realmUser.write(() {
-          realmUser.deleteAll<UserData>(); // 기존 데이터 삭제
-          realmUser.add(UserData(listArr['num'], listArr['addr'] , listArr['type'], listArr['sDate'], listArr['eDate']));
-        });
-
-        //  IdArr cloberid, userid, pk 저장
-        realmIdArr.write(() {
-          realmIdArr.deleteAll<IdArr>(); // 기존 데이터 삭제
-          for (var idArrValue in listArr['idArr']) {
-            realmIdArr.add(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
-          }
-        });
-
+        userDB.deleteDB(); // 기존 데이터 삭제
+        userDB.createUserData(listArr['num'], listArr['addr'], listArr['type'], listArr['sDate'], listArr['eDate']); // 유저 데이터 저장
+        //  IdArr (cloberid, userid, pk) 저장
+        for (var idArrValue in listArr['idArr']) {
+          userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
+        }
 
       } else {
         debugPrint('Response Status : ${response.statusCode}');

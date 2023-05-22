@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:ypass/realm/SettingDBUtill.dart';
+import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 
@@ -188,7 +188,7 @@ class _agreeyButton extends StatelessWidget {
           // 모든 약관에 동의시 DB저장후 메인페이지로 이동
           // 하나라도 동의 안했을시 약관 동의 안내메세지 전송
           if (TermsOfServiceScreen.agreeyNum == 2) {
-            SettingDataUtill().createSettingData(true, 20, false, false, ""); // realm DB에 역관 동의 확인 여부 및 인증 범위 저장
+            SettingDataUtil().createSettingData(true, 20, false, false, ""); // realm DB에 역관 동의 확인 여부 및 인증 범위 저장
             Navigator.pushReplacementNamed(context, '/main'); // 메인 페이지로 이동
           } else {
             CustomToast().showToast('모든 약관에 동의 해주셔야 됩니다.');

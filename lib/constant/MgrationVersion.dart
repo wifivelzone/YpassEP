@@ -5,13 +5,9 @@
 
 
 // 개발 및 테스트용
-const USER_DATA_VERSION = 0;
-const ID_ARR_VERSION = 0;
-const SETTING_DATA_VERSION = 1;
+const REALM_DB_VERSION = 1;
 
 
 
 // 배포용
-// const UserDataVersion = 0;
-// const IdArrVersion = 0;
-// const SettingDataVersion = 0;
+// const REALM_DB_VERSION = 0;

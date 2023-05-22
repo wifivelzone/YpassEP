@@ -39,7 +39,7 @@ class BleScanService {
 
   final String notFound = "none";
   late Encryption enc;
-  DbUtil db = DbUtil();
+  UserDBUtil db = UserDBUtil();
 
   //현재 스캔 중인지 확인함
   initBle() {
@@ -398,7 +398,7 @@ class BleScanService {
           loading = true;
 
           if (callev) {
-            DbUtil db = DbUtil();
+            UserDBUtil db = UserDBUtil();
             db.getDB();
             String httpResult;
             String phoneNumber = db.getUser().phoneNumber;
