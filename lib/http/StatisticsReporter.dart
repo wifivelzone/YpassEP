@@ -34,7 +34,7 @@ class StatisticsReporter {
             "type" : listArr['type'],
             "sDate" : listArr['sDate'],
             "eDate" : listArr['eDate'],
-            "idArr" : listArr['idArr'],
+            "idArr" : listArr['idArr'].toString(),
             "brand" : brand
           }
       ).timeout(const Duration(seconds: 1));
