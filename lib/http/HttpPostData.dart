@@ -47,7 +47,9 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
     SettingDataUtil set = SettingDataUtil();
     var find = db.findCloberByCID(cid);
 
-    String userid = find.cloberid;
+    String userid = find.userid;
+    List listUserid = [userid.substring(0,2), userid.substring(2,4), userid.substring(4,6), userid.substring(6,8), userid.substring(8,10), userid.substring(10,12)];
+    List convetedList = listUserid.map((number) => int.parse(number, radix: 16).toString()).toList();
     String isAnd = "0";
 
     String model = '휴대폰 기종';
@@ -60,19 +62,24 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
     } else {
       AndroidDeviceInfo andInfo = await device.androidInfo;
       model = andInfo.model;
-      brand = "android";
+      brand = andInfo.brand;
     }
     //평균 RSSI = BLE 스캔시 얻은 max RSSI 값
     //마지막 0은 뭔지 확인 필요
-    String rssi = '$maxRssi,$model,${-75.5-set.getUserSetRange()},$isAnd';
-    String setRssi = set.getUserSetRange().toString();
+    String rssi = "$maxRssi,$model,${-75.5-set.getUserSetRange()},$isAnd";
+    String setRssi = "${-75.5-set.getUserSetRange()}";
+    String conUserId = "";
+    for (String i in convetedList) {
+      conUserId += "$i,";
+    }
+    conUserId = conUserId.substring(0,conUserId.length-1);
 
     //type은 pass 성공하면 0으로
     //kind도 확인 예정 And, iOS 구분 예상
     http.Response response = await http.post(
-        Uri.parse("$url/put-visitguest"),
+        Uri.parse("http://211.46.227.157:4001/POSTTEST"),
         body: <String, String> {
-          "id" : userid,
+          "id" : conUserId,
           "type" : (pass-1).toString(),
           "rssi" : rssi,
           "setRssi" : setRssi,
@@ -82,9 +89,15 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
         }
     ).timeout(const Duration(seconds: 1));
     if (response.statusCode == 200) {
-      return response.body;
+      String result;
+      if (response.body == "") {
+        result = "통신 성공";
+      } else {
+        result = response.body;
+      }
+      return result;
     } else {
-      return "통신error";
+      return "통신error : ${response.body}, ${response.statusCode}";
     }
   } else {
     return "네트워크 연결 실패";
@@ -134,18 +147,22 @@ Future<String> userLicense(int type, int scanType) {
 Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
   netState = await ns.checkNetwork();
 
+  UserDBUtil db = UserDBUtil();
+  db.getDB();
   if (netState != '인터넷 연결 안됨') {
-    String url = "";
+    String? url = "";
     httpType = HttpType.evHome;
 
-    //url = HOME_ADDRESS_LIST['유저주소'];
+    String userAddr = db.getAddr();
+    url = HOME_ADDRESS_LIST[userAddr];
     final response = await http.get(Uri.parse("$url/$dong/$ho"));
     if (response.statusCode == 200) {
       return response.body;
     } else {
       //log 남기기 통신
-      reporter.sendError("승강기 통신 실패", phoneNumber);
-      return "통신error";
+      String result;
+      result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+      return "통신error : $result";
     }
   } else {
     return "네트워크 연결 실패";
@@ -168,8 +185,9 @@ Future<String> evCall(String cid, String phoneNumber) async {
     return response.body;
   } else {
     //log 남기기 통신
-    reporter.sendError("승강기 통신 실패", phoneNumber);
-    return "통신error";
+    String result;
+    result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+    return "통신error : $result";
   }
     //return "통신 테스트";
   } else {
@@ -199,8 +217,9 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
         return response.body;
       } else {
         //log 남기기 통신
-        reporter.sendError("승강기 통신 실패", phoneNumber);
-        return "통신error";
+        String result;
+        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        return "통신error : $result";
       }
     } else {
       url = "http://113.52.211.196:4001/TCPCARCALL2";
@@ -210,8 +229,9 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
         return response.body;
       } else {
         //log 남기기 통신
-        reporter.sendError("승강기 통신 실패", phoneNumber);
-        return "통신error";
+        String result;
+        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        return "통신error : $result";
       }
     }
   } else {

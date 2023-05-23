@@ -11,7 +11,7 @@ import 'package:ypass/screen/serve/Toast.dart';
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/CustomColor.dart';
-//import '../http/HttpPostData.dart';
+import '../http/HttpPostData.dart' as http;
 import '../http/UserDataRequest.dart';
 
 //foreground task 시작
@@ -48,6 +48,24 @@ class MyTaskHandler extends TaskHandler {
     //ble init
     ble.initBle();
     db.getDB();
+
+    var find = db.getUser();
+    DateTime sDate = DateTime.parse(find.sDate);
+    DateTime eDate = DateTime.parse(find.eDate);
+    debugPrint("sDate : $sDate");
+    debugPrint("eDate : $eDate");
+
+    DateTime now = DateTime.now();
+    int vaildTime = eDate.millisecondsSinceEpoch - sDate.millisecondsSinceEpoch;
+    int useTime = now.millisecondsSinceEpoch - sDate.millisecondsSinceEpoch;
+    debugPrint("sDate ~ eDate : $vaildTime");
+    debugPrint("sDate ~ Now : $useTime");
+    if (vaildTime < useTime*3) {
+      debugPrint("Update UserData");
+      await UserDataRequest().setUserData(find.phoneNumber);
+    } else {
+      debugPrint("Not Update Time");
+    }
   }
 
   //push가 올 때마다 실행
@@ -63,6 +81,10 @@ class MyTaskHandler extends TaskHandler {
     var find = db.getUser();
     debugPrint("Foreground DB 체크 : ${find.phoneNumber}");
     debugPrint("Foreground DB 체크 : ${find.addr}");
+    debugPrint("Foreground DB 체크 sDate : ${find.sDate}");
+    debugPrint("Foreground DB 체크 eDate : ${find.eDate}");
+    //사용기간 체크해서 UserData갱신
+
     bool scanR = await ble.scan();
     //ble 스캔 끝나고 작동하게 delay
     await Future.delayed(const Duration(milliseconds: 1500));
@@ -125,6 +147,7 @@ class MyTaskHandler extends TaskHandler {
     ble.stopScan();
     //ble 연결 도중이면 끊기 (안하면 연결 상태가 더미로 남음)
     ble.disposeBle();
+    ble.disconnect();
     await FlutterForegroundTask.clearAllData();
   }
 
@@ -480,14 +503,19 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 엘레베이터 집으로 호출 버튼 클릭시
   clickedEvCallBtn() async {
+    userDBUtil.getDB();
     if (userDBUtil.isEmpty()) {
       CustomToast().showToast("사용자 정보 추가가 필요합니다.");
-    }
-    //UserData 구축전엔 주석처리
-    //http.homeEvCall(phoneNumber, dong, ho);
-    debugPrint("1");
-    /*UserDataRequest a = UserDataRequest();
+    } else {
+      var user = userDBUtil.getUser();
+      List addr = userDBUtil.getDong();
+      String result = "";
+      result = await http.homeEvCall(user.phoneNumber, addr[0], addr[1]);
+      debugPrint("통신 결과 : $result");
+      debugPrint("1");
+      /*UserDataRequest a = UserDataRequest();
     a.getUserData('01027283301');*/
+    }
     await UserDataRequest().setUserData('01027283301');
   }
 

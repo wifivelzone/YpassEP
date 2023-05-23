@@ -166,6 +166,11 @@ class BleScanService {
               sum += a;
             }
           }
+          //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
+          if (DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch < 3*60*1000){
+            debugPrint("But Cooldown ... (3 minute)");
+            continue;
+          }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
           if (outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"] == null) {
@@ -177,11 +182,6 @@ class BleScanService {
             //Clober ID로 EV용 구별
             if (manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45) {
               debugPrint("But EvClober");
-              //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
-              if (lastEv.millisecondsSinceEpoch < 3*60*1000){
-                debugPrint("But Cooldown ... (3 minute)");
-                continue;
-              }
               //유저 설정 확인
               SettingDataUtil db = SettingDataUtil();
               bool auto = db.getAutoFlowSelectState();
@@ -473,7 +473,9 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            http.cloberPass(1, cid, maxRssi.toString());
+            String result;
+            result = await http.cloberPass(1, cid, maxRssi.toString());
+            debugPrint("통신 결과 : $result");
             //전화 번호
             db.getDB();
             String phoneNumber = db.getUser().phoneNumber;
@@ -484,6 +486,8 @@ class BleScanService {
             //최신 lastInCloberID 갱신
             SettingDataUtil set = SettingDataUtil();
             set.setLastInCloberID(maxCid);
+
+            lastEv = DateTime.now();
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");

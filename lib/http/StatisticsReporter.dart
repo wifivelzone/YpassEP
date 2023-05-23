@@ -34,14 +34,14 @@ class StatisticsReporter {
             "type" : listArr['type'],
             "sDate" : listArr['sDate'],
             "eDate" : listArr['eDate'],
-            "idArr" : listArr['idArr'].toString(),
+            "idArr" : jsonEncode(listArr['idArr']).toString(),
             "brand" : brand
           }
       ).timeout(const Duration(seconds: 1));
       if (response.statusCode == 200) {
         return response.body;
       } else {
-        return "통신error";
+        return "통신error : ${response.body}, ${response.statusCode}";
       }
     } else {
       return "네트워크 연결 실패";

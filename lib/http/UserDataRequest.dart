@@ -68,13 +68,17 @@ class UserDataRequest {
           userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
         }
 
-        reporter.sendReport(response.body, userPhoneNumber);
+        String result;
+        result = await reporter.sendReport(response.body, userPhoneNumber);
+        debugPrint("통신 결과 : $result");
 
       } else {
         debugPrint('Response Status : ${response.statusCode}');
         debugPrint('통신error');
         // debugPrint('Response Body : ${response.body}');
-        reporter.sendError("미등록 이용자", userPhoneNumber);
+        String result;
+        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        debugPrint("통신error : $result");
       }
     } else {
       debugPrint('네트워크 연결 실패');
