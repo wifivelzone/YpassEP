@@ -97,7 +97,7 @@ class _MiddleState extends State<_Middle> {
           ),
           const LinePadding(value: 20),
 
-          widget.isGyeongSan ? autoFlowButton() : const LinePadding(value: 5),// 경산 층 버튼용
+          widget.isGyeongSan ? const AutoFlowButton() : const LinePadding(value: 5),// 경산 층 버튼용
 
           SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -123,15 +123,15 @@ class _MiddleState extends State<_Middle> {
 
 
 // 경산 전용 층 버튼 자동 눌임
-class autoFlowButton extends StatefulWidget {
+class AutoFlowButton extends StatefulWidget {
 
-  autoFlowButton({Key? key}) : super(key: key);
+  const AutoFlowButton({Key? key}) : super(key: key);
 
   @override
-  State<autoFlowButton> createState() => _autoFlowButtonState();
+  State<AutoFlowButton> createState() => _AutoFlowButtonState();
 }
 
-class _autoFlowButtonState extends State<autoFlowButton> {
+class _AutoFlowButtonState extends State<AutoFlowButton> {
   SettingDataUtil settingData = SettingDataUtil();
 
   @override
@@ -142,7 +142,7 @@ class _autoFlowButtonState extends State<autoFlowButton> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('층 버튼 자동 눌림', style: TextStyle(fontSize: 20)),
+            const Text('층 버튼 자동 눌림', style: TextStyle(fontSize: 20)),
             FlutterSwitch(
               width: 60.0,
               height: 35.0,
@@ -166,13 +166,13 @@ class _autoFlowButtonState extends State<autoFlowButton> {
 
           ],
         ),
-        LinePadding(value: 5),
+        const LinePadding(value: 5),
         const Text('엘리베이터 탑승 시, 현재 거주층 또는 마지막으로 출입했던 층을 자동으로 눌러주는 기능입니다.',
           style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR),),
-        LinePadding(value: 3),
+        const LinePadding(value: 3),
         const Text(' * 이 기능은 시범적으로 제공하는 기능으로 안정화 될때까지\n    이용 하실 입주민분만 스위치 on하여 사용해주시기 바랍니다.',
           style: TextStyle(color: UPDATE_USER_DATA_BUTTON_COLOR, fontSize: 10)),
-        LinePadding(value: 20),
+        const LinePadding(value: 20),
       ],
     );
   }

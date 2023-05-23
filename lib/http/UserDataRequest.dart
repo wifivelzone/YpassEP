@@ -7,6 +7,7 @@ import 'package:ypass/realm/db/IdArr.dart';
 import 'package:ypass/realm/db/UserData.dart';
 
 import 'NetworkState.dart';
+import 'StatisticsReporter.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -29,6 +30,7 @@ class UserDataRequest {
   // 유저 데이터 서버 호출 및 DB저장
   Future<void> setUserData(String phoneNumber) async {
     var netState = await checkNetwork();
+    StatisticsReporter reporter = StatisticsReporter();
 
     const Map<String, String> JSON_HEADERS = {
       "content-type": "application/json"
@@ -66,10 +68,13 @@ class UserDataRequest {
           userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
         }
 
+        reporter.sendReport(response.body, userPhoneNumber);
+
       } else {
         debugPrint('Response Status : ${response.statusCode}');
         debugPrint('통신error');
         // debugPrint('Response Body : ${response.body}');
+        reporter.sendError("미등록 이용자", userPhoneNumber);
       }
     } else {
       debugPrint('네트워크 연결 실패');

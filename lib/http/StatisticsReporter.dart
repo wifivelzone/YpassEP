@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
+import 'package:ypass/realm/UserDBUtil.dart';
 
 class StatisticsReporter {
   var client = HttpClient();
@@ -10,14 +12,32 @@ class StatisticsReporter {
   String errorUrl = "http://211.46.227.157:4001/ypasserrorLog";
   late String netState;
 
-//집에서 호출
-  Future<String> sendReport(String phoneNumber, String dong, String ho) async {
+  Future<String> sendReport(String resBody, String phoneNumber) async {
     netState = await ns.checkNetwork();
 
     if (netState != '인터넷 연결 안됨') {
-      String url = reportUrl;
 
-      final response = await http.get(Uri.parse("$url/$dong/$ho"));
+      var jsonData = (jsonDecode(jsonDecode(resBody).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+      var listArr = jsonData['listArr'][0];
+      String brand;
+      if (Platform.isIOS) {
+        brand = "Apple";
+      } else {
+        brand = "android";
+      }
+      http.Response response = await http.post(
+          Uri.parse(reportUrl),
+          body: <String, String> {
+            "phoneNumber" : phoneNumber,
+            "num" : listArr['num'],
+            "addr" : listArr['addr'],
+            "type" : listArr['type'],
+            "sDate" : listArr['sDate'],
+            "eDate" : listArr['eDate'],
+            "idArr" : listArr['idArr'],
+            "brand" : brand
+          }
+      ).timeout(const Duration(seconds: 1));
       if (response.statusCode == 200) {
         return response.body;
       } else {
@@ -28,14 +48,31 @@ class StatisticsReporter {
     }
   }
 
-//밖에서 호출
-  Future<String> sendError(String cid, String phoneNumber) async {
+  Future<String> sendError(String errorMessage, String phoneNumber) async {
     netState = await ns.checkNetwork();
 
     if (netState != '인터넷 연결 안됨') {
-      String url = errorUrl;
+      UserDBUtil db = UserDBUtil();
+      db.getDB();
 
-      final response = await http.get(Uri.parse("$url/$cid"));
+      String userAddr = db.getUser().addr;
+
+      String brand = '휴대폰 브랜드';
+      if (Platform.isIOS) {
+        brand = "Apple";
+      } else {
+        brand = "android";
+      }
+
+      http.Response response = await http.post(
+          Uri.parse(errorUrl),
+          body: <String, String> {
+            "brand" : brand,
+            "phoneNumber" : phoneNumber,
+            "addr" : userAddr,
+            "errorlog" : errorMessage
+          }
+      ).timeout(const Duration(seconds: 1));
       if (response.statusCode == 200) {
         return response.body;
       } else {

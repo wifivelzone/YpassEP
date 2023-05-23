@@ -102,12 +102,12 @@ class _MiddleState extends State<_Middle> {
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       child: Column(
         children: [
-          Text('서비스 이용 약관에 동의해 주세요.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),),
-          Padding(padding: EdgeInsets.all(10)),
+          const Text('서비스 이용 약관에 동의해 주세요.', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),),
+          const Padding(padding: EdgeInsets.all(10)),
           _TermsOfService(title: '개인정보 제 3자 제공 동의 (필수)', url: privacyTermsOfService),
           _TermsOfService(title: '와이패스 이용 약관 (필수)', url: yPassTermsOfService),
-          Padding(padding: EdgeInsets.all(30)),
-          _agreeyButton(),
+          const Padding(padding: EdgeInsets.all(30)),
+          const _AgreeyButton(),
         ],
       ),
     );
@@ -132,38 +132,36 @@ class _TermsOfServiceState extends State<_TermsOfService> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Checkbox(
-                value: checkboxValue,
-                onChanged: (value) {
-                  // 이용약관 수락을 하면 +1 취소하면 -1
-                  setState(() {
-                    checkboxValue = value!;
-                    value
-                        ? TermsOfServiceScreen.agreeyNum += 1
-                        : TermsOfServiceScreen.agreeyNum -= 1;
-                  });
-                },
-                activeColor: Colors.black,
-                // checkColor: Colors.red,
-              ),
-              Text(widget.title),
-            ],
-          ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Checkbox(
+              value: checkboxValue,
+              onChanged: (value) {
+                // 이용약관 수락을 하면 +1 취소하면 -1
+                setState(() {
+                  checkboxValue = value!;
+                  value
+                      ? TermsOfServiceScreen.agreeyNum += 1
+                      : TermsOfServiceScreen.agreeyNum -= 1;
+                });
+              },
+              activeColor: Colors.black,
+              // checkColor: Colors.red,
+            ),
+            Text(widget.title),
+          ],
+        ),
 
-          TextButton(
-            onPressed: (){
-              _launchUrl(widget.url);
-            },
-            child: Text('보기'))
-        ],
-      ),
+        TextButton(
+          onPressed: (){
+            _launchUrl(widget.url);
+          },
+          child: const Text('보기'))
+      ],
     );
   }
 
@@ -175,8 +173,8 @@ class _TermsOfServiceState extends State<_TermsOfService> {
 }
 
 // 이용 약관 수락 버튼 (다음 페이지 이동)
-class _agreeyButton extends StatelessWidget {
-  const _agreeyButton({Key? key}) : super(key: key);
+class _AgreeyButton extends StatelessWidget {
+  const _AgreeyButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

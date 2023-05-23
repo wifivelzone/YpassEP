@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/Toast.dart';
@@ -24,14 +23,14 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const Bar(barSize: 10.0),
-              const TopBar(title: '사용자 정보 수정'), // 상단 타이틀바
+              Bar(barSize: 10.0),
+              TopBar(title: '사용자 정보 수정'), // 상단 타이틀바
               _Middle(),
             ],
           ),
@@ -44,7 +43,7 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
 
 class _Middle extends StatefulWidget {
 
-  _Middle({Key? key}) : super(key: key);
+  const _Middle({Key? key}) : super(key: key);
 
   @override
   State<_Middle> createState() => _MiddleState();
@@ -105,8 +104,8 @@ class _MiddleState extends State<_Middle> {
           sendSMS ? _InputText(
             inputTitle: "인증번호",
             fieldText: authenticatioNumber,
-          ) : Padding(padding: EdgeInsets.all(1)),
-          sendSMS ? Container(
+          ) : const Padding(padding: EdgeInsets.all(1)),
+          sendSMS ? SizedBox(
             width: MediaQuery
                 .of(context)
                 .size
@@ -114,7 +113,7 @@ class _MiddleState extends State<_Middle> {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                print(authenticatioNumber.text);
+                debugPrint(authenticatioNumber.text);
                 clickedUpdateInformationButton();
               },
               style: ElevatedButton.styleFrom(
@@ -125,7 +124,7 @@ class _MiddleState extends State<_Middle> {
               ),
               child: const Text('정보수정'),
             ),
-          ) : Padding(padding: EdgeInsets.all(1)),
+          ) : const Padding(padding: EdgeInsets.all(1)),
         ],
       ),
     );
@@ -228,7 +227,7 @@ class _InputText extends StatelessWidget {
   final TextEditingController fieldText; // 텍스트 필트에 적은 텍스트 불러오기 용
 
   const _InputText(
-      {Key? key, required String this.inputTitle, required this.fieldText})
+      {Key? key, required this.inputTitle, required this.fieldText})
       : super(key: key);
 
   @override

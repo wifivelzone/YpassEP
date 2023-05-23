@@ -75,9 +75,9 @@ class UserDBUtil {
     if (kDebugMode){
       addrArr[0] += "101동 301호"; //test Code
     }
-    debugPrint("Addr Array Check : ${addrArr}");
+    debugPrint("Addr Array Check : $addrArr");
     List<String> split = addrArr[0].split(" ");
-    debugPrint("Addr Check : ${split}");
+    debugPrint("Addr Check : $split");
     for (int i = 0; i < split.length-2; i++) {
       debugPrint("Addr Check : ${split[i]}");
       result += split[i];

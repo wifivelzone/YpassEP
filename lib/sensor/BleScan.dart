@@ -300,6 +300,7 @@ class BleScanService {
     //통신 (밖에서 부르는 것이므로 isInward false로)
     String result;
     result = await http.evCallGyeongSan(phoneNumber, false, maxCid, ho);
+    debugPrint("통신 결과 : $result");
     if (result == "통신error") {
       return false;
     } else {
@@ -472,6 +473,7 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
+            http.cloberPass(1, cid, maxRssi.toString());
             //전화 번호
             db.getDB();
             String phoneNumber = db.getUser().phoneNumber;
