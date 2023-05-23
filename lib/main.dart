@@ -6,10 +6,13 @@ import 'package:ypass/screen/SetttingScreen.dart';
 import 'package:ypass/screen/TermsOfServiceScreen.dart';
 import 'package:ypass/screen/UpdateUserDataScreen.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   //instance 초기화 + methodChannel 통신 안정성 보장, 정적 바인딩
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,); // 파이어 베이스
+  // KaKaoSdk.init(nativeAppK:83ce8d6e03a7823d0beffa856d0d9e9d);
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
 

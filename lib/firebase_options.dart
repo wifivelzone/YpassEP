@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c',
-    appId: '1:692410132364:android:6b4bcb40ab43142577d8a9',
+    appId: '1:692410132364:android:697878729b04d9b177d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
@@ -63,12 +63,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:4363f13d2a1acc8677d8a9',
+    appId: '1:692410132364:ios:8b676691aa74e31577d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
-    iosClientId: '692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com',
-    iosBundleId: 'com.example.ypass',
+    androidClientId: '692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com',
+    iosClientId: '692410132364-vjucu0ldem20s2h63jk6hbb3r5pm6gro.apps.googleusercontent.com',
+    iosBundleId: 'com.wifive.inoutappgwanjeo',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -77,6 +78,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
+    androidClientId: '692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com',
     iosClientId: '692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com',
     iosBundleId: 'com.example.ypass',
   );

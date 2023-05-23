@@ -14,6 +14,50 @@
       },
       "oauth_client": [
         {
+          "client_id": "692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ypass",
+            "certificate_hash": "e2176045f33054ad1487bd4c27e57f7b2abf1f82"
+          }
+        },
+        {
+          "client_id": "692410132364-b5qkekitvd3lrv59lfrldkekprt89n8n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "692410132364-b5qkekitvd3lrv59lfrldkekprt89n8n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ypass"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:692410132364:android:697878729b04d9b177d8a9",
+        "android_client_info": {
+          "package_name": "com.wifive.inoutappgwanjeo"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "692410132364-b5qkekitvd3lrv59lfrldkekprt89n8n.apps.googleusercontent.com",
           "client_type": 3
         }

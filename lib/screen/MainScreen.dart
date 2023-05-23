@@ -464,7 +464,7 @@ class _MiddleButtonImg extends StatelessWidget {
             ),
           ),
           Expanded(
-            // 집으로 호출 버튼
+            // 문의 하기 버튼
             child: Container(
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
               child: TextButton(
