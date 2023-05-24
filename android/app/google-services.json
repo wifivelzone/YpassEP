@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:692410132364:android:6b4bcb40ab43142577d8a9",
         "android_client_info": {
-          "package_name": "com.example.ypass"
+          "package_name": "com.wifive.inoutappgwanjeo"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.ypass",
+            "package_name": "com.wifive.inoutappgwanjeo",
             "certificate_hash": "e2176045f33054ad1487bd4c27e57f7b2abf1f82"
           }
         },
@@ -42,7 +42,7 @@
               "client_id": "692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.ypass"
+                "bundle_id": "com.wifive.inoutappgwanjeo"
               }
             }
           ]
@@ -78,7 +78,7 @@
               "client_id": "692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.ypass"
+                "bundle_id": "com.wifive.inoutappgwanjeo"
               }
             }
           ]

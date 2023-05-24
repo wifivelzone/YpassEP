@@ -80,6 +80,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'ypassflutter.appspot.com',
     androidClientId: '692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com',
     iosClientId: '692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com',
-    iosBundleId: 'com.example.ypass',
+    iosBundleId: 'com.wifive.inoutappgwanjeo',
   );
 }

@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
@@ -539,11 +540,18 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 문의 버튼 클릭시
   Future<void> clickedQuestionBtn() async {
-    // Uri url = await TalkApi.instance.addChannelUrl('_ZeUTxl');
+    if (await isKakaoTalkInstalled()) {
+      Uri url = await TalkApi.instance.channelChatUrl('_cZBEK');
+      try {
+        await launchBrowserTab(url);
+      } catch (error) {
+        print('카카오톡 채널 채팅 실패 $error');
+      }
+    } else {
+      CustomToast().showToast('카카오톡을 설치해 주세요');
+    }
     // debugPrint("4");
   }
-
-
 
 }
 

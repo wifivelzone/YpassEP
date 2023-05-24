@@ -49,6 +49,12 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+<!--                <data android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" android:host="oauth"/>-->
+<!--                <data android:host="kakaolink"-->
+<!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
+<!--                &lt;!&ndash; 카카오스토리 &ndash;&gt;-->
+<!--                <data android:host="kakaostory"-->
+<!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
