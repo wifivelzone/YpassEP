@@ -1,10 +1,12 @@
 import 'dart:convert';
+// import 'dart:js_interop';
 
 import 'package:flutter/cupertino.dart';
 import 'package:realm/realm.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/realm/db/IdArr.dart';
 import 'package:ypass/realm/db/UserData.dart';
+import 'package:ypass/screen/serve/Toast.dart';
 
 import 'NetworkState.dart';
 import 'StatisticsReporter.dart';
@@ -28,7 +30,7 @@ class UserDataRequest {
 
 
   // 유저 데이터 서버 호출 및 DB저장
-  Future<void> setUserData(String phoneNumber) async {
+  Future<bool> setUserData(String phoneNumber) async {
     var netState = await checkNetwork();
     StatisticsReporter reporter = StatisticsReporter();
 
@@ -56,6 +58,11 @@ class UserDataRequest {
         // var test3 = jsonDecode(test2) as Map<String, dynamic>;
         // 위 내용과 jsonData과 동일
         var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+
+        if (jsonData['result'] == 0 || jsonData['result'] == '0') {
+          CustomToast().showToast('등록된 사용자가 아닙니다. 관리실에 문의해주세요');
+          return false;
+        }
         var listArr = jsonData['listArr'][0];
 
         // User Realm 불러오기
@@ -72,6 +79,8 @@ class UserDataRequest {
         result = await reporter.sendReport(response.body, userPhoneNumber);
         debugPrint("통신 결과 : $result");
 
+        return true;
+
       } else {
         debugPrint('Response Status : ${response.statusCode}');
         debugPrint('통신error');
@@ -79,9 +88,13 @@ class UserDataRequest {
         String result;
         result = await reporter.sendError("승강기 통신 실패", phoneNumber);
         debugPrint("통신error : $result");
+
+        return false;
       }
     } else {
       debugPrint('네트워크 연결 실패');
+      CustomToast().showToast('인터넷 연결상태를 확인해 주세요.');
+      return false;
     }
   }
 

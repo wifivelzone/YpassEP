@@ -191,8 +191,10 @@ class _MiddleState extends State<_Middle> {
   // 정보 수정 버튼을 클릭시
   Future <void> clickedUpdateInformationButton() async {
     if (await compareVerificationID()) {
-      UserDataRequest().setUserData(phoneNumbe); // 유저 정보 업데이트
-      CustomToast().showToast('정보 수정이 완료되었습니다.');
+      // 유저 정보 업데이트
+      if (await UserDataRequest().setUserData(phoneNumbe)) {
+        CustomToast().showToast('정보 수정이 완료되었습니다.');
+      }
       Navigator.pop(context); // 메인 화면으로 이동
     }
   }

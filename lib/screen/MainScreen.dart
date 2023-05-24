@@ -517,7 +517,7 @@ class _MiddleButtonImg extends StatelessWidget {
       /*UserDataRequest a = UserDataRequest();
     a.getUserData('01027283301');*/
     }
-    await UserDataRequest().setUserData('01027283301');
+    // await UserDataRequest().setUserData('01027283301');
   }
 
   // 사용자 정보 수정 버튼 클릭시
