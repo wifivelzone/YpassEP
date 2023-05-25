@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
@@ -200,7 +201,7 @@ class Top extends StatefulWidget {
 class _TopState extends State<Top> {
   ReceivePort? _receivePort;
   bool isAnd = Platform.isAndroid;
-  bool foreIsRun = false;
+  bool foreIsRun = SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff(); // on off 버튼
   bool inActive = false;
   UserDBUtil db = UserDBUtil();
 
@@ -380,6 +381,7 @@ class _TopState extends State<Top> {
                         foreIsRun = true;
                         _startForegroundTask();
                       }
+                      SettingDataUtil().setStateOnOff(foreIsRun);
                       setState(() {});
                       await Future.delayed(const Duration(milliseconds: 1000));
                       inActive = false;

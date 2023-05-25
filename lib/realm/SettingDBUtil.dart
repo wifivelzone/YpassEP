@@ -41,6 +41,10 @@ class SettingDataUtil {
     return _realm.all<SettingData>()[0].autoFlowSelectState;
   }
 
+  bool getStateOnOff() {
+    return _realm.all<SettingData>()[0].stateOnOff;
+  }
+
   String getLastInCloberID() {
     return _realm.all<SettingData>()[0].lastInCloberID;
   }
@@ -57,6 +61,10 @@ class SettingDataUtil {
 
   void setAutoFlowSelectState(bool autoFlowSelectState) {
     _realm.write(() => _realm.all<SettingData>()[0].autoFlowSelectState = autoFlowSelectState);
+  }
+
+  void setStateOnOff(bool stateOnOff) {
+    _realm.write(() => _realm.all<SettingData>()[0].stateOnOff = stateOnOff);
   }
 
   void setLastInCloberID(String lastInCloberID) {
