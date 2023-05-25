@@ -84,7 +84,7 @@ class MyTaskHandler extends TaskHandler {
     //gps 더미 코드
     //gps.getLocation();
 
-    if (!ble.scanDone) {
+    if (ble.scanRestart) {
       await ble.scan();
     }
     //스캔 결과 따라 Clober search

@@ -22,6 +22,8 @@ class BleScanService {
 
   //지금 스캔 중인가?
   bool _isScanning = false;
+  bool timerValid = false;
+  bool scanRestart = true;
   bool scanDone = false;
   bool searchDone = false;
   bool connecting = false;
@@ -67,10 +69,29 @@ class BleScanService {
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
   Future<bool> scan() async {
+    int counter = 0;
     Future<bool>? returnValue;
+    DateTime scanTime = DateTime.now();
     //이미 스캔 중인지 확인
     debugPrint("Is Scanning? : $_isScanning");
     if (!_isScanning) {
+      scanRestart = false;
+      Future.delayed(const Duration(seconds: 1), (){
+        debugPrint("1 Second !!!");
+        timerValid = true;
+      });
+      Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+        if (timerValid) {
+          DateTime nowTime = DateTime.now();
+          if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
+            debugPrint("Scan Cut !!!");
+            counter = 0;
+            timerValid = false;
+            scanDone = true;
+            scanTime = nowTime;
+          }
+        }
+      });
       //기존 scan list 초기화
       scanResultList.clear();
       cloberList.clear();
@@ -83,13 +104,13 @@ class BleScanService {
           //UUID filter 설정
           withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
           //시간초 설정 (4초)
-          timeout: const Duration(seconds: 1)
+          timeout: const Duration(seconds: 15)
       ).then((_) {
-        scanDone = true;
+        duration.cancel();
+        scanRestart = true;
         stopListen();
       });
       //스캔 결과 (list형태)가 나오면 가져와서 저장
-      int counter = 0;
       resStream = flutterBlue.scanResults.listen((results) {
         counter++;
         scanResultList = results;
@@ -125,14 +146,21 @@ class BleScanService {
 
   //scan 결과 중에 clober 찾기
   Future<bool> searchClober() async {
+    debugPrint("Start Search!!");
     Future<bool>? returnValue;
     isEv = false;
     int forwardRssi = -100;
     int backRssi = -100;
     //기존 RSSI MAX 값들 초기화
     clearMax();
-    for (int i = 0; i < scanResultList.length; i++) {
-      ScanResult res = scanResultList[i];
+    List<ScanResult> scanResultListCopy = List.from(scanResultList);
+    scanResultList.clear();
+    Map<String, List> cloberListCopy = Map.from(cloberList);
+    cloberList.clear();
+    outCloberList.clear();
+
+    for (int i = 0; i < scanResultListCopy.length; i++) {
+      ScanResult res = scanResultListCopy[i];
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
       var manu = res.advertisementData.manufacturerData;
 
@@ -171,9 +199,9 @@ class BleScanService {
           //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue
           //이미 후면 Clober RSSI가 있는 정면 Clober만 진행시킴으로 Clober가 여러개여도 구분 가능
           debugPrint("ID Check : ${res.device.id}");
-          debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
+          debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
           int sum = 0;
-          List? tempList = cloberList[res.device.id.toString()];
+          List? tempList = cloberListCopy[res.device.id.toString()];
           if (tempList != null) {
             for (int a in tempList) {
               sum += a;
@@ -188,7 +216,7 @@ class BleScanService {
           //후면 Clober RSSI가 저장되어 있는지 확인
           if (outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"] == null) {
             //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
-            scanResultList.add(res);
+            scanResultListCopy.add(res);
             debugPrint("Before Input South!!");
             debugPrint("==================");
             //단 경산용 EV Clober는 따로 처리 (정면 밖에 없음)
@@ -224,9 +252,9 @@ class BleScanService {
           //후면 Clober는 RSSI 평균 값만 저장하고 continue
           //outCloberList에 Clober ID를 key값으로 RSSI 평균을 저장함(정면, 후면 Clober ID가 같음)
           debugPrint("ID Check : ${res.device.id}");
-          debugPrint("Get List : ${cloberList[res.device.id.toString()]}");
+          debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
           int sum = 0;
-          List? tempList = cloberList[res.device.id.toString()];
+          List? tempList = cloberListCopy[res.device.id.toString()];
           if (tempList != null) {
             for (int a in tempList) {
               sum += a;
@@ -301,6 +329,10 @@ class BleScanService {
     }
 
     scanDone = false;
+    debugPrint("Search Done? : $searchDone");
+    if (!searchDone) {
+      timerValid = true;
+    }
     return returnValue ?? Future.value(false);
   }
 
@@ -361,6 +393,7 @@ class BleScanService {
     });
     if (isFail) {
       connecting = false;
+      timerValid = true;
       return returnValue ?? Future.value(false);
     }
     debugPrint('connect');
@@ -378,6 +411,7 @@ class BleScanService {
     }
     if (isFail) {
       connecting = false;
+      timerValid = true;
       return returnValue ?? Future.value(false);
     }
 
@@ -460,6 +494,7 @@ class BleScanService {
             valueStream.cancel();
             debugPrint("Start Write를 실패했습니다.");
             connecting = false;
+            timerValid = true;
             return Future.value(false);
           }
           loading = true;
@@ -493,7 +528,7 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            String result;
+            /*String result;
             result = await http.cloberPass(1, cid, maxRssi.toString());
             debugPrint("통신 결과 : $result");
             //전화 번호
@@ -505,13 +540,14 @@ class BleScanService {
             debugPrint("통신 결과 : $httpResult");
             //최신 lastInCloberID 갱신
             SettingDataUtil set = SettingDataUtil();
-            set.setLastInCloberID(maxCid);
+            set.setLastInCloberID(maxCid);*/
 
             lastEv = DateTime.now();
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
             connecting = false;
+            timerValid = true;
             return Future.value(false);
           }
           valueStream.cancel();
@@ -524,6 +560,7 @@ class BleScanService {
     }
 
     connecting = false;
+    timerValid = true;
     return returnValue ?? Future.value(false);
   }
 
