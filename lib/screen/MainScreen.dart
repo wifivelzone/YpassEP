@@ -52,6 +52,7 @@ class MyTaskHandler extends TaskHandler {
     ble.initBle();
     db.getDB();
 
+    //사용기간 체크해서 UserData갱신
     var find = db.getUser();
     DateTime sDate = DateTime.parse(find.sDate);
     DateTime eDate = DateTime.parse(find.eDate);
@@ -81,66 +82,50 @@ class MyTaskHandler extends TaskHandler {
     );
     //gps 더미 코드
     //gps.getLocation();
-    var find = db.getUser();
-    debugPrint("Foreground DB 체크 : ${find.phoneNumber}");
-    debugPrint("Foreground DB 체크 : ${find.addr}");
-    debugPrint("Foreground DB 체크 sDate : ${find.sDate}");
-    debugPrint("Foreground DB 체크 eDate : ${find.eDate}");
-    //사용기간 체크해서 UserData갱신
 
-    bool scanR = await ble.scan();
-    //ble 스캔 끝나고 작동하게 delay
-    await Future.delayed(const Duration(milliseconds: 1500));
+    if (!ble.scanDone) {
+      await ble.scan();
+    }
     //스캔 결과 따라 Clober search
-    debugPrint("List Check : ${ble.cloberList}");
-    if (scanR) {
-      ble.stopScan();
+    if (ble.scanDone && !ble.connecting) {
+      debugPrint("List Check : ${ble.cloberList}");
       debugPrint("BLE Scan Success!!");
-      bool cloberR = await ble.searchClober();
-      if (cloberR) {
-        debugPrint("Found Clober");
-      }
-    } else {
-      debugPrint("BLE Scan Fail!!");
+      await ble.searchClober();
     }
 
     //clober search 결과 따라
-    if (ble.findClober()) {
-      if (isAnd) {
-        debugPrint("IsAndroid from Foreground");
-        //일단 둘다 connect
-        //ble.writeBle();
-        try {
-          await ble.connect().then((value) {
+    if (ble.searchDone) {
+      if (ble.findClober() && !ble.connecting) {
+        if (isAnd) {
+          debugPrint("IsAndroid from Foreground");
+          //일단 둘다 connect
+          //ble.writeBle();
+          try {
+            await ble.connect().then((value) {
+              ble.disconnect();
+            });
+          } catch (e) {
             ble.disconnect();
-          });
-        } catch (e){
-          ble.disconnect();
-          debugPrint("Connect Error!!!");
-          debugPrint("Error log : ${e.toString()}");
+            debugPrint("Connect Error!!!");
+            debugPrint("Error log : ${e.toString()}");
+          }
+        } else {
+          debugPrint("IsiOS from Foreground");
+          try {
+            await ble.connect().then((value) {
+              ble.disconnect();
+            });
+          } catch (e) {
+            ble.disconnect();
+            debugPrint("Connect Error!!!");
+          }
         }
       } else {
-        debugPrint("IsiOS from Foreground");
-        try {
-          await ble.connect().then((value) {
-            ble.disconnect();
-          });
-        } catch (e){
-          ble.disconnect();
-          debugPrint("Connect Error!!!");
-        }
+        debugPrint("Clober not Found");
       }
-    } else {
-      debugPrint("Clober not Found");
     }
 
-    var finds2 = db.findCloberByCID(ble.maxCid);
-    debugPrint("Enc Find Clober in DB(CID) : ${finds2.cloberid}");
-    debugPrint("Enc Find Clober in DB(PK) : ${finds2.pk}");
-    debugPrint("Enc Find Clober in DB(ID) : ${finds2.userid}");
-
     _eventCount++;
-    debugPrint("Is Running?");
   }
 
   //foreground task가 끝날 때
@@ -244,7 +229,7 @@ class _TopState extends State<Top> {
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 8000,  //12000
+        interval: 100,  //12000
         //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,

@@ -22,6 +22,9 @@ class BleScanService {
 
   //지금 스캔 중인가?
   bool _isScanning = false;
+  bool scanDone = false;
+  bool searchDone = false;
+  bool connecting = false;
 
   //현재 확인 중인 clober의 값들
   late String cid;
@@ -65,11 +68,12 @@ class BleScanService {
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
   Future<bool> scan() async {
     Future<bool>? returnValue;
-    clearMax();
     //이미 스캔 중인지 확인
+    debugPrint("Is Scanning? : $_isScanning");
     if (!_isScanning) {
       //기존 scan list 초기화
       scanResultList.clear();
+      cloberList.clear();
       //스캔 시작
       flutterBlue.startScan(
           //성능 설정
@@ -80,13 +84,16 @@ class BleScanService {
           withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
           //시간초 설정 (4초)
           timeout: const Duration(seconds: 1)
-      );
+      ).then((_) {
+        scanDone = true;
+        stopListen();
+      });
       //스캔 결과 (list형태)가 나오면 가져와서 저장
       int counter = 0;
       resStream = flutterBlue.scanResults.listen((results) {
         counter++;
-        debugPrint("Scan Counter : $counter");
         scanResultList = results;
+        debugPrint("Scan Counter : $counter");
         debugPrint("Scan Length : ${scanResultList.length}");
         for(ScanResult res in scanResultList) {
           if (cloberList[res.device.id.toString()] == null) {
@@ -99,8 +106,8 @@ class BleScanService {
       });
       returnValue = Future.value(true);
     } else {
-      //이미 작동 중이었으면 멈춤
-      flutterBlue.stopScan();
+      //이미 작동 중이었으면 넘어감
+      debugPrint("Scanning...");
       returnValue = Future.value(false);
     }
 
@@ -110,6 +117,9 @@ class BleScanService {
   //스캔 중단
   void stopScan() {
     flutterBlue.stopScan();
+    resStream.cancel();
+  }
+  void stopListen() {
     resStream.cancel();
   }
 
@@ -122,7 +132,6 @@ class BleScanService {
     //기존 RSSI MAX 값들 초기화
     clearMax();
     for (int i = 0; i < scanResultList.length; i++) {
-      debugPrint("Length Check : ${scanResultList.length}");
       ScanResult res = scanResultList[i];
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
       var manu = res.advertisementData.manufacturerData;
@@ -155,6 +164,10 @@ class BleScanService {
         List code2 = [manu[a]?[2], manu[a]?[3]];
         debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
+          if (manu[a]?[8] == 0 && manu[a]?[9] == 0) {
+            debugPrint("invalid Clober");
+            continue;
+          }
           //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue
           //이미 후면 Clober RSSI가 있는 정면 Clober만 진행시킴으로 Clober가 여러개여도 구분 가능
           debugPrint("ID Check : ${res.device.id}");
@@ -280,12 +293,14 @@ class BleScanService {
         } else {
           debugPrint("Not Max");
         }
+        searchDone = true;
       } else {
         debugPrint("Pass");
         returnValue = Future.value(false);
       }
     }
 
+    scanDone = false;
     return returnValue ?? Future.value(false);
   }
 
@@ -329,6 +344,8 @@ class BleScanService {
   Future<bool> connect() async {
     Future<bool>? returnValue;
     StreamSubscription<List<int>> valueStream;
+    searchDone = false;
+    connecting = true;
     bool isFail = false;
     bool loading = true;
     bool callev = false;
@@ -343,6 +360,7 @@ class BleScanService {
           isFail = true;
     });
     if (isFail) {
+      connecting = false;
       return returnValue ?? Future.value(false);
     }
     debugPrint('connect');
@@ -359,6 +377,7 @@ class BleScanService {
       isFail = true;
     }
     if (isFail) {
+      connecting = false;
       return returnValue ?? Future.value(false);
     }
 
@@ -435,11 +454,12 @@ class BleScanService {
           await char1.write(start, withoutResponse: true);
           while (loading) {
             debugPrint("Waiting Reponse...");
-            await Future.delayed(const Duration(milliseconds: 1000));
+            await Future.delayed(const Duration(milliseconds: 100));
           }
           if (!startSuccess) {
             valueStream.cancel();
             debugPrint("Start Write를 실패했습니다.");
+            connecting = false;
             return Future.value(false);
           }
           loading = true;
@@ -467,7 +487,7 @@ class BleScanService {
           debugPrint('Read Value : ${c.lastValue}');
           while (loading) {
             debugPrint("Waiting Reponse...");
-            await Future.delayed(const Duration(milliseconds: 1000));
+            await Future.delayed(const Duration(milliseconds: 100));
           }
           loading = true;
 
@@ -491,6 +511,7 @@ class BleScanService {
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
+            connecting = false;
             return Future.value(false);
           }
           valueStream.cancel();
@@ -502,6 +523,7 @@ class BleScanService {
       }
     }
 
+    connecting = false;
     return returnValue ?? Future.value(false);
   }
 
