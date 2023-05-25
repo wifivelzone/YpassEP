@@ -6,6 +6,7 @@ import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 
 import '../constant/CustomColor.dart';
+import '../constant/YPassURL.dart';
 
 // 이용 약관 페이지
 // 처음 한번만 보여줌
@@ -93,8 +94,8 @@ class _Middle extends StatefulWidget {
 }
 
 class _MiddleState extends State<_Middle> {
-  final Uri privacyTermsOfService = Uri.parse('https://wifivecloud.co.kr:8000/privacy3');
-  final Uri yPassTermsOfService = Uri.parse('https://wifivecloud.co.kr:8000/privacy4');
+  final Uri privacyTermsOfService = Uri.parse(PRIVACY_TERMS_OF_SERVICE);
+  final Uri yPassTermsOfService = Uri.parse(YPASS_TERMS_OF_SERVICE);
 
   @override
   Widget build(BuildContext context) {

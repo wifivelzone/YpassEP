@@ -1,5 +1,5 @@
 import 'package:realm/realm.dart';
-import 'package:ypass/constant/MgrationVersion.dart';
+import 'package:ypass/constant/MigrationVersion.dart';
 import 'package:ypass/realm/db/SettingData.dart';
 
 

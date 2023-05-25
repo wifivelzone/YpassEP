@@ -4,6 +4,7 @@ import 'dart:isolate';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/sensor/BleScan.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
@@ -12,6 +13,7 @@ import 'package:ypass/screen/serve/Toast.dart';
 //import 'package:ypass/sensor/GpsScan.dart';
 
 import '../constant/CustomColor.dart';
+import '../constant/YPassURL.dart';
 import '../http/HttpPostData.dart' as http;
 import '../http/UserDataRequest.dart';
 
@@ -580,8 +582,9 @@ class Bottom extends StatelessWidget {
         TextButton(
             onPressed: () => {
 
+              _launchUrl(Uri.parse(PRIVACY_TERMS_OF_SERVICE))
                   //TODO: 약관 화면 표시
-                },
+            },
             style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -594,6 +597,7 @@ class Bottom extends StatelessWidget {
         TextButton(
           onPressed: () => {
             //TODO: 약관 화면 표시
+            _launchUrl(Uri.parse(YPASS_TERMS_OF_SERVICE))
           },
           style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
@@ -606,5 +610,11 @@ class Bottom extends StatelessWidget {
         height: 15,
       )
     ]);
+  }
+
+  Future<void> _launchUrl(url) async {
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
   }
 }
