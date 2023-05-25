@@ -95,8 +95,8 @@ class MyTaskHandler extends TaskHandler {
     }
 
     //clober search 결과 따라
-    if (ble.searchDone) {
-      if (ble.findClober() && !ble.connecting) {
+    if (ble.searchDone && !ble.connecting) {
+      if (ble.findClober()) {
         if (isAnd) {
           debugPrint("IsAndroid from Foreground");
           //일단 둘다 connect
@@ -230,7 +230,7 @@ class _TopState extends State<Top> {
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 100,  //12000
+        interval: 200,  //12000
         //1번만 push설정
         isOnceEvent: false,
         autoRunOnBoot: true,

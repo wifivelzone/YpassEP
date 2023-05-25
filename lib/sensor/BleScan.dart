@@ -19,6 +19,7 @@ class BleScanService {
   //찾은 clober 저장하는 list
   Map<String, List> cloberList = {};
   Map<String, List> outCloberList = {};
+  Map<String, List> skippedCloberList = {};
 
   //지금 스캔 중인가?
   bool _isScanning = false;
@@ -81,8 +82,10 @@ class BleScanService {
         timerValid = true;
       });
       Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        if (timerValid) {
+        if (timerValid && counter > 15) {
           DateTime nowTime = DateTime.now();
+          debugPrint("Time Check : $nowTime");
+          debugPrint("Time Check : $scanTime");
           if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
             debugPrint("Scan Cut !!!");
             counter = 0;
@@ -158,6 +161,7 @@ class BleScanService {
     Map<String, List> cloberListCopy = Map.from(cloberList);
     cloberList.clear();
     outCloberList.clear();
+    skippedCloberList.clear();
 
     for (int i = 0; i < scanResultListCopy.length; i++) {
       ScanResult res = scanResultListCopy[i];
@@ -214,18 +218,22 @@ class BleScanService {
           }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
-          if (outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"] == null) {
-            //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
-            scanResultListCopy.add(res);
+          if (outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
             debugPrint("Before Input South!!");
             debugPrint("==================");
+            //두번 skip은 짝인 1.3 Clober가 없다고 판단 pass
+            if (skippedCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] != null) {
+              debugPrint("Arleady Skipped Clober!!");
+              debugPrint("==================");
+              continue;
+            }
             //단 경산용 EV Clober는 따로 처리 (정면 밖에 없음)
             //Clober ID로 EV용 구별
             if (manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45) {
               debugPrint("But EvClober");
               //유저 설정 확인
-              SettingDataUtil db = SettingDataUtil();
-              bool auto = db.getAutoFlowSelectState();
+              SettingDataUtil setdb = SettingDataUtil();
+              bool auto = setdb.getAutoFlowSelectState();
 
               //유저가 거부 해놨으면 pass
               if (auto) {
@@ -238,12 +246,15 @@ class BleScanService {
                 continue;
               }
             } else {
+              //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
+              scanResultListCopy.add(res);
+              skippedCloberList.addEntries({"${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}" : [backRssi]}.entries);
               continue;
             }
           } else {
             //후면 RSSI 평균이 있으면 읽어와서 back에 넣어줌 forward는 계산
             forwardRssi = sum~/tempList!.length;
-            backRssi = outCloberList["${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}"]?.first;
+            backRssi = outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"]?.first;
             debugPrint("Input North");
             debugPrint("Fore : $forwardRssi, Back : $backRssi");
           }
@@ -262,7 +273,7 @@ class BleScanService {
           }
           backRssi = sum~/tempList!.length;
           debugPrint("Input South");
-          outCloberList.addEntries({"${manu[a]![4]+manu[a]![5]+manu[a]![6]+manu[a]![7]}" : [backRssi]}.entries);
+          outCloberList.addEntries({"${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}" : [backRssi]}.entries);
           debugPrint("==================");
           continue;
           //후면
@@ -330,6 +341,13 @@ class BleScanService {
 
     scanDone = false;
     debugPrint("Search Done? : $searchDone");
+    try {
+      var temp = db.findCloberByCID(maxCid);
+      debugPrint(temp.cloberid);
+    } catch (e) {
+      debugPrint("접근할 수 없는 Clober 입니다.");
+      searchDone = false;
+    }
     if (!searchDone) {
       timerValid = true;
     }
@@ -384,7 +402,7 @@ class BleScanService {
     bool startSuccess = false;
     //연결 시도 (ScanResult.device에서 .connect로 함)
     await maxR.device
-        .connect(autoConnect: true)
+        .connect(autoConnect: false)
     //시간제한 설정
         .timeout(const Duration(milliseconds: 2000), onTimeout: () {
           debugPrint('Fail BLE Connect');
