@@ -31,7 +31,7 @@ class SettingScreen extends StatelessWidget {
 
 class _Middle extends StatefulWidget {
   double stateNumber = SettingDataUtil().getUserSetRange().toDouble();
-  bool isGyeongSan = UserDBUtil().getUser().addr == '대전시 서구 관저중로 33 ';
+  bool isGyeongSan = UserDBUtil().getUser().addr.contains('경산');
 
   _Middle({Key? key}) : super(key: key);
 
