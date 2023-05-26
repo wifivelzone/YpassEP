@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -84,12 +85,13 @@ class BleScanService {
         timerValid = true;
       });
       Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-         if (timerValid && counter > 15) {
-        //if (timerValid && counter > 0) {
+        //if (timerValid && counter > 15) {
+        if (timerValid && counter > 0) {
           DateTime nowTime = DateTime.now();
-          debugPrint("Not Time or Not 15 Count");
           if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
             debugPrint("Scan Cut !!!");
+            debugPrint("Scan Counter : $counter");
+            debugPrint("Scan Length : ${scanResultList.length}");
             counter = 0;
             timerValid = false;
             scanDone = true;
@@ -119,8 +121,6 @@ class BleScanService {
       resStream = flutterBlue.scanResults.listen((results) {
         counter++;
         scanResultList = results;
-        debugPrint("Scan Counter : $counter");
-        debugPrint("Scan Length : ${scanResultList.length}");
         for(ScanResult res in scanResultList) {
           if (cloberList[res.device.id.toString()] == null) {
             cloberList.addEntries({"${res.device.id}" : [res.rssi]}.entries);
@@ -217,8 +217,9 @@ class BleScanService {
             }
           }
           //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
-          if (DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch < 3*60*1000){
-            debugPrint("But Cooldown ... (3 minute)");
+          int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
+          if (restTime < 3*60*1000){
+            debugPrint("But Cooldown ... (3 minute / ${restTime~/1000})");
             continue;
           }
 
@@ -317,14 +318,16 @@ class BleScanService {
         debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
-        if (isEv && rssi > maxRssi && rssi > -75.5 - SettingDataUtil().getUserSetRange()) {
+        double correctRssi = Platform.isAndroid ? -55 : -60;
+        debugPrint("보정된 RSSI : $correctRssi");
+        if (isEv && rssi > maxRssi && rssi > correctRssi - SettingDataUtil().getUserSetRange()) {
           debugPrint("New Max with Ev");
           maxCid = cid;
           maxRssi = rssi;
           maxBat = bat;
           maxR = res;
           returnValue = Future.value(true);
-        } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > -75.5 - SettingDataUtil().getUserSetRange()) {
+        } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > correctRssi - SettingDataUtil().getUserSetRange()) {
           //EV용 Clober가 이미 인식되어 있더라도
           //다른 Clober가 max 갱신되면 isEv = false
           debugPrint("New Max");
@@ -354,6 +357,7 @@ class BleScanService {
       searchDone = false;
     }
     if (!searchDone) {
+      debugPrint("Search 실패");
       timerValid = true;
     }
     return returnValue ?? Future.value(false);
@@ -402,7 +406,6 @@ class BleScanService {
     searchDone = false;
     connecting = true;
     bool isFail = false;
-    bool loading = true;
     bool callev = false;
     bool startSuccess = false;
     //연결 시도 (ScanResult.device에서 .connect로 함)
@@ -481,7 +484,6 @@ class BleScanService {
           //write 이후 characteristic의 response를 얻는 listener
           valueStream = c.onValueChangedStream.listen((value) async {
             //loading은 바로 해제
-            loading = false;
             debugPrint('!!!!!Value Changed');
             listenValue = value;
             debugPrint('!!!!!Value check : $listenValue');
@@ -509,10 +511,8 @@ class BleScanService {
           List<int> start = [readData[a]![4], readData[a]![5], readData[a]![6], readData[a]![7], 0x53, 0x54, 0x41, 0x52, 0x54];
           //저장돼 있던 write용 Characteristic에 write 진행
           await char1.write(start, withoutResponse: true);
-          while (loading) {
-            debugPrint("Waiting Reponse...");
-            await Future.delayed(const Duration(milliseconds: 100));
-          }
+          debugPrint("Waiting Reponse...");
+          await Future.delayed(const Duration(milliseconds: 100));
           if (!startSuccess) {
             valueStream.cancel();
             debugPrint("Start Write를 실패했습니다.");
@@ -520,7 +520,6 @@ class BleScanService {
             timerValid = true;
             return Future.value(false);
           }
-          loading = true;
           //위의 onValueChangedStream에서 Response를 읽어옴
 
           //Android식으로 Key값을 manufacturerData에서 읽어옴
@@ -543,11 +542,8 @@ class BleScanService {
 
           await char1.write(enc.result, withoutResponse: true);
           debugPrint('Read Value : ${c.lastValue}');
-          while (loading) {
-            debugPrint("Waiting Reponse...");
-            await Future.delayed(const Duration(milliseconds: 100));
-          }
-          loading = true;
+          debugPrint("Waiting Reponse...");
+          await Future.delayed(const Duration(milliseconds: 100));
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
@@ -590,7 +586,9 @@ class BleScanService {
   //connect된 BLE 끊기
   void disconnect() {
     debugPrint("Disconnecting...");
-    maxR.device.disconnect();
+    if (connecting) {
+      maxR.device.disconnect();
+    }
   }
 
   //Android도 Connect하면서 안씀 일단 냅둠
