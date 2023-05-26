@@ -70,6 +70,8 @@ class BleScanService {
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
   Future<bool> scan() async {
+    scanResultList.clear();
+    cloberList.clear();
     int counter = 0;
     Future<bool>? returnValue;
     DateTime scanTime = DateTime.now();
@@ -82,11 +84,10 @@ class BleScanService {
         timerValid = true;
       });
       Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        // if (timerValid && counter > 15) {
-        if (timerValid && counter > 0) {
+         if (timerValid && counter > 15) {
+        //if (timerValid && counter > 0) {
           DateTime nowTime = DateTime.now();
-          debugPrint("Time Check : $nowTime");
-          debugPrint("Time Check : $scanTime");
+          debugPrint("Not Time or Not 15 Count");
           if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
             debugPrint("Scan Cut !!!");
             counter = 0;
@@ -124,6 +125,9 @@ class BleScanService {
           if (cloberList[res.device.id.toString()] == null) {
             cloberList.addEntries({"${res.device.id}" : [res.rssi]}.entries);
           } else {
+            if (cloberList[res.device.id.toString()]!.length >= 30) {
+              cloberList[res.device.id.toString()]?.removeAt(0);
+            }
             cloberList[res.device.id.toString()]?.add(res.rssi);
           }
         }
@@ -158,9 +162,8 @@ class BleScanService {
     //기존 RSSI MAX 값들 초기화
     clearMax();
     List<ScanResult> scanResultListCopy = List.from(scanResultList);
-    scanResultList.clear();
+    debugPrint("Length Check : ${scanResultList.length}");
     Map<String, List> cloberListCopy = Map.from(cloberList);
-    cloberList.clear();
     outCloberList.clear();
     skippedCloberList.clear();
 
@@ -207,6 +210,7 @@ class BleScanService {
           debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
           int sum = 0;
           List? tempList = cloberListCopy[res.device.id.toString()];
+          debugPrint("Length Check : ${tempList?.length}");
           if (tempList != null) {
             for (int a in tempList) {
               sum += a;
