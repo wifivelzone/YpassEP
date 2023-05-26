@@ -225,7 +225,7 @@ class _TopState extends State<Top> {
         enableVibration: true,
       ), //iOS 설정
       iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: true,
+        showNotification: false,
         playSound: false,
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(

@@ -82,7 +82,8 @@ class BleScanService {
         timerValid = true;
       });
       Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        if (timerValid && counter > 15) {
+        // if (timerValid && counter > 15) {
+        if (timerValid && counter > 0) {
           DateTime nowTime = DateTime.now();
           debugPrint("Time Check : $nowTime");
           debugPrint("Time Check : $scanTime");
