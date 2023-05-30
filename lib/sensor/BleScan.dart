@@ -336,11 +336,11 @@ class BleScanService {
           maxBat = bat;
           maxR = res;
           isEv = false;
+          searchDone = true;
           returnValue = Future.value(true);
         } else {
           debugPrint("Not Max");
         }
-        searchDone = true;
       } else {
         debugPrint("Pass");
         returnValue = Future.value(false);
@@ -357,14 +357,20 @@ class BleScanService {
       searchDone = false;
     }
     if (!searchDone) {
-      debugPrint("Search 실패");
-      timerValid = true;
+      if (isEv) {
+        debugPrint("경산 Ev Search");
+        callEvGyeongSan();
+      } else {
+        debugPrint("Search 실패");
+        timerValid = true;
+      }
     }
     return returnValue ?? Future.value(false);
   }
 
   Future<bool> callEvGyeongSan() async {
     //경산 EvCall한 시간 갱신
+    int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
     lastEv = DateTime.now();
     //전화 번호
     db.getDB();
@@ -373,8 +379,15 @@ class BleScanService {
     String ho = db.getDong()[1];
     //통신 (밖에서 부르는 것이므로 isInward false로)
     String result;
-    result = await http.evCallGyeongSan(phoneNumber, false, maxCid, ho);
+    if (restTime < 60*1000) {
+      //집에서 밖으로
+      result = await http.evCallGyeongSan(phoneNumber, false, maxCid, ho);
+    } else {
+      //밖에서 집으로
+      result = await http.evCallGyeongSan(phoneNumber, true, maxCid, ho);
+    }
     debugPrint("통신 결과 : $result");
+    timerValid = true;
     if (result == "통신error") {
       return false;
     } else {

@@ -54,9 +54,9 @@ class UserDBUtil {
   List<String> getDong() {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-    if (kDebugMode){
+    /*if (kDebugMode){
       addrArr[0] += "101동 301호"; //test Code
-    }
+    }*/
     List<String> split = addrArr[0].split(" ");
     String dong = "";
     String ho = "";
@@ -72,9 +72,9 @@ class UserDBUtil {
     String result = "";
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-    if (kDebugMode){
+    /*if (kDebugMode){
       addrArr[0] += "101동 301호"; //test Code
-    }
+    }*/
     debugPrint("Addr Array Check : $addrArr");
     List<String> split = addrArr[0].split(" ");
     debugPrint("Addr Check : $split");

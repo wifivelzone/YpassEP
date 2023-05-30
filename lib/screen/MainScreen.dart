@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -434,6 +435,8 @@ class _MiddleButtonImg extends StatelessWidget {
   BuildContext? context;
   UserDBUtil userDBUtil = UserDBUtil();
 
+  int evTime = 0;
+
   _MiddleButtonImg({Key? key}) : super(key: key);
 
   @override
@@ -500,9 +503,24 @@ class _MiddleButtonImg extends StatelessWidget {
     } else {
       var user = userDBUtil.getUser();
       List addr = userDBUtil.getDong();
-      String result = "";
-      result = await http.homeEvCall(user.phoneNumber, addr[0], addr[1]);
-      debugPrint("통신 결과 : $result");
+      debugPrint("Addr Dong Check : $addr");
+      int nowTime = DateTime.now().millisecondsSinceEpoch;
+      debugPrint("ev : $evTime, now : $nowTime");
+      int sec = nowTime - evTime;
+      if (sec > 20000) {
+        evTime = nowTime;
+        if (addr[0] == null || addr[1] == null) {
+          String result = "";
+          result = await http.homeEvCall(user.phoneNumber, addr[0], addr[1]);
+          debugPrint("통신 결과 : $result");
+        } else {
+          CustomToast().showToast("\"집으로 호출\"기능은 관리자는 사용하실 수 없습니다.");
+          debugPrint("관리자 체크");
+        }
+      } else {
+        CustomToast().showToast("\"집으로 호출\"기능은 20초에 한번씩만 사용가능합니다. ${20 - (sec ~/ 1000)}초 후에 다시 사용 가능합니다.");
+        debugPrint("20초 제한");
+      }
       debugPrint("1");
       /*UserDataRequest a = UserDataRequest();
     a.getUserData('01027283301');*/
