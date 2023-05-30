@@ -84,11 +84,12 @@ class MyTaskHandler extends TaskHandler {
     //gps 더미 코드
     //gps.getLocation();
 
-    if (ble.scanRestart) {
+    if (ble.scanRestart && !ble.connecting) {
       await ble.scan();
     }
     //스캔 결과 따라 Clober search
     if (ble.scanDone && !ble.connecting) {
+      debugPrint("Connected Device Check : ${await ble.flutterBlue.connectedDevices}");
       debugPrint("List Check : ${ble.cloberList}");
       debugPrint("BLE Scan Success!!");
       await ble.searchClober();
@@ -534,7 +535,7 @@ class _MiddleButtonImg extends StatelessWidget {
       try {
         await launchBrowserTab(url);
       } catch (error) {
-        print('카카오톡 채널 채팅 실패 $error');
+        debugPrint('카카오톡 채널 채팅 실패 $error');
       }
     } else {
       CustomToast().showToast('카카오톡을 설치해 주세요');

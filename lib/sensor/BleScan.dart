@@ -104,14 +104,14 @@ class BleScanService {
       cloberList.clear();
       //스캔 시작
       flutterBlue.startScan(
-          //성능 설정
-          scanMode: ScanMode.lowLatency,
-          //중복 scan 가능 설정
-          allowDuplicates: true,
-          //UUID filter 설정
-          withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
-          //시간초 설정 (4초)
-          timeout: const Duration(seconds: 15)
+        //성능 설정
+        scanMode: ScanMode.lowLatency,
+        //중복 scan 가능 설정
+        allowDuplicates: true,
+        //UUID filter 설정
+        withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
+        //시간초 설정 (4초)
+        timeout: const Duration(seconds: 15)
       ).then((_) {
         duration.cancel();
         scanRestart = true;
@@ -418,7 +418,6 @@ class BleScanService {
           isFail = true;
     });
     if (isFail) {
-      connecting = false;
       timerValid = true;
       return returnValue ?? Future.value(false);
     }
@@ -436,7 +435,6 @@ class BleScanService {
       isFail = true;
     }
     if (isFail) {
-      connecting = false;
       timerValid = true;
       return returnValue ?? Future.value(false);
     }
@@ -516,7 +514,6 @@ class BleScanService {
           if (!startSuccess) {
             valueStream.cancel();
             debugPrint("Start Write를 실패했습니다.");
-            connecting = false;
             timerValid = true;
             return Future.value(false);
           }
@@ -565,7 +562,6 @@ class BleScanService {
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
-            connecting = false;
             timerValid = true;
             return Future.value(false);
           }
@@ -578,7 +574,6 @@ class BleScanService {
       }
     }
 
-    connecting = false;
     timerValid = true;
     return returnValue ?? Future.value(false);
   }
@@ -587,6 +582,7 @@ class BleScanService {
   void disconnect() {
     debugPrint("Disconnecting...");
     if (connecting) {
+      connecting = false;
       maxR.device.disconnect();
     }
   }
