@@ -102,32 +102,7 @@ class _TopState extends State<Top> {
             child: SizedBox(
               width: MediaQuery.of(context).size.width.toDouble() * 0.3,
               child: TextButton(
-                onPressed: () async {
-                  if (db.isEmpty()) {
-                    CustomToast().showToast("사용자 정보 추가가 필요합니다.");
-                    debugPrint("DB 없다");
-                  } else {
-                    if (!inActive) {
-                      inActive = true;
-                      if (foreIsRun) {
-                        foreIsRun = false;
-                        taskSetting.stopForegroundTask();
-                      } else {
-                        foreIsRun = true;
-                        taskSetting.setContext(context);
-                        taskSetting.startForegroundTask();
-                      }
-                      SettingDataUtil().setStateOnOff(foreIsRun);
-                      setState(() {});
-                      await Future.delayed(const Duration(milliseconds: 1000));
-                      inActive = false;
-                    } else {
-                      CustomToast().showToast("잠시만 기다려 주십시오.");
-                      debugPrint("On/Off 시간초 제한 중");
-                    }
-                  }
-                  debugPrint('222');
-                },
+                onPressed: onClickOnOffButton,
                 child: foreIsRun
                     ? Image.asset('asset/img/on_ios.png')
                     : Image.asset('asset/img/off_ios.png'),
@@ -137,6 +112,32 @@ class _TopState extends State<Top> {
         ],
       ),
     );
+  }
+  void onClickOnOffButton() async {
+    if (db.isEmpty()) {
+      CustomToast().showToast("사용자 정보 추가가 필요합니다.");
+      debugPrint("DB 없다");
+    } else {
+      if (!inActive) {
+        inActive = true;
+        if (foreIsRun) {
+          foreIsRun = false;
+          taskSetting.stopForegroundTask();
+        } else {
+          foreIsRun = true;
+          taskSetting.setContext(context);
+          taskSetting.startForegroundTask();
+        }
+        SettingDataUtil().setStateOnOff(foreIsRun);
+        setState(() {});
+        await Future.delayed(const Duration(milliseconds: 1000));
+        inActive = false;
+      } else {
+        CustomToast().showToast("잠시만 기다려 주십시오.");
+        debugPrint("On/Off 시간초 제한 중");
+      }
+    }
+    debugPrint('222');
   }
 }
 
