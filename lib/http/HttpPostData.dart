@@ -7,28 +7,12 @@ import 'package:ypass/http/StatisticsReporter.dart';
 import 'package:ypass/http/HttpType.dart';
 import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
+import 'package:ypass/constant/YPassURL.dart';
 
 var client = HttpClient();
 StatisticsReporter reporter = StatisticsReporter();
-
-Map<String,String> ADDRESS_LIST = {
-  "대전시 서구 관저중로 33" : "http://211.230.62.208:4400/TCPEVCALL",
-  "충남 공주시 웅진절골3길 38" : "http://220.82.77.100:4001/TCPEVCALL",
-  "경상북도 경산시 정평길 9-2" : "http://113.52.211.196:4001/TCPEVCALL",
-  "동탄역센트럴예미지" : "http://211.221.88.71:4001/TCPEVCALL",
-  "예미지트리플에듀" : "http://121.142.232.41:4001/TCPEVCALL"
-};
-
-Map<String,String> HOME_ADDRESS_LIST = {
-  "대전시 서구 관저중로 33" : "http://211.230.62.208:4400/TCPEVCALL2",
-  "충남 공주시 웅진절골3길 38" : "http://220.82.77.100:4001/TCPEVCALL2",
-  "경상북도 경산시 정평길 9-2" : "http://113.52.211.196:4001/TCPEVCALL2",
-  "동탄역센트럴예미지" : "http://211.221.88.71:4001/TCPEVCALL2",
-  "예미지트리플에듀" : "http://121.142.232.41:4001/TCPEVCALL2"
-};
-
 //url 확인 필요 일단 긁어옴
-String url = "https://xphub.xperp.co.kr/_clober/xpclober_api.svc";
+String url = YPASS_EZS_URL;
 
 late int httpType;
 
@@ -77,7 +61,7 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
     //type은 pass 성공하면 0으로
     //kind도 확인 예정 And, iOS 구분 예상
     http.Response response = await http.post(
-        Uri.parse("http://211.46.227.157:4001/POSTTEST"),
+        Uri.parse(YPASS_POST_TEST),
         body: <String, String> {
           "id" : conUserId,
           "type" : (pass-1).toString(),
@@ -210,7 +194,7 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
       inClober = userDB.getFirstClober();
     }
     if (isInward) {
-      url = "http://113.52.211.196:4001/TCPCARCALL";
+      url = YPASS_GYEONGSAN_EV;
       final response =
           await http.get(Uri.parse("$url/$inClober/$cloberId/$ho"));
       if (response.statusCode == 200) {
@@ -222,7 +206,7 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
         return "통신error : $result";
       }
     } else {
-      url = "http://113.52.211.196:4001/TCPCARCALL2";
+      url = YPASS_GYEONGSAN_HOME;
       final response =
       await http.get(Uri.parse("$url/$inClober/$cloberId"));
       if (response.statusCode == 200) {
