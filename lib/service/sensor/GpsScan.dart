@@ -1,3 +1,4 @@
+//더미코드
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
