@@ -50,6 +50,7 @@ class BleScanService {
   bool isEv = false;
   //초기값 2000년 1월 1일 0시 0분 0초
   DateTime lastEv = DateTime(2000);
+  DateTime lastGS = DateTime(2000);
 
   final String notFound = "none";
   late Encryption enc;
@@ -217,8 +218,10 @@ class BleScanService {
             }
           }
           //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
+          //Clober ID로 EV용 구별
+          bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
           int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-          if (restTime < 3*60*1000){
+          if (restTime < 3*60*1000 && !isGS){
             debugPrint("But Cooldown ... (3 minute / ${restTime~/1000})");
             continue;
           }
@@ -234,22 +237,27 @@ class BleScanService {
               continue;
             }
             //단 경산용 EV Clober는 따로 처리 (정면 밖에 없음)
-            //Clober ID로 EV용 구별
-            if (manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45) {
+            //경산 EV 쿨타임 5분
+            int restGSTime = DateTime.now().millisecondsSinceEpoch - lastGS.millisecondsSinceEpoch;
+            if (isGS) {
               debugPrint("But EvClober");
-              //유저 설정 확인
-              SettingDataUtil setdb = SettingDataUtil();
-              bool auto = setdb.getAutoFlowSelectState();
+              if (restGSTime < 5*60*1000) {
+                //유저 설정 확인
+                SettingDataUtil setdb = SettingDataUtil();
+                bool auto = setdb.getAutoFlowSelectState();
 
-              //유저가 거부 해놨으면 pass
-              if (auto) {
-                //후면 RSSI도 있다고 치고 정면이랑 같은 값 넣어줌
-                //EV Clober가 가장 가까이 있으면 결국 이게 MAX RSSI가 될 것
-                forwardRssi = sum ~/ tempList!.length;
-                backRssi = forwardRssi;
-                isEv = true;
+                //유저가 거부 해놨으면 pass
+                if (auto) {
+                  //후면 RSSI도 있다고 치고 정면이랑 같은 값 넣어줌
+                  //EV Clober가 가장 가까이 있으면 결국 이게 MAX RSSI가 될 것
+                  forwardRssi = sum ~/ tempList!.length;
+                  backRssi = forwardRssi;
+                  isEv = true;
+                } else {
+                  continue;
+                }
               } else {
-                continue;
+                debugPrint("But EVCooldown ... (5 minute / ${restGSTime~/1000})");
               }
             } else {
               //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
@@ -326,6 +334,7 @@ class BleScanService {
           maxRssi = rssi;
           maxBat = bat;
           maxR = res;
+          searchDone = false;
           returnValue = Future.value(true);
         } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > correctRssi - SettingDataUtil().getUserSetRange()) {
           //EV용 Clober가 이미 인식되어 있더라도
@@ -371,7 +380,7 @@ class BleScanService {
   Future<bool> callEvGyeongSan() async {
     //경산 EvCall한 시간 갱신
     int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-    lastEv = DateTime.now();
+    lastGS = DateTime.now();
     //전화 번호
     db.getDB();
     String phoneNumber = db.getUser().phoneNumber;
@@ -379,7 +388,7 @@ class BleScanService {
     String ho = db.getDong()[1];
     //통신 (밖에서 부르는 것이므로 isInward false로)
     String result;
-    if (restTime < 60*1000) {
+    if (restTime < 2*60*1000) {
       //집에서 밖으로
       result = await http.evCallGyeongSan(phoneNumber, false, maxCid, ho);
     } else {
