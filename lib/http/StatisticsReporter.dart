@@ -53,7 +53,6 @@ class StatisticsReporter {
 
     if (netState != '인터넷 연결 안됨') {
       UserDBUtil db = UserDBUtil();
-      db.getDB();
 
       String userAddr = db.getUser().addr;
 

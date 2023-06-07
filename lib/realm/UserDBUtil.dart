@@ -109,10 +109,9 @@ class UserDBUtil {
     return temp1.isEmpty && temp2.isEmpty;
   }
 
-
-
-
-
-
+  bool findCloberByCIDIsEmpty(String cid) {
+    var finds = temp2.query("cloberid == '$cid'");
+    return finds.isEmpty;
+  }
 
 }

@@ -58,7 +58,6 @@ class BleScanService {
 
   //현재 스캔 중인지 확인함
   initBle() {
-    db.getDB();
     subscription = flutterBlue.isScanning.listen((isScanning) {
       _isScanning = isScanning;
     });
@@ -358,12 +357,12 @@ class BleScanService {
 
     scanDone = false;
     debugPrint("Search Done? : $searchDone");
-    try {
+    if (db.findCloberByCIDIsEmpty(maxCid)) {
+      debugPrint("접근할 수 없는 Clober 입니다. CID : $maxCid");
+      searchDone = false;
+    } else {
       var temp = db.findCloberByCID(maxCid);
       debugPrint(temp.cloberid);
-    } catch (e) {
-      debugPrint("접근할 수 없는 Clober 입니다.");
-      searchDone = false;
     }
     if (!searchDone) {
       if (isEv) {
@@ -382,7 +381,6 @@ class BleScanService {
     int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
     lastGS = DateTime.now();
     //전화 번호
-    db.getDB();
     String phoneNumber = db.getUser().phoneNumber;
     //호수
     String ho = db.getDong()[1];

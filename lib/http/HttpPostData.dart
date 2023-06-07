@@ -27,7 +27,6 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
     httpType = HttpType.tempUser;
     DeviceInfoPlugin device = DeviceInfoPlugin();
     UserDBUtil db = UserDBUtil();
-    db.getDB();
     SettingDataUtil set = SettingDataUtil();
     var find = db.findCloberByCID(cid);
 
@@ -132,7 +131,6 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
   netState = await ns.checkNetwork();
 
   UserDBUtil db = UserDBUtil();
-  db.getDB();
   if (netState != '인터넷 연결 안됨') {
     String? url = "";
     httpType = HttpType.evHome;
@@ -158,7 +156,6 @@ Future<String> evCall(String cid, String phoneNumber) async {
   netState = await ns.checkNetwork();
 
   UserDBUtil db = UserDBUtil();
-  db.getDB();
   if (netState != '인터넷 연결 안됨') {
     String? url = "";
 
@@ -187,7 +184,6 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
     httpType = HttpType.evHome;
 
     UserDBUtil userDB = UserDBUtil();
-    userDB.getDB();
     SettingDataUtil db = SettingDataUtil();
     String inClober = db.getLastInCloberID();
     if (inClober == "") {

@@ -232,7 +232,6 @@ class _MiddleButtonImg extends StatelessWidget {
 
   // 엘레베이터 집으로 호출 버튼 클릭시
   clickedEvCallBtn() async {
-    userDBUtil.getDB();
     if (userDBUtil.isEmpty()) {
       CustomToast().showToast("사용자 정보 추가가 필요합니다.");
     } else {
