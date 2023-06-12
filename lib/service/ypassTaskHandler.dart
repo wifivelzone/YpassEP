@@ -56,19 +56,25 @@ class YPassTaskHandler extends TaskHandler {
     debugPrint("sDate ~ Now : $useTime");
     if (vaildTime < useTime*3) {
       debugPrint("Update UserData");
-      await UserDataRequest().setUserData(find.phoneNumber);
+      debugPrint("phoneNumber : ${find.phoneNumber}");
+      if (find.phoneNumber != "1") {
+        debugPrint("갱신 시작");
+        await UserDataRequest().setUserData(find.phoneNumber);
+      } else {
+        debugPrint("관리자 PASS");
+      }
     } else {
       debugPrint("Not Update Time");
     }
+    //표시되는 push 창 업데이트
+    FlutterForegroundTask.updateService(
+      notificationTitle: 'YPass',
+    );
   }
 
   //push가 올 때마다 실행
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
-    //표시되는 push 창 업데이트
-    FlutterForegroundTask.updateService(
-      notificationTitle: 'YPass',
-    );
     //gps 더미 코드
     //gps.getLocation();
 
