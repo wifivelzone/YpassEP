@@ -51,6 +51,7 @@ dependencies:
   geolocator: ^9.0.2
   flutter_switch: ^0.3.2
   device_info_plus: ^9.0.1
+  upgrader: ^7.1.0
 
 dependency_overrides:
   geolocator_android:

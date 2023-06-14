@@ -13,6 +13,9 @@ import '../constant/CustomColor.dart';
 import '../constant/YPassURL.dart';
 import '../http/HttpPostData.dart' as http;
 
+
+import 'package:upgrader/upgrader.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -23,19 +26,21 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Bar(barSize: 5.0),
-            Top(),
-            Bar(barSize: 5.0),
-            _Middle(),
-            Bar(barSize: 5.0),
-            Bottom(),
-          ],
+        child: UpgradeAlert(
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Bar(barSize: 5.0),
+              Top(),
+              Bar(barSize: 5.0),
+              _Middle(),
+              Bar(barSize: 5.0),
+              Bottom(),
+            ],
+          ),
         ),
       ),
     );
