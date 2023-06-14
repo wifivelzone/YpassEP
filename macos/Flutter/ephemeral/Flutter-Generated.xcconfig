@@ -1,6 +1,6 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/seongtaegyeong/flutter
-FLUTTER_APPLICATION_PATH=/Users/seongtaegyeong/Desktop/YPass/flutter/git/YPassFlutter
+FLUTTER_ROOT=C:\flutter
+FLUTTER_APPLICATION_PATH=E:\YPassFlutter
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.0.0
