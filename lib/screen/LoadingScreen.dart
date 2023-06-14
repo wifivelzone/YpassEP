@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:ypass/screen/serve/Toast.dart';
+
+import 'package:device_info_plus/device_info_plus.dart';
 
 import 'dart:io';
 
@@ -56,20 +60,47 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   // 권한 설정
   Future<void> checkPermission() async {
+    bool rejectPermission = false;
+    int andVersion = 0;
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
+      andVersion = androidDeviceInfo.version.sdkInt;
+    }
+
     // 위치 정보
-    await Permission.location.request();
-    await Permission.locationAlways.request();
+    await Permission.location.request().isDenied ? rejectPermission = true : "";
+    print('location$rejectPermission');
+    await Permission.locationAlways.request().isDenied ? rejectPermission = true : "";
+    print('locationAlways$rejectPermission');
 
     // 블루투스
-    await Permission.bluetooth.request();
-    await Permission.bluetoothConnect.request();
-    await Permission.bluetoothScan.request();
+    if (andVersion < 31) {
+      await Permission.bluetooth.request().isDenied ? rejectPermission = true : "";
+      print('bluetooth$rejectPermission');
+    }
+    await Permission.bluetoothConnect.request().isDenied ? rejectPermission = true : "";
+    print('bluetoothConnect$rejectPermission');
+    await Permission.bluetoothScan.request().isDenied ? rejectPermission = true : "";
+    print('bluetoothScan$rejectPermission');
 
-    await Permission.ignoreBatteryOptimizations.request(); // 배터리 사용량 최적화 중지
-    await Permission.systemAlertWindow.request(); // 다른 앱 위에 표시
+    var battery = await Permission.ignoreBatteryOptimizations.request();
+    await Permission.ignoreBatteryOptimizations.isDenied ? rejectPermission = true : "";
+    print('ignoreBatteryOptimizations$rejectPermission');
 
-    // 페이지 이동
-    goToMainPage();
+    await Permission.systemAlertWindow.request().isDenied ? rejectPermission = true : ""; // 다른 앱 위에 표시
+    print('systemAlertWindow$rejectPermission');
+
+    // 권한 설정 여부 확인
+    if (rejectPermission) {
+      CustomToast().showToast("모든 권한을 (항상)허용 하셔야 됩니다.");
+      Future.delayed(const Duration(seconds: 2), () {
+        SystemNavigator.pop();
+      });
+    } else {
+      goToMainPage(); // 페이지 이동
+    }
+
   }
 
   // 페이지 이동

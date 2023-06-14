@@ -83,7 +83,7 @@ class YPassTaskHandler extends TaskHandler {
     }
     //스캔 결과 따라 Clober search
     if (ble.scanDone && !ble.connecting) {
-      debugPrint("Connected Device Check : ${await ble.flutterBlue.connectedDevices}");
+      //debugPrint("Connected Device Check : ${await ble.flutterBlue.connectedDevices}");
       debugPrint("List Check : ${ble.cloberList}");
       debugPrint("BLE Scan Success!!");
       await ble.searchClober();
