@@ -70,26 +70,26 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     // 위치 정보
     await Permission.location.request().isDenied ? rejectPermission = true : "";
-    print('location$rejectPermission');
+    debugPrint('location$rejectPermission');
     await Permission.locationAlways.request().isDenied ? rejectPermission = true : "";
-    print('locationAlways$rejectPermission');
+    debugPrint('locationAlways$rejectPermission');
 
     // 블루투스
     if (andVersion < 31) {
       await Permission.bluetooth.request().isDenied ? rejectPermission = true : "";
-      print('bluetooth$rejectPermission');
+      debugPrint('bluetooth$rejectPermission');
     }
     await Permission.bluetoothConnect.request().isDenied ? rejectPermission = true : "";
-    print('bluetoothConnect$rejectPermission');
+    debugPrint('bluetoothConnect$rejectPermission');
     await Permission.bluetoothScan.request().isDenied ? rejectPermission = true : "";
-    print('bluetoothScan$rejectPermission');
+    debugPrint('bluetoothScan$rejectPermission');
 
-    var battery = await Permission.ignoreBatteryOptimizations.request();
+    await Permission.ignoreBatteryOptimizations.request();
     await Permission.ignoreBatteryOptimizations.isDenied ? rejectPermission = true : "";
-    print('ignoreBatteryOptimizations$rejectPermission');
+    debugPrint('ignoreBatteryOptimizations$rejectPermission');
 
     await Permission.systemAlertWindow.request().isDenied ? rejectPermission = true : ""; // 다른 앱 위에 표시
-    print('systemAlertWindow$rejectPermission');
+    debugPrint('systemAlertWindow$rejectPermission');
 
     // 권한 설정 여부 확인
     if (rejectPermission) {

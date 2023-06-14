@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:realm/realm.dart';
 
 part 'UserData.g.dart';
@@ -12,8 +10,4 @@ class _UserData {
   late String type;         // 0:입주자, 1:방문자
   late String sDate;        // 방문 가능 시작 시간
   late String eDate;        // 방문 가능 종료 시간
-
-
-
-
 }
