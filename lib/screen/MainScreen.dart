@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:ypass/constant/APPInfo.dart';
 
 import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/screen/serve/Bar.dart';
@@ -315,7 +317,7 @@ class Bottom extends StatelessWidget {
       const SizedBox(
         height: 5,
       ),
-      const Text('1.0.0v'),
+      Text('$APP_VERSION v'),
       const SizedBox(
         height: 5,
       ),
@@ -362,4 +364,5 @@ class Bottom extends StatelessWidget {
       throw Exception('Could not launch $url');
     }
   }
+
 }

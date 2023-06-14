@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:ypass/constant/APPInfo.dart';
 import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -99,6 +101,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
         SystemNavigator.pop();
       });
     } else {
+      // 앱 버전 저장
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      APP_VERSION = packageInfo.version;
+
       goToMainPage(); // 페이지 이동
     }
 
