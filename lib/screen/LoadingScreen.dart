@@ -9,6 +9,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 
 import 'dart:io';
 
+import '../http/HttpPostData.dart';
 import '../realm/SettingDBUtil.dart';
 
 class LoadingScreen extends StatefulWidget {
