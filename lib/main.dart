@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:ypass/screen/LoadingScreen.dart';
 import 'package:ypass/screen/MainScreen.dart';
@@ -16,6 +17,10 @@ void main() async {
   KakaoSdk.init(
     nativeAppKey: '83ce8d6e03a7823d0beffa856d0d9e9d',
   );
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
 
