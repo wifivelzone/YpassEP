@@ -80,6 +80,8 @@ class _LoadingScreenState extends State<LoadingScreen> {
     if (andVersion < 31) {
       await Permission.bluetooth.request().isDenied ? rejectPermission = true : "";
       debugPrint('bluetooth$rejectPermission');
+    } else if (andVersion >= 33) {
+      await Permission.notification.request().isDenied ? rejectPermission = true : "";
     }
     await Permission.bluetoothConnect.request().isDenied ? rejectPermission = true : "";
     debugPrint('bluetoothConnect$rejectPermission');
@@ -92,6 +94,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     await Permission.systemAlertWindow.request().isDenied ? rejectPermission = true : ""; // 다른 앱 위에 표시
     debugPrint('systemAlertWindow$rejectPermission');
+
 
     // 권한 설정 여부 확인
     if (rejectPermission) {

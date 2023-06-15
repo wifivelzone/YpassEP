@@ -190,6 +190,7 @@ class _MiddleState extends State<_Middle> {
       if (await UserDataRequest().setUserData(phoneNumbe)) {
         CustomToast().showToast('정보 수정이 완료되었습니다.');
       }
+
       Navigator.pop(context); // 메인 화면으로 이동
     }
   }
