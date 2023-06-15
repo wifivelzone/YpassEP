@@ -176,7 +176,7 @@ Future<String> evCall(String cid, String phoneNumber) async {
   }
 }
 
-Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberId, String ho) async {
+Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberId, String? ho) async {
   netState = await ns.checkNetwork();
 
   if (netState != '인터넷 연결 안됨') {
@@ -191,6 +191,8 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
     }
     if (isInward) {
       url = YPASS_GYEONGSAN_EV;
+      //ho = null이면 ""으로
+      ho ??= "";
       final response =
           await http.get(Uri.parse("$url/$inClober/$cloberId/$ho"));
       if (response.statusCode == 200) {

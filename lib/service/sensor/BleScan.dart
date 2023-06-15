@@ -564,7 +564,7 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            /*String result;
+            String result;
             result = await http.cloberPass(1, cid, maxRssi.toString());
             debugPrint("통신 결과 : $result");
             //전화 번호
@@ -576,7 +576,7 @@ class BleScanService {
             debugPrint("통신 결과 : $httpResult");
             //최신 lastInCloberID 갱신
             SettingDataUtil set = SettingDataUtil();
-            set.setLastInCloberID(maxCid);*/
+            set.setLastInCloberID(maxCid);
 
             lastEv = DateTime.now();
           } else {
