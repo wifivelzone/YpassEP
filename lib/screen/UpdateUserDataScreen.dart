@@ -137,12 +137,10 @@ class _MiddleState extends State<_Middle> {
       // 문자 요청
       await auth.verifyPhoneNumber(
         phoneNumber: "+82 $num", // 인증 요청할 전화번호
-        timeout: const Duration(seconds: 120),// 2분 안에 인증 코드를 입력해야됨
+        timeout: const Duration(seconds: 119),// 2분 안에 인증 코드를 입력해야됨
         verificationCompleted: (PhoneAuthCredential credential) async {
           // Android only
-          await auth
-              .signInWithCredential(credential)
-              .then((_) => debugPrint('ttt'));
+
         },
         // 문지 전송 실패시
         verificationFailed: (FirebaseAuthException e) {
