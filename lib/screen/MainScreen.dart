@@ -69,7 +69,7 @@ class _TopState extends State<Top> {
   YPassTaskSetting taskSetting = YPassTaskSetting();
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
     db.getDB();
     taskSetting.init();
