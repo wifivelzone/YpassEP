@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:ypass/constant/APPInfo.dart';
 
 import 'package:ypass/realm/SettingDBUtil.dart';
@@ -69,7 +69,7 @@ class _TopState extends State<Top> {
   YPassTaskSetting taskSetting = YPassTaskSetting();
 
   @override
-  void initState() {
+  void initState() async {
     super.initState();
     db.getDB();
     taskSetting.init();
@@ -120,31 +120,37 @@ class _TopState extends State<Top> {
       ),
     );
   }
-  void onClickOnOffButton() async {
-    if (db.isEmpty()) {
-      CustomToast().showToast("사용자 정보 추가가 필요합니다.");
-      debugPrint("DB 없다");
-    } else {
-      if (!inActive) {
-        inActive = true;
-        if (foreIsRun) {
-          foreIsRun = false;
-          taskSetting.stopForegroundTask();
-        } else {
-          foreIsRun = true;
-          taskSetting.setContext(context);
-          taskSetting.startForegroundTask();
-        }
-        SettingDataUtil().setStateOnOff(foreIsRun);
-        setState(() {});
-        await Future.delayed(const Duration(milliseconds: 1000));
-        inActive = false;
+  void onClickOnOffButton() {
+    FlutterBluePlus.instance.isOn.then((isOn) {
+      if (isOn) {
+        CustomToast().showToast("블루투스를 켜주시기 바랍니다.");
+        debugPrint("Bluetooth Off");
+      } else if (db.isEmpty()) {
+        CustomToast().showToast("사용자 정보 추가가 필요합니다.");
+        debugPrint("DB 없다");
       } else {
-        CustomToast().showToast("잠시만 기다려 주십시오.");
-        debugPrint("On/Off 시간초 제한 중");
+        if (!inActive) {
+          inActive = true;
+          if (foreIsRun) {
+            foreIsRun = false;
+            taskSetting.stopForegroundTask();
+          } else {
+            foreIsRun = true;
+            taskSetting.setContext(context);
+            taskSetting.startForegroundTask();
+          }
+          SettingDataUtil().setStateOnOff(foreIsRun);
+          setState(() {});
+          Future.delayed(const Duration(milliseconds: 1000)).then((value) {
+            inActive = false;
+          });
+        } else {
+          CustomToast().showToast("잠시만 기다려 주십시오.");
+          debugPrint("On/Off 시간초 제한 중");
+        }
       }
-    }
-    debugPrint('222');
+      debugPrint('222');
+    });
   }
 }
 
