@@ -185,14 +185,21 @@ class _MiddleState extends State<_Middle> {
 
   // 정보 수정 버튼을 클릭시
   Future <void> clickedUpdateInformationButton() async {
+    debugPrint("11111");
     if (await compareVerificationID()) {
+
+      debugPrint("22222");
       // 유저 정보 업데이트
       if (await UserDataRequest().setUserData(phoneNumbe)) {
+        debugPrint("33333");
         CustomToast().showToast('정보 수정이 완료되었습니다.');
       }
 
+      debugPrint("44444");
       Navigator.pop(context); // 메인 화면으로 이동
     }
+
+    debugPrint("55555");
   }
 
 

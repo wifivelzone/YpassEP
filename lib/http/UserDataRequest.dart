@@ -31,6 +31,8 @@ class UserDataRequest {
 
   // 유저 데이터 서버 호출 및 DB저장
   Future<bool> setUserData(String phoneNumber) async {
+
+    debugPrint("66666");
     var netState = await checkNetwork();
     StatisticsReporter reporter = StatisticsReporter();
 
@@ -53,6 +55,9 @@ class UserDataRequest {
 
       // POST 요청이 성공 했을 경우
       if (response.statusCode == 200) {
+
+
+        debugPrint("77777");
         // var test = jsonDecode(response.body);
         // var test2 = test.toString().replaceAll('\'', '\"');
         // var test3 = jsonDecode(test2) as Map<String, dynamic>;
@@ -65,6 +70,7 @@ class UserDataRequest {
         }
         var listArr = jsonData['listArr'][0];
 
+        debugPrint("88888");
         // User Realm 불러오기
         UserDBUtil userDB = UserDBUtil();
 
@@ -75,13 +81,16 @@ class UserDataRequest {
           userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
         }
 
+        debugPrint("999999");
         String result;
         result = await reporter.sendReport(response.body, userPhoneNumber);
         debugPrint("통신 결과 : $result");
 
+        debugPrint("10101010");
         return true;
 
       } else {
+
         debugPrint('Response Status : ${response.statusCode}');
         debugPrint('통신error');
         // debugPrint('Response Body : ${response.body}');
