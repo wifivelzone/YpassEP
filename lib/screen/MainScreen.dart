@@ -122,7 +122,7 @@ class _TopState extends State<Top> {
   }
   void onClickOnOffButton() {
     FlutterBluePlus.instance.isOn.then((isOn) {
-      if (isOn) {
+      if (!isOn) {
         CustomToast().showToast("블루투스를 켜주시기 바랍니다.");
         debugPrint("Bluetooth Off");
       } else if (db.isEmpty()) {

@@ -74,6 +74,8 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
+            shrinkResources false
+            minifyEnabled false
 
             //코드 난독화 일단 주석화 (flutter package랑 호환 문제 있는듯)
             /*minifyEnabled true
