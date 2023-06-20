@@ -64,6 +64,7 @@ class UserDataRequest {
         // 위 내용과 jsonData과 동일
         var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
 
+
         if (jsonData['result'] == 0 || jsonData['result'] == '0') {
           CustomToast().showToast('등록된 사용자가 아닙니다. 관리실에 문의해주세요');
           return false;
