@@ -75,7 +75,7 @@ class UserDataRequest {
         UserDBUtil userDB = UserDBUtil();
 
         userDB.deleteDB(); // 기존 데이터 삭제
-        userDB.createUserData(listArr['num'], listArr['addr'], listArr['type'], listArr['sDate'], listArr['eDate']); // 유저 데이터 저장
+        userDB.createUserData(phoneNumber, listArr['addr'], listArr['type'], listArr['sDate'], listArr['eDate'], listArr['addr'].toString().contains('동')); // 유저 데이터 저장
         //  IdArr (cloberid, userid, pk) 저장
         for (var idArrValue in listArr['idArr']) {
           userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));

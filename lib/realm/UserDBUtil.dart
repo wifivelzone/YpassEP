@@ -21,10 +21,10 @@ class UserDBUtil {
 
 
   /// Create
-  void createUserData(String phoneNumber, String addr, String type, String sDate, String eDate) {
+  void createUserData(String phoneNumber, String addr, String type, String sDate, String eDate, bool admin) {
     realmUser.write(() {
       realmUser.deleteAll<UserData>(); // 기존 데이터 삭제
-      realmUser.add(UserData(phoneNumber, addr , type, sDate, eDate));
+      realmUser.add(UserData(phoneNumber, addr , type, sDate, eDate, admin));
     });
   }
 
@@ -91,6 +91,12 @@ class UserDBUtil {
   //user가 사용 가능한 출입 Clober list의 첫번째 Clober 가져오기
   String getFirstClober() {
     return temp2[0].cloberid;
+  }
+
+
+  // 관리자 여부
+  bool getAdmin() {
+    return temp1[0].admin;
   }
 
 

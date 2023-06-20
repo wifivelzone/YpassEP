@@ -171,7 +171,6 @@ class BleScanService {
       ScanResult res = scanResultListCopy[i];
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
       var manu = res.advertisementData.manufacturerData;
-
       //map의 형태로 반환됨
       if(manu.keys.toList().isNotEmpty){
         //주의

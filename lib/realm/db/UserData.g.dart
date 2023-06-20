@@ -14,12 +14,14 @@ class UserData extends _UserData
     String type,
     String sDate,
     String eDate,
+    bool admin,
   ) {
     RealmObjectBase.set(this, 'phoneNumber', phoneNumber);
     RealmObjectBase.set(this, 'addr', addr);
     RealmObjectBase.set(this, 'type', type);
     RealmObjectBase.set(this, 'sDate', sDate);
     RealmObjectBase.set(this, 'eDate', eDate);
+    RealmObjectBase.set(this, 'admin', admin);
   }
 
   UserData._();
@@ -52,6 +54,11 @@ class UserData extends _UserData
   set eDate(String value) => RealmObjectBase.set(this, 'eDate', value);
 
   @override
+  bool get admin => RealmObjectBase.get<bool>(this, 'admin') as bool;
+  @override
+  set admin(bool value) => RealmObjectBase.set(this, 'admin', value);
+
+  @override
   Stream<RealmObjectChanges<UserData>> get changes =>
       RealmObjectBase.getChanges<UserData>(this);
 
@@ -68,6 +75,7 @@ class UserData extends _UserData
       SchemaProperty('type', RealmPropertyType.string),
       SchemaProperty('sDate', RealmPropertyType.string),
       SchemaProperty('eDate', RealmPropertyType.string),
+      SchemaProperty('admin', RealmPropertyType.bool),
     ]);
   }
 }
