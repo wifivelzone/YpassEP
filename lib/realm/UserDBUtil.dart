@@ -63,6 +63,12 @@ class UserDBUtil {
       dong = split[split.length - 2].replaceAll("동", "");
       ho = split[split.length - 1].replaceAll("호", "");
     }
+    if (dong[0] == "0") {
+      dong = dong.substring(1);
+    }
+    if (ho[0] == "0") {
+      ho = ho.substring(1);
+    }
     return [dong, ho];
   }
 

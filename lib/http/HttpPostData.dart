@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:ypass/http/NetworkState.dart' as ns;
@@ -137,10 +138,15 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
 
     String userAddr = db.getAddr();
     url = HOME_ADDRESS_LIST[userAddr];
+    debugPrint("URL Check : $url");
+    debugPrint("Phone Number Check : $phoneNumber");
+    debugPrint("Addr Check : $dong, $ho");
+    //String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
     final response = await http.get(Uri.parse("$url/$dong/$ho"));
     if (response.statusCode == 200) {
       return response.body;
     } else {
+      debugPrint("통신 확인");
       //log 남기기 통신
       String result;
       result = await reporter.sendError("승강기 통신 실패", phoneNumber);

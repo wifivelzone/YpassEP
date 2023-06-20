@@ -257,12 +257,12 @@ class _MiddleButtonImg extends StatelessWidget {
       if (sec > 20000) {
         evTime = nowTime;
         if (addr[0] == null || addr[1] == null) {
+          CustomToast().showToast("\"집으로 호출\"기능은 관리자는 사용하실 수 없습니다.");
+          debugPrint("관리자 체크");
+        } else {
           String result = "";
           result = await http.homeEvCall(user.phoneNumber, addr[0], addr[1]);
           debugPrint("통신 결과 : $result");
-        } else {
-          CustomToast().showToast("\"집으로 호출\"기능은 관리자는 사용하실 수 없습니다.");
-          debugPrint("관리자 체크");
         }
       } else {
         CustomToast().showToast("\"집으로 호출\"기능은 20초에 한번씩만 사용가능합니다. ${20 - (sec ~/ 1000)}초 후에 다시 사용 가능합니다.");
