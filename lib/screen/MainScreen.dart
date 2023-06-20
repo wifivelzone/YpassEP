@@ -334,9 +334,7 @@ class Bottom extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         TextButton(
             onPressed: () => {
-
-              _launchUrl(Uri.parse(PRIVACY_TERMS_OF_SERVICE))
-                  //TODO: 약관 화면 표시
+              Navigator.of(context).pushNamed('/terms', arguments: PRIVACY_TERMS_OF_SERVICE) // 약관 페이지로 이동
             },
             style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
@@ -350,7 +348,7 @@ class Bottom extends StatelessWidget {
         TextButton(
           onPressed: () => {
             //TODO: 약관 화면 표시
-            _launchUrl(Uri.parse(YPASS_TERMS_OF_SERVICE))
+            Navigator.of(context).pushNamed('/terms', arguments: YPASS_TERMS_OF_SERVICE) // 약관 페이지로 이동
           },
           style: TextButton.styleFrom(
               padding: EdgeInsets.zero,

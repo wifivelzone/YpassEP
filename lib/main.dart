@@ -6,6 +6,7 @@ import 'package:ypass/screen/LoadingScreen.dart';
 import 'package:ypass/screen/MainScreen.dart';
 import 'package:ypass/screen/SetttingScreen.dart';
 import 'package:ypass/screen/TermsOfServiceScreen.dart';
+import 'package:ypass/screen/TermsWebView.dart';
 import 'package:ypass/screen/UpdateUserDataScreen.dart';
 
 import 'firebase_options.dart';
@@ -30,6 +31,7 @@ void main() async {
       '/setting' : (BuildContext context) => const SettingScreen(),
       '/updateUser' : (BuildContext context) => const UpdateUserDataScreen(),
       '/termsOfService' : (BuildContext context) => const TermsOfServiceScreen(),
+      '/terms' : (BuildContext context) => const TermWebView(),
       '/' : (BuildContext context) => const LoadingScreen(),
     },
   ));

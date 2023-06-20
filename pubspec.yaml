@@ -53,6 +53,7 @@ dependencies:
   device_info_plus: ^9.0.1
   upgrader: ^7.1.0
   package_info_plus: ^4.0.2
+  webview_flutter: ^3.0.0
 
 dependency_overrides:
   geolocator_android:

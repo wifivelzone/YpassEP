@@ -159,17 +159,11 @@ class _TermsOfServiceState extends State<_TermsOfService> {
 
         TextButton(
           onPressed: (){
-            _launchUrl(widget.url);
+            Navigator.of(context).pushNamed('/terms', arguments: widget.url); // 약관 페이지로 이동
           },
           child: const Text('보기'))
       ],
     );
-  }
-
-  Future<void> _launchUrl(url) async {
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
   }
 }
 
