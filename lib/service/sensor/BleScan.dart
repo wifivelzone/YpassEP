@@ -509,6 +509,8 @@ class BleScanService {
             if (listenValue.isEmpty && !startSuccess) {
               debugPrint("StartWrite 실패");
             } else if (!startSuccess){
+              k1 = listenValue[4];
+              k2 = listenValue[5];
               startSuccess = true;
               debugPrint("StartWrite 성공");
               //startSuccess가 true이면 암호화 단계로 인식
@@ -529,7 +531,7 @@ class BleScanService {
           //저장돼 있던 write용 Characteristic에 write 진행
           await char1.write(start, withoutResponse: true);
           debugPrint("Waiting Reponse...");
-          await Future.delayed(const Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 500));
           if (!startSuccess) {
             valueStream.cancel();
             debugPrint("Start Write를 실패했습니다.");
@@ -537,12 +539,8 @@ class BleScanService {
             return Future.value(false);
           }
           //위의 onValueChangedStream에서 Response를 읽어옴
-
-          //Android식으로 Key값을 manufacturerData에서 읽어옴
-          k1 = readData[a]![8];
-          k2 = readData[a]![9];
-          debugPrint('Key1 Check : ${readData[a]![8]}');
-          debugPrint('Key2 Check : ${readData[a]![9]}');
+          debugPrint('Key1 Check : $k1');
+          debugPrint('Key2 Check : $k2');
           debugPrint('Clober ID : $maxCid');
 
           debugPrint("Notifying Check : ${c.isNotifying}");
@@ -559,7 +557,7 @@ class BleScanService {
           await char1.write(enc.result, withoutResponse: true);
           debugPrint('Read Value : ${c.lastValue}');
           debugPrint("Waiting Reponse...");
-          await Future.delayed(const Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 500));
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
