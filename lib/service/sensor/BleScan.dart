@@ -324,9 +324,10 @@ class BleScanService {
         debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
-        double correctRssi = Platform.isAndroid ? -55 : -60;
+        double correctRssi = Platform.isAndroid ? -60 : -65;
+        correctRssi = correctRssi - SettingDataUtil().getUserSetRange()/4;
         debugPrint("보정된 RSSI : $correctRssi");
-        if (isEv && rssi > maxRssi && rssi > correctRssi - SettingDataUtil().getUserSetRange()) {
+        if (isEv && rssi > maxRssi && rssi > correctRssi) {
           debugPrint("New Max with Ev");
           maxCid = cid;
           maxRssi = rssi;
@@ -334,7 +335,7 @@ class BleScanService {
           maxR = res;
           searchDone = false;
           returnValue = Future.value(true);
-        } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > correctRssi - SettingDataUtil().getUserSetRange()) {
+        } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > correctRssi) {
           //EV용 Clober가 이미 인식되어 있더라도
           //다른 Clober가 max 갱신되면 isEv = false
           debugPrint("New Max");
