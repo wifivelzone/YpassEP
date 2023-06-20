@@ -54,9 +54,8 @@ class UserDBUtil {
   List<String> getDong() {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
-    if (getUser().phoneNumber == "1"){
-      addrArr[0] += "101동 301호"; //test Code
-    }
+    debugPrint("Phone Number Check : ${getUser().phoneNumber}");
+    debugPrint("Addr Array Check : $addrArr");
     List<String> split = addrArr[0].split(" ");
     String dong = "";
     String ho = "";
@@ -73,9 +72,6 @@ class UserDBUtil {
     String addStr = getUser().addr;
     List<String> addrArr = addStr.split("::");
     debugPrint("Phone Number Check : ${getUser().phoneNumber}");
-    if (getUser().phoneNumber == "1"){
-      addrArr[0] += "101동 301호"; //test Code
-    }
     debugPrint("Addr Array Check : $addrArr");
     List<String> split = addrArr[0].split(" ");
     debugPrint("Addr Check : $split");

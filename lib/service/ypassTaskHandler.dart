@@ -57,12 +57,8 @@ class YPassTaskHandler extends TaskHandler {
     if (vaildTime < useTime*3) {
       debugPrint("Update UserData");
       debugPrint("phoneNumber : ${find.phoneNumber}");
-      if (find.phoneNumber != "1") {
-        debugPrint("갱신 시작");
-        await UserDataRequest().setUserData(find.phoneNumber);
-      } else {
-        debugPrint("관리자 PASS");
-      }
+      debugPrint("갱신 시작");
+      await UserDataRequest().setUserData(find.phoneNumber);
     } else {
       debugPrint("Not Update Time");
     }
