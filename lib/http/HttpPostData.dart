@@ -166,7 +166,9 @@ Future<String> evCall(String cid, String phoneNumber) async {
     String? url = "";
 
     String userAddr = db.getAddr();
+    debugPrint("Http Addr Check : $userAddr");
     url = ADDRESS_LIST[userAddr];
+    debugPrint("URL : $url");
     final response = await http.get(Uri.parse("$url/$cid"));
   if (response.statusCode == 200) {
     return response.body;

@@ -63,11 +63,16 @@ class UserDBUtil {
       dong = split[split.length - 2].replaceAll("동", "");
       ho = split[split.length - 1].replaceAll("호", "");
     }
-    if (dong[0] == "0") {
-      dong = dong.substring(1);
-    }
-    if (ho[0] == "0") {
-      ho = ho.substring(1);
+    debugPrint("Dong Ho Check : $dong, $ho");
+    if (dong == "" || ho == "") {
+      debugPrint("관리자는 동호가 없어");
+    } else {
+      if (dong[0] == "0") {
+        dong = dong.substring(1);
+      }
+      if (ho[0] == "0") {
+        ho = ho.substring(1);
+      }
     }
     return [dong, ho];
   }
@@ -76,15 +81,25 @@ class UserDBUtil {
   String getAddr() {
     String result = "";
     String addStr = getUser().addr;
+    bool check = getUser().admin;
     List<String> addrArr = addStr.split("::");
     debugPrint("Phone Number Check : ${getUser().phoneNumber}");
     debugPrint("Addr Array Check : $addrArr");
     List<String> split = addrArr[0].split(" ");
+    int length = split.length;
     debugPrint("Addr Check : $split");
-    for (int i = 0; i < split.length-2; i++) {
+    if (!check){
+      debugPrint("관리자 아님");
+      length -= 2;
+    } else {
+      debugPrint("관리자 맞음");
+      length -= 1;
+    }
+    for (int i = 0; i < length; i++) {
       debugPrint("Addr Check : ${split[i]}");
       result += split[i];
-      if (i!=split.length-3) {
+      debugPrint("i 비교 : $i, $length");
+      if (i!=length-1) {
         result += " ";
       }
     }

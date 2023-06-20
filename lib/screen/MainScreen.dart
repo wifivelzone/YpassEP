@@ -256,7 +256,7 @@ class _MiddleButtonImg extends StatelessWidget {
       int sec = nowTime - evTime;
       if (sec > 20000) {
         evTime = nowTime;
-        if (addr[0] == null || addr[1] == null) {
+        if (addr[0] == "" || addr[1] == "") {
           CustomToast().showToast("\"집으로 호출\"기능은 관리자는 사용하실 수 없습니다.");
           debugPrint("관리자 체크");
         } else {
