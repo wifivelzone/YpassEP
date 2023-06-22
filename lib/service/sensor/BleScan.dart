@@ -325,7 +325,7 @@ class BleScanService {
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
         double correctRssi = Platform.isAndroid ? -60 : -65;
-        correctRssi = correctRssi - SettingDataUtil().getUserSetRange()/4;
+        correctRssi = correctRssi - SettingDataUtil().getUserSetRange()/2;
         debugPrint("보정된 RSSI : $correctRssi");
         if (isEv && rssi > maxRssi && rssi > correctRssi) {
           debugPrint("New Max with Ev");
