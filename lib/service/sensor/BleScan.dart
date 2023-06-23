@@ -199,8 +199,8 @@ class BleScanService {
         List code2 = [manu[a]?[2], manu[a]?[3]];
         debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
-          if (manu[a]?[8] == 0 && manu[a]?[9] == 0) {
-            debugPrint("invalid Clober");
+          if (manu[a]?[8] == 0) {
+            debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
             continue;
           }
           //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue

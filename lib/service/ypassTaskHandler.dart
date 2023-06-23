@@ -7,6 +7,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:ypass/service/sensor/BleScan.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import '../http/UserDataRequest.dart';
+import '../http/NetworkState.dart';
 
 //foreground task 시작
 @pragma('vm:entry-point')
@@ -26,6 +27,9 @@ class YPassTaskHandler extends TaskHandler {
   BleScanService ble = BleScanService();
   UserDBUtil db = UserDBUtil();
 
+  late String netState;
+  late bool netCheck;
+
   //gps는 더미 코드
   //LocationService gps = LocationService();
 
@@ -33,6 +37,8 @@ class YPassTaskHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
+    netState = await checkNetwork();
+    netCheck = netState  != "인터넷 연결 안됨";
 
     //foreground task 자체에 저장된 데이터 가져오기 (예시 코드)
     final customData =
@@ -63,8 +69,10 @@ class YPassTaskHandler extends TaskHandler {
       debugPrint("Not Update Time");
     }
     //표시되는 push 창 업데이트
+    debugPrint("Network Check : $netCheck");
     FlutterForegroundTask.updateService(
       notificationTitle: 'YPass',
+      notificationText: netCheck? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
     );
   }
 
@@ -73,6 +81,16 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     //gps 더미 코드
     //gps.getLocation();
+    String temp = await checkNetwork();
+    debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
+    if (netState != temp) {
+      netState = temp;
+      netCheck = netState  != "인터넷 연결 안됨";
+      FlutterForegroundTask.updateService(
+        notificationTitle: 'YPass',
+        notificationText: netCheck? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
+      );
+    }
 
     if (ble.scanRestart && !ble.connecting) {
       await ble.scan();

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:url_launcher/url_launcher.dart';
+//import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:ypass/constant/APPInfo.dart';
 
@@ -122,7 +122,8 @@ class _TopState extends State<Top> {
   }
   void onClickOnOffButton() {
     FlutterBluePlus.instance.isOn.then((isOn) {
-      if (!isOn) {
+      debugPrint("Running Check : $foreIsRun");
+      if (!isOn && !foreIsRun) {
         CustomToast().showToast("블루투스를 켜주시기 바랍니다.");
         debugPrint("Bluetooth Off");
       } else if (db.isEmpty()) {
@@ -362,11 +363,11 @@ class Bottom extends StatelessWidget {
       )
     ]);
   }
-
+/*
   Future<void> _launchUrl(url) async {
     if (!await launchUrl(url)) {
       throw Exception('Could not launch $url');
     }
-  }
+  }*/
 
 }
