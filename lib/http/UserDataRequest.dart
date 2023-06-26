@@ -93,7 +93,7 @@ class UserDataRequest {
 
         debugPrint('Response Status : ${response.statusCode}');
         debugPrint('통신error');
-        // debugPrint('Response Body : ${response.body}');
+        debugPrint('Response Body : ${response.body}');
         String result;
         result = await reporter.sendError("승강기 통신 실패", phoneNumber);
         debugPrint("통신error : $result");

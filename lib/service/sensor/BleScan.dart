@@ -200,7 +200,7 @@ class BleScanService {
         debugPrint("출입 확인 : ${code2.toString()}");
         if(listEquals(code2, [1, 1])) {
           if (manu[a]?[8] == 0) {
-            debugPrint("invalid Clober");
+            debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
             continue;
           }
           //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue
@@ -324,8 +324,8 @@ class BleScanService {
         debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
-        double correctRssi = Platform.isAndroid ? -60 : -65;
-        correctRssi = correctRssi - SettingDataUtil().getUserSetRange();
+        double correctRssi = Platform.isAndroid ? -65 : -70;
+        correctRssi = correctRssi - SettingDataUtil().getUserSetRange() / 2;
         debugPrint("보정된 RSSI : $correctRssi");
         if (isEv && rssi > maxRssi && rssi > correctRssi) {
           debugPrint("New Max with Ev");
