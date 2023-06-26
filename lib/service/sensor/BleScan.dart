@@ -218,11 +218,6 @@ class BleScanService {
           //쿨타임 3분으로 (계속 눌리면 EV문이 계속 열리니)
           //Clober ID로 EV용 구별
           bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
-          int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-          if (restTime < 3*60*1000 && !isGS){
-            debugPrint("But Cooldown ... (3 minute / ${restTime~/1000})");
-            continue;
-          }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
           if (outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
