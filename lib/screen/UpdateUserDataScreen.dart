@@ -6,7 +6,9 @@ import 'package:ypass/screen/serve/Toast.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 import '../constant/Exception.dart';
+import '../http/StatisticsReporter.dart';
 import '../http/UserDataRequest.dart';
+import '../realm/UserDBUtil.dart';
 
 // 사용자 정보 수정 페이지
 class UpdateUserDataScreen extends StatefulWidget {
@@ -165,6 +167,8 @@ class _MiddleState extends State<_Middle> {
     debugPrint('문자 전송 에러 메세지');
     debugPrint(e.toString());
     debugPrint('------------------');
+
+    StatisticsReporter().sendError('$e 문자 전송 실패', phoneNumbe);
     CustomToast().showToast('잘못된 전화번호 입니다.');
     waitPhoneAuth = true;
   }

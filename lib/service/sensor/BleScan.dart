@@ -9,6 +9,8 @@ import 'package:ypass/http/Encryption.dart';
 import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 
+import '../../http/StatisticsReporter.dart';
+
 class BleScanService {
   //instance 가져오기
   FlutterBluePlus flutterBlue = FlutterBluePlus.instance;
@@ -219,8 +221,8 @@ class BleScanService {
           //Clober ID로 EV용 구별
           bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
           int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-          if (restTime < 10*1000 && !isGS){
-            debugPrint("But Cooldown ... (10 sec / ${restTime~/1000})");
+          if (restTime < 2*1000 && !isGS){
+            debugPrint("But Cooldown ... (2 sec / ${restTime~/1000})");
             continue;
           }
 
@@ -324,8 +326,8 @@ class BleScanService {
         debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
-        double correctRssi = Platform.isAndroid ? -65 : -70;
-        correctRssi = correctRssi - SettingDataUtil().getUserSetRange() / 2;
+        double correctRssi = Platform.isAndroid ? -70 : -75;
+        correctRssi = correctRssi - SettingDataUtil().getUserSetRange()/2;
         debugPrint("보정된 RSSI : $correctRssi");
         if (isEv && rssi > maxRssi && rssi > correctRssi) {
           debugPrint("New Max with Ev");
@@ -396,6 +398,7 @@ class BleScanService {
     debugPrint("통신 결과 : $result");
     timerValid = true;
     if (result == "통신error") {
+      StatisticsReporter().sendError('경산 엘베 call 에러', db.getUser().phoneNumber);
       return false;
     } else {
       return true;
@@ -522,6 +525,7 @@ class BleScanService {
               debugPrint("암호화 성공 : $callev");
             } else {
               debugPrint("암호화 실패");
+              StatisticsReporter().sendError('암호화 실패.', db.getUser().phoneNumber);
             }
           });
 
@@ -580,6 +584,7 @@ class BleScanService {
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
+            StatisticsReporter().sendError('암호화 실패', db.getUser().phoneNumber);
             timerValid = true;
             return Future.value(false);
           }
