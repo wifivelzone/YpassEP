@@ -129,6 +129,7 @@ class _MiddleState extends State<_Middle> {
     );
   }
 
+
   // 파이어베이스 인증 문자요청
   Future<void> requestAuthNumber() async {
     // 문자 요청을 처음 하는 경우
