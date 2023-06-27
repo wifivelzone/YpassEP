@@ -78,7 +78,7 @@ class UserDataRequest {
         userDB.createUserData(phoneNumber, listArr['addr'], listArr['type'], listArr['sDate'], listArr['eDate'], !(listArr['addr'].toString().contains('동'))); // 유저 데이터 저장
         //  IdArr (cloberid, userid, pk) 저장
         for (var idArrValue in listArr['idArr']) {
-          userDB.createIDArr(IdArr(idArrValue['cloberid'], idArrValue['userid'], idArrValue['pk']));
+          userDB.createIDArr(IdArr(idArrValue['cloberid'].toString().toLowerCase(), idArrValue['userid'], idArrValue['pk']));
         }
 
         debugPrint("999999");
