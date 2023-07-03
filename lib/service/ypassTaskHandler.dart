@@ -3,9 +3,11 @@ import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ypass/service/sensor/BleScan.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
+import '../constant/APPInfo.dart';
 import '../http/UserDataRequest.dart';
 
 //foreground task 시작
@@ -25,6 +27,7 @@ class YPassTaskHandler extends TaskHandler {
   //ble 시작
   BleScanService ble = BleScanService();
   UserDBUtil db = UserDBUtil();
+  late PackageInfo packageInfo;
 
   //gps는 더미 코드
   //LocationService gps = LocationService();
@@ -33,6 +36,8 @@ class YPassTaskHandler extends TaskHandler {
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
+    packageInfo = await PackageInfo.fromPlatform();
+    APP_VERSION = packageInfo.version;
 
     //foreground task 자체에 저장된 데이터 가져오기 (예시 코드)
     final customData =

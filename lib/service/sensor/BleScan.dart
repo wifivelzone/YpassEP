@@ -221,8 +221,8 @@ class BleScanService {
           //Clober ID로 EV용 구별
           bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
           int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-          if (restTime < 2*1000 && !isGS){
-            debugPrint("But Cooldown ... (2 sec / ${restTime~/1000})");
+          if (restTime < 5*1000 && !isGS){
+            debugPrint("But Cooldown ... (5 sec / ${restTime~/1000})");
             continue;
           }
 
@@ -525,7 +525,6 @@ class BleScanService {
               debugPrint("암호화 성공 : $callev");
             } else {
               debugPrint("암호화 실패");
-              StatisticsReporter().sendError('암호화 실패.', db.getUser().phoneNumber);
             }
           });
 
@@ -566,21 +565,29 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            String result;
-            result = await http.cloberPass(1, cid, maxRssi.toString());
-            debugPrint("통신 결과 : $result");
-            //전화 번호
-            db.getDB();
-            String phoneNumber = db.getUser().phoneNumber;
-            String httpResult;
+            try {
+              String result;
+              result = await http.cloberPass(1, cid, maxRssi.toString());
+              debugPrint("통신 결과 : $result");
+              //전화 번호
+              db.getDB();
+              String phoneNumber = db
+                  .getUser()
+                  .phoneNumber;
+              String httpResult;
 
-            httpResult = await http.evCall(maxCid, phoneNumber);
-            debugPrint("통신 결과 : $httpResult");
-            //최신 lastInCloberID 갱신
-            SettingDataUtil set = SettingDataUtil();
-            set.setLastInCloberID(maxCid);
+              httpResult = await http.evCall(maxCid, phoneNumber);
+              debugPrint("통신 결과 : $httpResult");
+              //최신 lastInCloberID 갱신
+              SettingDataUtil set = SettingDataUtil();
+              set.setLastInCloberID(maxCid);
 
-            lastEv = DateTime.now();
+              lastEv = DateTime.now();
+            } catch (e) {
+              debugPrint("Error log : ${e.toString()}");
+              StatisticsReporter().sendError('서버 통신 실패.', db.getUser().phoneNumber);
+              valueStream.cancel();
+            }
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");

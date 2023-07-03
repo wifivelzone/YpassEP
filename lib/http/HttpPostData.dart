@@ -9,6 +9,7 @@ import 'package:ypass/http/HttpType.dart';
 import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/constant/YPassURL.dart';
+import 'package:ypass/constant/APPInfo.dart';
 
 var client = HttpClient();
 StatisticsReporter reporter = StatisticsReporter();
@@ -60,6 +61,7 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
 
     //type은 pass 성공하면 0으로
     //kind도 확인 예정 And, iOS 구분 예상
+    debugPrint(APP_VERSION);
     http.Response response = await http.post(
         Uri.parse(YPASS_POST_TEST),
         body: <String, String> {
@@ -69,7 +71,8 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
           "setRssi" : setRssi,
           "phone" : model,
           "kind" : isAnd,
-          "brand" : brand
+          "brand" : brand,
+          "version" : APP_VERSION
         }
     ).timeout(const Duration(seconds: 1));
     if (response.statusCode == 200) {
