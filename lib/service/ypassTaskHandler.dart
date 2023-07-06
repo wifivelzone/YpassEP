@@ -86,6 +86,10 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     //gps 더미 코드
     //gps.getLocation();
+    if (!await ble.flutterBlue.isOn) {
+      debugPrint("블루투스 꺼졌다.");
+      _sendPort?.send('bluetooth off');
+    }
     String temp = await checkNetwork();
     debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
     if (netState != temp) {

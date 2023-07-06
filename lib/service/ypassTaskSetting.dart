@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'package:ypass/service/ypassTaskHandler.dart';
+import 'package:ypass/screen/MainScreen.dart';
 
 class YPassTaskSetting {
   ReceivePort? _receivePort;
   late BuildContext context;
+  late GlobalKey<TopState> topKey;
 
   void setContext(BuildContext inputContext) {
     context = inputContext;
+  }
+
+  void setTopKey(GlobalKey<TopState> inputTopKey) {
+    topKey = inputTopKey;
   }
 
   //foureground task 기본 설정
@@ -115,6 +121,10 @@ class YPassTaskSetting {
       } else if (message is String) {
         if (message == 'onNotificationPressed') {
           Navigator.of(context).pushNamed('/');
+        } else if (message == "bluetooth off") {
+          debugPrint("스캔 끌게");
+          //debugPrint("작동 체크 : ${Top.of(context)}");
+          topKey.currentState?.onClickOnOffButton();
         }
       } else if (message is DateTime) {
         debugPrint('timestamp: ${message.toString()}');

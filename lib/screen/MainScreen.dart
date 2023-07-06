@@ -26,21 +26,22 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final GlobalKey<TopState> _topKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
       body: SafeArea(
         child: UpgradeAlert(
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Bar(barSize: 5.0),
-              Top(),
-              Bar(barSize: 5.0),
-              _Middle(),
-              Bar(barSize: 5.0),
-              Bottom(),
+              const Bar(barSize: 5.0),
+              Top(key: _topKey, topKey: _topKey,),
+              const Bar(barSize: 5.0),
+              const _Middle(),
+              const Bar(barSize: 5.0),
+              const Bottom(),
             ],
           ),
         ),
@@ -55,13 +56,14 @@ class _MainScreenState extends State<MainScreen> {
 /// -------------------------------------------------------
 
 class Top extends StatefulWidget {
-  const Top({Key? key}) : super(key: key);
+  final GlobalKey<TopState> topKey;
+  const Top({Key? key, required this.topKey}) : super(key: key);
 
   @override
-  State<Top> createState() => _TopState();
+  State<Top> createState() => TopState();
 }
 
-class _TopState extends State<Top> {
+class TopState extends State<Top> {
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff(); // on off 버튼
   bool inActive = false;
@@ -73,6 +75,7 @@ class _TopState extends State<Top> {
     super.initState();
     db.getDB();
     taskSetting.init();
+    taskSetting.setTopKey(widget.topKey);
   }
 
   @override

@@ -113,7 +113,7 @@ class BleScanService {
         //UUID filter 설정
         withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
         //시간초 설정 (4초)
-        timeout: const Duration(seconds: 15)
+        timeout: const Duration(minutes: 10)
       ).then((_) {
         duration.cancel();
         scanRestart = true;
