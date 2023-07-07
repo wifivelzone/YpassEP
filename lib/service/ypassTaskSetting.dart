@@ -16,6 +16,7 @@ class YPassTaskSetting {
   }
 
   void setTopKey(GlobalKey<TopState> inputTopKey) {
+    debugPrint("TopKey 들어갔냐?");
     topKey = inputTopKey;
   }
 

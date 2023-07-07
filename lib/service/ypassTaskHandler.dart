@@ -6,6 +6,7 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:ypass/service/sensor/BleScan.dart';
+import 'package:ypass/service/ypassTaskSetting.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import '../constant/APPInfo.dart';
 import '../http/UserDataRequest.dart';
@@ -32,6 +33,8 @@ class YPassTaskHandler extends TaskHandler {
 
   late String netState;
   late bool netCheck;
+
+  YPassTaskSetting taskSetting = YPassTaskSetting();
 
   //gps는 더미 코드
   //LocationService gps = LocationService();
@@ -88,6 +91,7 @@ class YPassTaskHandler extends TaskHandler {
     //gps.getLocation();
     if (!await ble.flutterBlue.isOn) {
       debugPrint("블루투스 꺼졌다.");
+      taskSetting.stopForegroundTask();
       _sendPort?.send('bluetooth off');
     }
     String temp = await checkNetwork();

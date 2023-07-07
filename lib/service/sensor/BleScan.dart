@@ -187,6 +187,7 @@ class BleScanService {
         int a = manu.keys.toList().first;
         List code = [manu[a]?[0], manu[a]?[1]];
         List coop = [76, 90];
+        List cidlist = [manu[a]?[4], manu[a]?[5], manu[a]?[6], manu[a]?[7]];
 
         if(listEquals(code, coop) && a == 13657){
           debugPrint("yes Clober");
@@ -200,8 +201,10 @@ class BleScanService {
         //clober 종류 확인 (출입용 + 방향)
         List code2 = [manu[a]?[2], manu[a]?[3]];
         debugPrint("출입 확인 : ${code2.toString()}");
+        debugPrint("CID 확인 : ${cidlist.toString()}");
         if(listEquals(code2, [1, 1])) {
           if (manu[a]?[8] == 0) {
+            debugPrint("현재 key값 : [${manu[a]?[8]},${manu[a]?[9]}]");
             debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
             continue;
           }
@@ -299,7 +302,6 @@ class BleScanService {
         }
         cid = "";
         bat = manu[a]![8].toString();
-        List cidlist = [manu[a]?[4], manu[a]?[5], manu[a]?[6], manu[a]?[7]];
 
         //package에서 주는 값은 dec임 hex로 변환
         if (cidlist[0] < 16) {
@@ -319,6 +321,10 @@ class BleScanService {
         }
         cid += cidlist[3].toRadixString(16).toString();
 
+        if (db.findCloberByCIDIsEmpty(cid)) {
+          debugPrint("접근할 수 없는 Clober 입니다. CID : $cid");
+          continue;
+        }
         rssi = (forwardRssi + backRssi)/2;
         //스캔된 device 값 확인 (clober라면)
         debugPrint("==================");
