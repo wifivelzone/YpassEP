@@ -297,6 +297,11 @@ class _MiddleButtonImg extends StatelessWidget {
     }
   }
 
+  // void pageTest() {
+  //   Navigator.of(context!).pushNamed('/updateUser');
+  // }
+
+
   // 문의 버튼 클릭시
   Future<void> clickedQuestionBtn() async {
     if (await isKakaoTalkInstalled()) {

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ypass/constant/APPInfo.dart';
 import 'package:ypass/constant/CustomColor.dart';
+import 'package:ypass/realm/UserDBUtil.dart';
+import 'package:ypass/realm/db/UserData.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ypass/screen/serve/Toast.dart';
@@ -21,7 +23,6 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-
   bool isAnd = Platform.isAndroid;
 
   @override
@@ -33,7 +34,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     Permission.location.isGranted;
-
 
     return Scaffold(
       backgroundColor: MAIN_BACKGROUND_COLOR,
@@ -52,7 +52,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
               height: MediaQuery.of(context).size.height * 0.2,
               child: Image.asset('asset/img/y5logo.png'),
             ),
-
             const Bar(barSize: 10.0),
           ],
         ),
@@ -66,35 +65,49 @@ class _LoadingScreenState extends State<LoadingScreen> {
     int andVersion = 0;
 
     if (Platform.isAndroid) {
-      AndroidDeviceInfo androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
+      AndroidDeviceInfo androidDeviceInfo =
+          await DeviceInfoPlugin().androidInfo;
       andVersion = androidDeviceInfo.version.sdkInt;
     }
 
     // 위치 정보
     await Permission.location.request().isDenied ? rejectPermission = true : "";
     debugPrint('location$rejectPermission');
-    await Permission.locationAlways.request().isDenied ? rejectPermission = true : "";
+    await Permission.locationAlways.request().isDenied
+        ? rejectPermission = true
+        : "";
     debugPrint('locationAlways$rejectPermission');
 
     // 블루투스
     if (andVersion < 31) {
-      await Permission.bluetooth.request().isDenied ? rejectPermission = true : "";
+      await Permission.bluetooth.request().isDenied
+          ? rejectPermission = true
+          : "";
       debugPrint('bluetooth$rejectPermission');
     } else if (andVersion >= 33) {
-      await Permission.notification.request().isDenied ? rejectPermission = true : "";
+      await Permission.notification.request().isDenied
+          ? rejectPermission = true
+          : "";
     }
-    await Permission.bluetoothConnect.request().isDenied ? rejectPermission = true : "";
+    await Permission.bluetoothConnect.request().isDenied
+        ? rejectPermission = true
+        : "";
     debugPrint('bluetoothConnect$rejectPermission');
-    await Permission.bluetoothScan.request().isDenied ? rejectPermission = true : "";
+    await Permission.bluetoothScan.request().isDenied
+        ? rejectPermission = true
+        : "";
     debugPrint('bluetoothScan$rejectPermission');
 
     await Permission.ignoreBatteryOptimizations.request();
-    await Permission.ignoreBatteryOptimizations.isDenied ? rejectPermission = true : "";
+    await Permission.ignoreBatteryOptimizations.isDenied
+        ? rejectPermission = true
+        : "";
     debugPrint('ignoreBatteryOptimizations$rejectPermission');
 
-    await Permission.systemAlertWindow.request().isDenied ? rejectPermission = true : ""; // 다른 앱 위에 표시
+    await Permission.systemAlertWindow.request().isDenied
+        ? rejectPermission = true
+        : ""; // 다른 앱 위에 표시
     debugPrint('systemAlertWindow$rejectPermission');
-
 
     // 권한 설정 여부 확인
     if (rejectPermission) {
@@ -109,7 +122,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
       goToMainPage(); // 페이지 이동
     }
-
   }
 
   // 페이지 이동
@@ -118,14 +130,18 @@ class _LoadingScreenState extends State<LoadingScreen> {
     // 페이지 이동
     // 이용 약관 수락한적 있으면 메인페이지로
     // 이용 약관 수락한적 없으면 이용약관 페이지로
-    String nextRoute;
+
     if (SettingDataUtil().isEmpty()) {
-      nextRoute = '/termsOfService';
+      Navigator.pushReplacementNamed(context, '/termsOfService');
     } else {
-      nextRoute = '/main';
+      UserDBUtil().getDB();
+      if (UserDBUtil().isEmpty()) {
+        Navigator.of(context)
+          ..pushReplacementNamed('/main')
+          ..pushNamed('/updateUser');
+      } else {
+        Navigator.pushReplacementNamed(context, '/main');
+      }
     }
-    Navigator.pushReplacementNamed(
-      context, nextRoute
-    );
   }
 }
