@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -144,16 +146,29 @@ Future<String> homeEvCall(String phoneNumber, String dong, String ho) async {
     debugPrint("URL Check : $url");
     debugPrint("Phone Number Check : $phoneNumber");
     debugPrint("Addr Check : $dong, $ho");
-    //String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
-    final response = await http.get(Uri.parse("$url/$dong/$ho"));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      debugPrint("통신 확인");
-      //log 남기기 통신
-      String result;
-      result = await reporter.sendError("승강기 통신 실패", phoneNumber);
-      return "통신error : $result";
+    try {
+      final response = await http.get(Uri.parse("$url/$dong/$ho")).timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200) {
+        var temp = jsonDecode(response.body);
+        debugPrint("Response body 확인 : $temp");
+        debugPrint("Response String 확인 : ${temp.runtimeType == String}");
+        if (temp.runtimeType != String && temp["result"] == 0) {
+          debugPrint("실패");
+          return temp["message"];
+        } else {
+          debugPrint("성공");
+          return response.body;
+        }
+      } else {
+        debugPrint("통신 확인");
+        //log 남기기 통신
+        String result;
+        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        return "통신error : $result";
+      }
+    } on TimeoutException catch (_) {
+      debugPrint("실패");
+      return "타임아웃: 서버(wifive) 연결에 실패했습니다.";
     }
   } else {
     return "네트워크 연결 실패";
@@ -172,16 +187,29 @@ Future<String> evCall(String cid, String phoneNumber) async {
     debugPrint("Http Addr Check : $userAddr");
     url = ADDRESS_LIST[userAddr];
     debugPrint("URL : $url");
-    final response = await http.get(Uri.parse("$url/$cid"));
-  if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    //log 남기기 통신
-    String result;
-    result = await reporter.sendError("승강기 통신 실패", phoneNumber);
-    return "통신error : $result";
-  }
-    //return "통신 테스트";
+    try {
+      final response = await http.get(Uri.parse("$url/$cid")).timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200) {
+        var temp = jsonDecode(response.body);
+        debugPrint("Response body 확인 : $temp");
+        debugPrint("Response String 확인 : ${temp.runtimeType == String}");
+        if (temp.runtimeType != String && temp["result"] == 0) {
+          debugPrint("실패");
+          return temp["message"];
+        } else {
+          debugPrint("성공");
+          return response.body;
+        }
+      } else {
+        //log 남기기 통신
+        String result;
+        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        return "통신error : $result";
+      }
+    } on TimeoutException catch (_) {
+      debugPrint("실패");
+      return "타임아웃: 서버(wifive) 연결에 실패했습니다.";
+    }
   } else {
     return "네트워크 연결 실패";
   }
