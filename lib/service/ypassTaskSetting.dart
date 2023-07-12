@@ -67,14 +67,6 @@ class YPassTaskSetting {
       }
     }
 
-    //foreground task 자체로 data 저장 기능 지원 (영구 저장은 아님)
-    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-    await FlutterForegroundTask.saveData(key: 'isRun', value: true);
-
-    final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
-    debugPrint('customData: $customData');
-
     //foreground task랑 통신 가능한 port (수신)
     final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
     final bool isRegistered = _registerReceivePort(receivePort);
@@ -103,7 +95,7 @@ class YPassTaskSetting {
 
   //foreground task 정지
   Future<bool> stopForegroundTask() {
-    FlutterForegroundTask.saveData(key: 'isRun', value: false);
+    debugPrint("꺼진드아아아");
     return FlutterForegroundTask.stopService();
   }
 
@@ -117,6 +109,7 @@ class YPassTaskSetting {
 
     _receivePort = newReceivePort;
     _receivePort?.listen((message) {
+      debugPrint("명령어 왔다");
       if (message is int) {
         debugPrint('eventCount: $message');
       } else if (message is String) {

@@ -19,6 +19,7 @@ class BleScanService {
   //스캔 중인지 확인하는 stram
   late StreamSubscription subscription;
   late StreamSubscription resStream;
+  late StreamSubscription<List<int>> valueStream;
   //찾은 clober 저장하는 list
   Map<String, List> cloberList = {};
   Map<String, List> outCloberList = {};
@@ -69,6 +70,7 @@ class BleScanService {
   disposeBle() {
     subscription.cancel();
     resStream.cancel();
+    valueStream.cancel();
   }
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
@@ -152,6 +154,7 @@ class BleScanService {
   }
   void stopListen() {
     resStream.cancel();
+    valueStream.cancel();
   }
 
   //scan 결과 중에 clober 찾기
@@ -431,7 +434,6 @@ class BleScanService {
   //BLE 연결
   Future<bool> connect() async {
     Future<bool>? returnValue;
-    StreamSubscription<List<int>> valueStream;
     searchDone = false;
     connecting = true;
     bool isFail = false;
@@ -619,6 +621,7 @@ class BleScanService {
     debugPrint("Disconnecting...");
     if (connecting) {
       connecting = false;
+      valueStream.cancel();
       maxR.device.disconnect();
     }
   }

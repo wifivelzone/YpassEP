@@ -9,6 +9,7 @@ import 'package:ypass/service/sensor/BleScan.dart';
 import 'package:ypass/service/ypassTaskSetting.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import '../constant/APPInfo.dart';
+import '../http/StatisticsReporter.dart';
 import '../http/UserDataRequest.dart';
 import '../http/NetworkState.dart';
 
@@ -25,6 +26,8 @@ void startCallback() {
 class YPassTaskHandler extends TaskHandler {
   SendPort? _sendPort;
   bool isAnd = Platform.isAndroid;
+  bool isClosing = false;
+  bool rebootWaiting = false;
 
   //ble 시작
   BleScanService ble = BleScanService();
@@ -48,10 +51,6 @@ class YPassTaskHandler extends TaskHandler {
     netState = await checkNetwork();
     netCheck = netState  != "인터넷 연결 안됨";
 
-    //foreground task 자체에 저장된 데이터 가져오기 (예시 코드)
-    final customData =
-    await FlutterForegroundTask.getData<String>(key: 'customData');
-    debugPrint('customData: $customData');
     //ble init
     ble.initBle();
     db.getDB();
@@ -89,62 +88,81 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     //gps 더미 코드
     //gps.getLocation();
+    debugPrint("Blue turn on Check : ${await ble.flutterBlue.isOn}");
     if (!await ble.flutterBlue.isOn) {
       debugPrint("블루투스 꺼졌다.");
-      taskSetting.stopForegroundTask();
-      _sendPort?.send('bluetooth off');
-    }
-    String temp = await checkNetwork();
-    debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
-    if (netState != temp) {
-      netState = temp;
-      netCheck = netState  != "인터넷 연결 안됨";
-      FlutterForegroundTask.updateService(
-        notificationTitle: 'YPass',
-        notificationText: netCheck? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
-      );
-    }
-
-    if (ble.scanRestart && !ble.connecting) {
-      await ble.scan();
-    }
-    //스캔 결과 따라 Clober search
-    if (ble.scanDone && !ble.connecting) {
-      //debugPrint("Connected Device Check : ${await ble.flutterBlue.connectedDevices}");
-      debugPrint("List Check : ${ble.cloberList}");
-      debugPrint("BLE Scan Success!!");
-      await ble.searchClober();
-    }
-
-    //clober search 결과 따라
-    if (ble.searchDone && !ble.connecting) {
-      if (ble.findClober()) {
-        if (isAnd) {
-          debugPrint("IsAndroid from Foreground");
-          //일단 둘다 connect
-          //ble.writeBle();
-          try {
-            await ble.connect().then((value) {
-              ble.disconnect();
-            });
-          } catch (e) {
-            ble.disconnect();
-            debugPrint("Connect Error!!!");
-            debugPrint("Error log : ${e.toString()}");
+      if (!isClosing) {
+        isClosing = true;
+        _sendPort?.send('bluetooth off');
+        taskSetting.stopForegroundTask();
+      }
+    } else {
+      String temp = await checkNetwork();
+      debugPrint(
+          "Network Check : $netCheck, NetState Check : $netState, now : $temp");
+      if (netState != temp) {
+        netState = temp;
+        netCheck = netState != "인터넷 연결 안됨";
+        FlutterForegroundTask.updateService(
+          notificationTitle: 'YPass',
+          notificationText:
+              netCheck ? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
+        );
+      }
+      try {
+        if (!rebootWaiting) {
+          if (ble.scanRestart && !ble.connecting) {
+            await ble.scan();
           }
-        } else {
-          debugPrint("IsiOS from Foreground");
-          try {
-            await ble.connect().then((value) {
-              ble.disconnect();
-            });
-          } catch (e) {
-            ble.disconnect();
-            debugPrint("Connect Error!!!");
+          //스캔 결과 따라 Clober search
+          if (ble.scanDone && !ble.connecting) {
+            debugPrint("List Check : ${ble.cloberList}");
+            debugPrint("BLE Scan Success!!");
+            await ble.searchClober();
+          }
+
+          //clober search 결과 따라
+          if (ble.searchDone && !ble.connecting) {
+            if (ble.findClober()) {
+              if (isAnd) {
+                debugPrint("IsAndroid from Foreground");
+                //일단 둘다 connect
+                //ble.writeBle();
+                try {
+                  await ble.connect().then((value) {
+                    ble.disconnect();
+                  });
+                } catch (e) {
+                  ble.disconnect();
+                  debugPrint("Connect Error!!!");
+                  debugPrint("Error log : ${e.toString()}");
+                }
+              } else {
+                debugPrint("IsiOS from Foreground");
+                try {
+                  await ble.connect().then((value) {
+                    ble.disconnect();
+                  });
+                } catch (e) {
+                  ble.disconnect();
+                  debugPrint("Connect Error!!!");
+                }
+              }
+            } else {
+              debugPrint("Clober not Found");
+            }
           }
         }
-      } else {
-        debugPrint("Clober not Found");
+      } catch (e) {
+        rebootWaiting = true;
+        ble.stopScan();
+        ble.disposeBle();
+        ble.disconnect();
+        ble.initBle();
+        StatisticsReporter().sendError('Scan 전 설정 오류.', db.getUser().phoneNumber);
+        Future.delayed(const Duration(milliseconds: 500)).then((value) {
+          rebootWaiting = false;
+        });
       }
     }
   }

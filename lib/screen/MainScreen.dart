@@ -67,6 +67,7 @@ class TopState extends State<Top> {
   bool isAnd = Platform.isAndroid;
   bool foreIsRun = SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff(); // on off 버튼
   bool inActive = false;
+  bool basicActive = false;
   UserDBUtil db = UserDBUtil();
   YPassTaskSetting taskSetting = YPassTaskSetting();
 
@@ -75,7 +76,6 @@ class TopState extends State<Top> {
     super.initState();
     db.getDB();
     taskSetting.init();
-    taskSetting.setTopKey(widget.topKey);
   }
 
   @override
@@ -85,11 +85,20 @@ class TopState extends State<Top> {
 
   @override
   Widget build(BuildContext context) {
-    if (!foreIsRun) {
-      taskSetting.stopForegroundTask();
-    } else {
-      taskSetting.setContext(context);
-      taskSetting.startForegroundTask();
+    if (!basicActive) {
+      basicActive = true;
+      if (!foreIsRun) {
+        debugPrint("Off 있었네?");
+        taskSetting.stopForegroundTask();
+      } else {
+        debugPrint("On 있었네?");
+        taskSetting.setTopKey(widget.topKey);
+        taskSetting.setContext(context);
+        taskSetting.startForegroundTask();
+      }
+      Future.delayed(const Duration(milliseconds: 1000)).then((value) {
+        basicActive = false;
+      });
     }
 
     return SizedBox(
