@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -25,23 +26,27 @@ class StatisticsReporter {
       } else {
         brand = "android";
       }
-      http.Response response = await http.post(
-          Uri.parse(reportUrl),
-          body: <String, String> {
-            "phoneNumber" : phoneNumber,
-            "num" : listArr['num'],
-            "addr" : listArr['addr'],
-            "type" : listArr['type'],
-            "sDate" : listArr['sDate'],
-            "eDate" : listArr['eDate'],
-            "idArr" : jsonEncode(listArr['idArr']).toString(),
-            "brand" : brand
-          }
-      ).timeout(const Duration(seconds: 1));
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        return "통신error : ${response.body}, ${response.statusCode}";
+      try {
+        http.Response response = await http.post(
+            Uri.parse(reportUrl),
+            body: <String, String>{
+              "phoneNumber": phoneNumber,
+              "num": listArr['num'],
+              "addr": listArr['addr'],
+              "type": listArr['type'],
+              "sDate": listArr['sDate'],
+              "eDate": listArr['eDate'],
+              "idArr": jsonEncode(listArr['idArr']).toString(),
+              "brand": brand
+            }
+        ).timeout(const Duration(seconds: 1));
+        if (response.statusCode == 200) {
+          return response.body;
+        } else {
+          return "통신error : ${response.body}, ${response.statusCode}";
+        }
+      } on TimeoutException catch (e) {
+        return "네트워크 연결 실패 : $e";
       }
     } else {
       return "네트워크 연결 실패";
@@ -63,19 +68,23 @@ class StatisticsReporter {
         brand = "android";
       }
 
-      http.Response response = await http.post(
-          Uri.parse(errorUrl),
-          body: <String, String> {
-            "brand" : brand,
-            "phoneNumber" : phoneNumber,
-            "addr" : userAddr,
-            "errorlog" : errorMessage
-          }
-      ).timeout(const Duration(seconds: 1));
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        return "통신error";
+      try {
+        http.Response response = await http.post(
+            Uri.parse(errorUrl),
+            body: <String, String>{
+              "brand": brand,
+              "phoneNumber": phoneNumber,
+              "addr": userAddr,
+              "errorlog": errorMessage
+            }
+        ).timeout(const Duration(seconds: 1));
+        if (response.statusCode == 200) {
+          return response.body;
+        } else {
+          return "통신error";
+        }
+      } on TimeoutException catch (e) {
+        return "네트워크 연결 실패 : $e";
       }
     } else {
       return "네트워크 연결 실패";

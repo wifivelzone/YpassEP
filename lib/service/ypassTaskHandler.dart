@@ -126,15 +126,11 @@ class YPassTaskHandler extends TaskHandler {
             if (ble.findClober()) {
               if (isAnd) {
                 debugPrint("IsAndroid from Foreground");
-                //일단 둘다 connect
-                //ble.writeBle();
                 try {
-                  await ble.connect().then((value) {
-                    ble.disconnect();
-                  });
+                  if (!ble.advertiseWaiting) {
+                    await ble.writeBle();
+                  }
                 } catch (e) {
-                  ble.disconnect();
-                  debugPrint("Connect Error!!!");
                   debugPrint("Error log : ${e.toString()}");
                 }
               } else {

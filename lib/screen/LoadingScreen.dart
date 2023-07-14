@@ -4,7 +4,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:ypass/constant/APPInfo.dart';
 import 'package:ypass/constant/CustomColor.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
-import 'package:ypass/realm/db/UserData.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:ypass/screen/serve/Toast.dart';
@@ -94,6 +93,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
         : "";
     debugPrint('bluetoothConnect$rejectPermission');
     await Permission.bluetoothScan.request().isDenied
+        ? rejectPermission = true
+        : "";
+    debugPrint('bluetoothScan$rejectPermission');
+    await Permission.bluetoothAdvertise.request().isDenied
         ? rejectPermission = true
         : "";
     debugPrint('bluetoothScan$rejectPermission');

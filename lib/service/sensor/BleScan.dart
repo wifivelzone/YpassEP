@@ -3,9 +3,11 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_ble_peripheral/flutter_ble_peripheral.dart';
 
 import 'package:ypass/http/HttpPostData.dart' as http;
 import 'package:ypass/http/Encryption.dart';
+import 'package:ypass/http/AdvertisingEnc.dart';
 import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 
@@ -32,6 +34,9 @@ class BleScanService {
   bool scanDone = false;
   bool searchDone = false;
   bool connecting = false;
+  bool advertiseSuccess = false;
+  bool advertiseWaiting = false;
+  bool isAnd = Platform.isAndroid;
 
   //현재 확인 중인 clober의 값들
   late String cid;
@@ -57,6 +62,8 @@ class BleScanService {
 
   final String notFound = "none";
   late Encryption enc;
+  late AdvertisingEnc advEnc;
+  List<int>? prevAdver;
   UserDBUtil db = UserDBUtil();
 
   //현재 스캔 중인지 확인함
@@ -70,7 +77,9 @@ class BleScanService {
   disposeBle() {
     subscription.cancel();
     resStream.cancel();
-    valueStream.cancel();
+    if(!isAnd) {
+      valueStream.cancel();
+    }
   }
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
@@ -154,7 +163,9 @@ class BleScanService {
   }
   void stopListen() {
     resStream.cancel();
-    valueStream.cancel();
+    if(!isAnd) {
+      valueStream.cancel();
+    }
   }
 
   //scan 결과 중에 clober 찾기
@@ -573,29 +584,7 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            try {
-              String result;
-              result = await http.cloberPass(1, cid, maxRssi.toString());
-              debugPrint("통신 결과 : $result");
-              //전화 번호
-              db.getDB();
-              String phoneNumber = db
-                  .getUser()
-                  .phoneNumber;
-              String httpResult;
-
-              httpResult = await http.evCall(maxCid, phoneNumber);
-              debugPrint("통신 결과 : $httpResult");
-              //최신 lastInCloberID 갱신
-              SettingDataUtil set = SettingDataUtil();
-              set.setLastInCloberID(maxCid);
-
-              lastEv = DateTime.now();
-            } catch (e) {
-              debugPrint("Error log : ${e.toString()}");
-              StatisticsReporter().sendError('서버 통신 실패.', db.getUser().phoneNumber);
-              valueStream.cancel();
-            }
+            evCall();
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
@@ -621,13 +610,107 @@ class BleScanService {
     debugPrint("Disconnecting...");
     if (connecting) {
       connecting = false;
-      valueStream.cancel();
+      if(!isAnd) {
+        valueStream.cancel();
+      }
       maxR.device.disconnect();
     }
   }
 
   //Android도 Connect하면서 안씀 일단 냅둠
-  void writeBle() {
+  Future<void> writeBle() async {
+    searchDone = false;
     debugPrint('write BLE');
+    Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
+    int a = readData.keys.toList().first;
+    var finds2 = db.findCloberByCID(maxCid);
+    debugPrint("USER ID 확인 : ${finds2.userid}");
+    k1 = readData[a]![8];
+    k2 = readData[a]![9];
+    debugPrint("manufactureData Check : $readData");
+    debugPrint("manufactureData Check : ${readData[a]!.runtimeType}");
+    debugPrint('Key1 Check : $k1');
+    debugPrint('Key2 Check : $k2');
+
+    List<int> adverCheck = List.from(readData[a]!.sublist(10,19));
+    debugPrint("new List Check : $adverCheck");
+
+    if (prevAdver != null) {
+      debugPrint("prev List check : $prevAdver");
+      if (listEquals(adverCheck, prevAdver)) {
+        debugPrint("Adv 성공!");
+        await FlutterBlePeripheral().stop();
+        advertiseSuccess = true;
+        advertiseWaiting = true;
+        evCall();
+        return ;
+      }
+    }
+    advEnc = AdvertisingEnc(k1.toString(),k2.toString(),finds2.userid);
+    advEnc.startEncryption();
+    prevAdver = advEnc.result;
+    debugPrint("Advertising Check : ${advEnc.result}");
+
+
+    //암호화 시작
+    debugPrint("암호화 시작");
+    enc = Encryption(finds2.userid, maxCid, finds2.pk, k1, k2);
+    enc.init();
+    enc.startEncryption();
+    debugPrint("Encryption 확인 : ${enc.result}");
+
+    List<int> bytes = [readData[a]![4], readData[a]![5], readData[a]![6], readData[a]![7]];
+    debugPrint("Bytes 확인 : $bytes");
+    AdvertiseData advertiseData = AdvertiseData(
+      manufacturerId: 117,
+      manufacturerData: Uint8List.fromList([...bytes, ...enc.result]),
+    );
+    debugPrint("Data 생성, ${advertiseData.manufacturerData}");
+
+    final AdvertiseSettings advertiseSettings = AdvertiseSettings(
+      advertiseMode: AdvertiseMode.advertiseModeLowLatency,
+      txPowerLevel: AdvertiseTxPower.advertiseTxPowerMedium,
+      connectable: true,
+      timeout: 5000,
+    );
+
+    BluetoothPeripheralState response;
+    response = await FlutterBlePeripheral().start(
+        advertiseData: advertiseData,
+        advertiseSettings: advertiseSettings
+    );
+    timerValid = true;
+
+    debugPrint("response : $response");
+  }
+
+  void evCall() async {
+    advertiseSuccess = false;
+    try {
+      String result;
+      result = await http.cloberPass(1, cid, maxRssi.toString());
+      debugPrint("통신 결과 : $result");
+      //전화 번호
+      db.getDB();
+      String phoneNumber = db
+          .getUser()
+          .phoneNumber;
+      String httpResult;
+
+      httpResult = await http.evCall(maxCid, phoneNumber);
+      debugPrint("통신 결과 : $httpResult");
+      //최신 lastInCloberID 갱신
+      SettingDataUtil set = SettingDataUtil();
+      set.setLastInCloberID(maxCid);
+
+      lastEv = DateTime.now();
+    } catch (e) {
+      debugPrint("Error log : ${e.toString()}");
+      StatisticsReporter().sendError('서버 통신 실패.', db.getUser().phoneNumber);
+      valueStream.cancel();
+    }
+    prevAdver = null;
+    advertiseWaiting = false;
+    timerValid = true;
   }
 }

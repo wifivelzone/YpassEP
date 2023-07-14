@@ -64,29 +64,33 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
     //type은 pass 성공하면 0으로
     //kind도 확인 예정 And, iOS 구분 예상
     debugPrint(APP_VERSION);
-    http.Response response = await http.post(
-        Uri.parse(YPASS_POST_TEST),
-        body: <String, String> {
-          "id" : conUserId,
-          "type" : (pass-1).toString(),
-          "rssi" : rssi,
-          "setRssi" : setRssi,
-          "phone" : model,
-          "kind" : isAnd,
-          "brand" : brand,
-          "version" : APP_VERSION
+    try {
+      http.Response response = await http.post(
+          Uri.parse(YPASS_POST_TEST),
+          body: <String, String>{
+            "id": conUserId,
+            "type": (pass - 1).toString(),
+            "rssi": rssi,
+            "setRssi": setRssi,
+            "phone": model,
+            "kind": isAnd,
+            "brand": brand,
+            "version": APP_VERSION
+          }
+      ).timeout(const Duration(seconds: 1));
+      if (response.statusCode == 200) {
+        String result;
+        if (response.body == "") {
+          result = "통신 성공";
+        } else {
+          result = response.body;
         }
-    ).timeout(const Duration(seconds: 1));
-    if (response.statusCode == 200) {
-      String result;
-      if (response.body == "") {
-        result = "통신 성공";
+        return result;
       } else {
-        result = response.body;
+        return "통신error : ${response.body}, ${response.statusCode}";
       }
-      return result;
-    } else {
-      return "통신error : ${response.body}, ${response.statusCode}";
+    } on TimeoutException catch (e) {
+      return "네트워크 연결 실패 : $e";
     }
   } else {
     return "네트워크 연결 실패";
@@ -232,27 +236,35 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
       url = YPASS_GYEONGSAN_EV;
       //ho = null이면 ""으로
       ho ??= "";
-      final response =
-          await http.get(Uri.parse("$url/$inClober/$cloberId/$ho"));
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        //log 남기기 통신
-        String result;
-        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
-        return "통신error : $result";
+      try {
+        final response =
+        await http.get(Uri.parse("$url/$inClober/$cloberId/$ho"));
+        if (response.statusCode == 200) {
+          return response.body;
+        } else {
+          //log 남기기 통신
+          String result;
+          result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+          return "통신error : $result";
+        }
+      } on TimeoutException catch (e) {
+        return "통신error : $e";
       }
     } else {
       url = YPASS_GYEONGSAN_HOME;
-      final response =
-      await http.get(Uri.parse("$url/$inClober/$cloberId"));
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        //log 남기기 통신
-        String result;
-        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
-        return "통신error : $result";
+      try {
+        final response =
+        await http.get(Uri.parse("$url/$inClober/$cloberId"));
+        if (response.statusCode == 200) {
+          return response.body;
+        } else {
+          //log 남기기 통신
+          String result;
+          result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+          return "통신error : $result";
+        }
+      } on TimeoutException catch (e) {
+        return "통신error : $e";
       }
     }
   } else {
