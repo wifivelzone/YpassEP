@@ -129,6 +129,12 @@ class YPassTaskHandler extends TaskHandler {
                 try {
                   if (!ble.advertiseWaiting) {
                     await ble.writeBle();
+                  } else {
+                    ble.count++;
+                    if (ble.count > 5) {
+                      ble.advertiseWaiting = false;
+                      ble.count = 0;
+                    }
                   }
                 } catch (e) {
                   debugPrint("Error log : ${e.toString()}");
