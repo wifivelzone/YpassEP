@@ -585,7 +585,7 @@ class BleScanService {
 
           //암호화 성공했으면 EV Call 실행
           if (callev) {
-            evCall();
+            await evCall();
           } else {
             valueStream.cancel();
             debugPrint("암호화를 실패했습니다.");
@@ -686,7 +686,7 @@ class BleScanService {
     debugPrint("response : $response");
   }
 
-  void evCall() async {
+  Future<void> evCall() async {
     advertiseSuccess = false;
     try {
       String result;

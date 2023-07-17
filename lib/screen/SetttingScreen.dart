@@ -112,7 +112,7 @@ class _MiddleState extends State<_Middle> {
                     borderRadius: BorderRadius.all(Radius.circular(10))),
                 backgroundColor: BAR_COLOR,
               ),
-              child: const Text('설정 저장'),
+              child: const Text('설정 저장', style: TextStyle(color: Colors.white),),
             ),
           ),
         ],
