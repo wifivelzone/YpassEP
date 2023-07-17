@@ -36,6 +36,7 @@ class YPassTaskHandler extends TaskHandler {
 
   late String netState;
   late bool netCheck;
+  late bool isOn;
 
   YPassTaskSetting taskSetting = YPassTaskSetting();
 
@@ -55,6 +56,7 @@ class YPassTaskHandler extends TaskHandler {
     ble.initBle();
     db.getDB();
 
+    ble.flutterBlue.isOn;
     //사용기간 체크해서 UserData갱신
     var find = db.getUser();
     DateTime sDate = DateTime.parse(find.sDate);
@@ -88,7 +90,6 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     //gps 더미 코드
     //gps.getLocation();
-    debugPrint("Blue turn on Check : ${await ble.flutterBlue.isOn}");
     if (!await ble.flutterBlue.isOn) {
       debugPrint("블루투스 꺼졌다.");
       if (!isClosing) {

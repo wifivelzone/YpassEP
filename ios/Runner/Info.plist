@@ -66,6 +66,8 @@
 	<string>Need location when in use</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>appTrackingTransparency</string>
+	<key>PermissionGroupCriticalAlerts</key>
+	<string>criticalAlerts</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>

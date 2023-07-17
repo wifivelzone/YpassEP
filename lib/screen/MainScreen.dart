@@ -75,6 +75,7 @@ class TopState extends State<Top> {
     super.initState();
     db.getDB();
     taskSetting.init();
+    FlutterBluePlus.instance.isOn;
   }
 
   @override

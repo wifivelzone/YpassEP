@@ -40,7 +40,7 @@ class YPassTaskSetting {
         enableVibration: true,
       ), //iOS 설정
       iosNotificationOptions: const IOSNotificationOptions(
-        showNotification: false,
+        showNotification: true,
         playSound: false,
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
@@ -48,9 +48,7 @@ class YPassTaskSetting {
         interval: 200,  //12000
         //1번만 push설정
         isOnceEvent: false,
-        autoRunOnBoot: true,
         allowWakeLock: true,
-        allowWifiLock: true,
       ),
     );
   }
