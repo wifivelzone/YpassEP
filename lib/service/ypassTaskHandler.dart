@@ -98,17 +98,17 @@ class YPassTaskHandler extends TaskHandler {
         taskSetting.stopForegroundTask();
       }
     } else {
-      String temp = await checkNetwork();
-      //debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
-      if (netState != temp) {
-        netState = temp;
-        netCheck = netState != "인터넷 연결 안됨";
-        FlutterForegroundTask.updateService(
-          notificationTitle: 'YPass',
-          notificationText:
-              netCheck ? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
-        );
-      }
+      // String temp = await checkNetwork();
+      // debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
+      // if (netState != temp) {
+      //   netState = temp;
+      //   netCheck = netState != "인터넷 연결 안됨";
+      //   FlutterForegroundTask.updateService(
+      //     notificationTitle: 'YPass',
+      //     notificationText:
+      //         netCheck ? "" : '인터넷이 연결되어 있지 않아, 정상 작동이 안될 수 있습니다.',
+      //   );
+      // }
       try {
         if (!rebootWaiting) {
           if (ble.scanRestart && !ble.connecting) {
