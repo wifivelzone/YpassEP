@@ -620,25 +620,25 @@ class BleScanService {
   //Android도 Connect하면서 안씀 일단 냅둠
   Future<void> writeBle() async {
     searchDone = false;
-    print('write BLE');
+    debugPrint('write BLE');
     Map<int, List<int>> readData = maxR.advertisementData.manufacturerData;
     int a = readData.keys.toList().first;
     var finds2 = db.findCloberByCID(maxCid);
-    print("USER ID 확인 : ${finds2.userid}");
+    debugPrint("USER ID 확인 : ${finds2.userid}");
     k1 = readData[a]![8];
     k2 = readData[a]![9];
-    print("manufactureData Check : $readData");
-    print("manufactureData Check : ${readData[a]!.runtimeType}");
-    print('Key1 Check : $k1');
-    print('Key2 Check : $k2');
+    debugPrint("manufactureData Check : $readData");
+    debugPrint("manufactureData Check : ${readData[a]!.runtimeType}");
+    debugPrint('Key1 Check : $k1');
+    debugPrint('Key2 Check : $k2');
 
     List<int> adverCheck = List.from(readData[a]!.sublist(10,19));
-    print("new List Check : $adverCheck");
+    debugPrint("new List Check : $adverCheck");
 
     if (prevAdver != null) {
-      print("prev List check : $prevAdver");
+      debugPrint("prev List check : $prevAdver");
       if (listEquals(adverCheck, prevAdver)) {
-        print("Adv 성공!");
+        debugPrint("Adv 성공!");
         await FlutterBlePeripheral().stop();
         advertiseSuccess = true;
         advertiseWaiting = true;
@@ -649,23 +649,23 @@ class BleScanService {
     advEnc = AdvertisingEnc(k1.toString(),k2.toString(),finds2.userid);
     advEnc.startEncryption();
     prevAdver = advEnc.result;
-    print("Advertising Check : ${advEnc.result}");
+    debugPrint("Advertising Check : ${advEnc.result}");
 
 
     //암호화 시작
-    print("암호화 시작");
+    debugPrint("암호화 시작");
     enc = Encryption(finds2.userid, maxCid, finds2.pk, k1, k2);
     enc.init();
     enc.startEncryption();
-    print("Encryption 확인 : ${enc.result}");
+    debugPrint("Encryption 확인 : ${enc.result}");
 
     List<int> bytes = [readData[a]![4], readData[a]![5], readData[a]![6], readData[a]![7]];
-    print("Bytes 확인 : $bytes");
+    debugPrint("Bytes 확인 : $bytes");
     AdvertiseData advertiseData = AdvertiseData(
       manufacturerId: 117,
       manufacturerData: Uint8List.fromList([...bytes, ...enc.result]),
     );
-    print("Data 생성, ${advertiseData.manufacturerData}");
+    debugPrint("Data 생성, ${advertiseData.manufacturerData}");
 
     final AdvertiseSettings advertiseSettings = AdvertiseSettings(
       advertiseMode: AdvertiseMode.advertiseModeLowLatency,
@@ -681,7 +681,7 @@ class BleScanService {
     );
     timerValid = true;
 
-    print("response : $response");
+    debugPrint("response : $response");
   }
 
   Future<void> evCall() async {
@@ -689,7 +689,7 @@ class BleScanService {
     try {
       String result;
       result = await http.cloberPass(1, cid, maxRssi.toString());
-      print("통신 결과 : $result");
+      debugPrint("통신 결과 : $result");
       //전화 번호
       db.getDB();
       String phoneNumber = db
@@ -698,14 +698,14 @@ class BleScanService {
       String httpResult;
 
       httpResult = await http.evCall(maxCid, phoneNumber);
-      print("통신 결과 : $httpResult");
+      debugPrint("통신 결과 : $httpResult");
       //최신 lastInCloberID 갱신
       SettingDataUtil set = SettingDataUtil();
       set.setLastInCloberID(maxCid);
 
       lastEv = DateTime.now();
     } catch (e) {
-      print("Error log : ${e.toString()}");
+      debugPrint("Error log : ${e.toString()}");
       StatisticsReporter().sendError('서버 통신 실패.', db.getUser().phoneNumber);
       valueStream.cancel();
     }

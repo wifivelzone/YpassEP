@@ -45,7 +45,7 @@ class YPassTaskSetting {
       ), //push 관련 설정
       foregroundTaskOptions: const ForegroundTaskOptions(
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
-        interval: 200,  //12000
+        interval: 500,  //12000
         //1번만 push설정
         isOnceEvent: false,
         allowWakeLock: true,
