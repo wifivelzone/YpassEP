@@ -99,8 +99,7 @@ class YPassTaskHandler extends TaskHandler {
       }
     } else {
       String temp = await checkNetwork();
-      debugPrint(
-          "Network Check : $netCheck, NetState Check : $netState, now : $temp");
+      //debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
       if (netState != temp) {
         netState = temp;
         netCheck = netState != "인터넷 연결 안됨";
