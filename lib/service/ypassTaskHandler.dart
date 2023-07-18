@@ -119,12 +119,6 @@ class YPassTaskHandler extends TaskHandler {
             debugPrint("List Check : ${ble.cloberList}");
             debugPrint("BLE Scan Success!!");
             await ble.searchClober();
-            debugPrint("Advertising Waiting ...");
-            ble.count++;
-            if (ble.count > 5) {
-              ble.advertiseWaiting = false;
-              ble.count = 0;
-            }
           }
 
           //clober search 결과 따라

@@ -53,7 +53,6 @@ class BleScanService {
   //Clober Key
   late int k1;
   late int k2;
-  int count = 0;
 
   //경산용 Ev 처리
   bool isEv = false;
@@ -639,7 +638,6 @@ class BleScanService {
     if (prevAdver != null) {
       debugPrint("prev List check : $prevAdver");
       if (listEquals(adverCheck, prevAdver)) {
-        count = 0;
         debugPrint("Adv 성공!");
         await FlutterBlePeripheral().stop();
         advertiseSuccess = true;
