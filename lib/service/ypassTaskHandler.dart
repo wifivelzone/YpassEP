@@ -38,6 +38,8 @@ class YPassTaskHandler extends TaskHandler {
   late bool netCheck;
   late bool isOn;
 
+  int bleCheckCount = 0;
+
   YPassTaskSetting taskSetting = YPassTaskSetting();
 
   //gps는 더미 코드
@@ -90,14 +92,18 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
     //gps 더미 코드
     //gps.getLocation();
-    if (!await ble.flutterBlue.isOn) {
-      debugPrint("블루투스 꺼졌다.");
-      if (!isClosing) {
-        isClosing = true;
-        _sendPort?.send('bluetooth off');
-        taskSetting.stopForegroundTask();
+    if (bleCheckCount >= 5) {
+      bleCheckCount = 0;
+      if (!await ble.flutterBlue.isOn) {
+        debugPrint("블루투스 꺼졌다.");
+        if (!isClosing) {
+          isClosing = true;
+          _sendPort?.send('bluetooth off');
+          taskSetting.stopForegroundTask();
+        }
       }
     } else {
+      bleCheckCount++;
       // String temp = await checkNetwork();
       // debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
       // if (netState != temp) {
