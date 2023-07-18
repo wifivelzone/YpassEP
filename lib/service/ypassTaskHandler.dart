@@ -58,7 +58,7 @@ class YPassTaskHandler extends TaskHandler {
     ble.initBle();
     db.getDB();
 
-    ble.flutterBlue.isOn;
+    await ble.flutterBlue.isOn;
     //사용기간 체크해서 UserData갱신
     var find = db.getUser();
     DateTime sDate = DateTime.parse(find.sDate);
