@@ -238,13 +238,13 @@ class BleScanService {
           //Clober ID로 EV용 구별
           bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
           int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
-          if (restTime < 5*1000 && !isGS){
-            debugPrint("But Cooldown ... (5 sec / ${restTime~/1000})");
+          if (restTime < 3*1000 && !isGS){
+            debugPrint("But Cooldown ... (3 sec / ${restTime~/1000})");
             continue;
           }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
-          if (outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
+          if (!isAnd && outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
             debugPrint("Before Input South!!");
             debugPrint("==================");
             //두번 skip은 짝인 1.3 Clober가 없다고 판단 pass
@@ -285,12 +285,20 @@ class BleScanService {
           } else {
             //후면 RSSI 평균이 있으면 읽어와서 back에 넣어줌 forward는 계산
             forwardRssi = sum~/tempList!.length;
-            backRssi = outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"]?.first;
+            if (isAnd) {
+              backRssi = forwardRssi;
+            } else {
+              backRssi = outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"]?.first;
+            }
             debugPrint("Input North");
             debugPrint("Fore : $forwardRssi, Back : $backRssi");
           }
           //정면
         } else if (listEquals(code2, [1, 3])) {
+          if (isAnd) {
+            debugPrint("Not Use in Android");
+            continue;
+          }
           //후면 Clober는 RSSI 평균 값만 저장하고 continue
           //outCloberList에 Clober ID를 key값으로 RSSI 평균을 저장함(정면, 후면 Clober ID가 같음)
           debugPrint("ID Check : ${res.device.id}");
@@ -346,8 +354,8 @@ class BleScanService {
         debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
-        double correctRssi = Platform.isAndroid ? -70 : -75;
-        correctRssi = correctRssi - SettingDataUtil().getUserSetRange()/2;
+        double correctRssi = Platform.isAndroid ? -75 : -80;
+        correctRssi = correctRssi - SettingDataUtil().getUserSetRange();
         debugPrint("보정된 RSSI : $correctRssi");
         if (isEv && rssi > maxRssi && rssi > correctRssi) {
           debugPrint("New Max with Ev");
