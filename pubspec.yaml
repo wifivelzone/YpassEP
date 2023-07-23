@@ -49,20 +49,12 @@ dependencies:
   fluttertoast: ^8.2.1
   kakao_flutter_sdk: ^1.4.1
   url_launcher: ^6.1.11
-  geolocator: ^9.0.2
   flutter_switch: ^0.3.2
   device_info_plus: ^9.0.1
   upgrader: ^7.1.0
   package_info_plus: ^4.0.2
   webview_flutter: ^3.0.0
   flutter_ble_peripheral: ^1.2.0
-
-dependency_overrides:
-  geolocator_android:
-    git:
-      url: https://github.com/Wackymax/flutter-geolocator.git
-      ref: 5f6e0aaae61c1178ebf93dfcaa80edef286de962
-      path: geolocator_android/
 
 dev_dependencies:
   flutter_test:
