@@ -19,9 +19,10 @@ class BleScanService {
   //스캔 결과 list
   List<ScanResult> scanResultList = [];
   //스캔 중인지 확인하는 stram
-  late StreamSubscription subscription;
-  late StreamSubscription resStream;
-  late StreamSubscription<List<int>> valueStream;
+  StreamSubscription? subscription;
+  StreamSubscription? resStream;
+  StreamSubscription<List<int>>? valueStream;
+  late Timer duration;
   //찾은 clober 저장하는 list
   Map<String, List> cloberList = {};
   Map<String, List> outCloberList = {};
@@ -59,6 +60,7 @@ class BleScanService {
   //초기값 2000년 1월 1일 0시 0분 0초
   DateTime lastEv = DateTime(2000);
   DateTime lastGS = DateTime(2000);
+  DateTime scanTime = DateTime.now();
 
   final String notFound = "none";
   late Encryption enc;
@@ -75,10 +77,16 @@ class BleScanService {
 
   //initble의 스캔 여부 확인하는 listen 종료 (안해주면 더미로 남음)
   disposeBle() {
-    subscription.cancel();
-    resStream.cancel();
+    if (subscription != null) {
+      subscription!.cancel();
+    }
+    if (resStream != null) {
+      resStream!.cancel();
+    }
     if(!isAnd) {
-      valueStream.cancel();
+      if (valueStream != null) {
+        valueStream!.cancel();
+      }
     }
   }
 
@@ -86,9 +94,7 @@ class BleScanService {
   Future<bool> scan() async {
     scanResultList.clear();
     cloberList.clear();
-    int counter = 0;
     Future<bool>? returnValue;
-    DateTime scanTime = DateTime.now();
     //이미 스캔 중인지 확인
     debugPrint("Is Scanning? : $_isScanning");
     if (!_isScanning) {
@@ -97,21 +103,7 @@ class BleScanService {
         debugPrint("1 Second !!!");
         timerValid = true;
       });
-      Timer duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-        //if (timerValid && counter > 15) {
-        if (timerValid && counter > 0) {
-          DateTime nowTime = DateTime.now();
-          if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
-            debugPrint("Scan Cut !!!");
-            debugPrint("Scan Counter : $counter");
-            debugPrint("Scan Length : ${scanResultList.length}");
-            counter = 0;
-            timerValid = false;
-            scanDone = true;
-            scanTime = nowTime;
-          }
-        }
-      });
+      timerStart();
       //기존 scan list 초기화
       scanResultList.clear();
       cloberList.clear();
@@ -120,19 +112,18 @@ class BleScanService {
         //성능 설정
         scanMode: ScanMode.lowLatency,
         //중복 scan 가능 설정
-        allowDuplicates: true,
+        allowDuplicates: false,
         //UUID filter 설정
         withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
         //시간초 설정 (4초)
         timeout: const Duration(minutes: 10)
       ).then((_) {
-        duration.cancel();
+        timerStop();
         scanRestart = true;
         stopListen();
       });
       //스캔 결과 (list형태)가 나오면 가져와서 저장
       resStream = flutterBlue.scanResults.listen((results) {
-        counter++;
         scanResultList = results;
         for(ScanResult res in scanResultList) {
           if (cloberList[res.device.id.toString()] == null) {
@@ -159,12 +150,18 @@ class BleScanService {
   //스캔 중단
   void stopScan() {
     flutterBlue.stopScan();
-    resStream.cancel();
+    if (resStream != null) {
+      resStream!.cancel();
+    }
   }
   void stopListen() {
-    resStream.cancel();
+    if (resStream != null) {
+      resStream!.cancel();
+    }
     if(!isAnd) {
-      valueStream.cancel();
+      if (valueStream != null) {
+        valueStream!.cancel();
+      }
     }
   }
 
@@ -217,8 +214,8 @@ class BleScanService {
         debugPrint("출입 확인 : ${code2.toString()}");
         debugPrint("CID 확인 : ${cidlist.toString()}");
         if(listEquals(code2, [1, 1])) {
+          debugPrint("현재 key값 : [${manu[a]?[8]},${manu[a]?[9]}]");
           if (manu[a]?[8] == 0) {
-            debugPrint("현재 key값 : [${manu[a]?[8]},${manu[a]?[9]}]");
             debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
             continue;
           }
@@ -401,6 +398,7 @@ class BleScanService {
       } else {
         debugPrint("Search 실패");
         timerValid = true;
+        debugPrint("Time Valid True");
       }
     }
     return returnValue ?? Future.value(false);
@@ -564,7 +562,7 @@ class BleScanService {
           debugPrint("Waiting Reponse...");
           await Future.delayed(const Duration(milliseconds: 500));
           if (!startSuccess) {
-            valueStream.cancel();
+            valueStream?.cancel();
             debugPrint("Start Write를 실패했습니다.");
             timerValid = true;
             return Future.value(false);
@@ -594,13 +592,13 @@ class BleScanService {
           if (callev) {
             await evCall();
           } else {
-            valueStream.cancel();
+            valueStream?.cancel();
             debugPrint("암호화를 실패했습니다.");
             StatisticsReporter().sendError('암호화 실패', db.getUser().phoneNumber);
             timerValid = true;
             return Future.value(false);
           }
-          valueStream.cancel();
+          valueStream?.cancel();
         } else {
           //1일 때는 write용이므로 일단 char1에 저장해두고 read용인 2찾으러가기
           debugPrint("Write Charateristic");
@@ -619,7 +617,9 @@ class BleScanService {
     if (connecting) {
       connecting = false;
       if(!isAnd) {
-        valueStream.cancel();
+        if (valueStream != null) {
+          valueStream!.cancel();
+        }
       }
       maxR.device.disconnect();
     }
@@ -715,10 +715,30 @@ class BleScanService {
     } catch (e) {
       debugPrint("Error log : ${e.toString()}");
       StatisticsReporter().sendError('서버 통신 실패.', db.getUser().phoneNumber);
-      valueStream.cancel();
+      valueStream?.cancel();
     }
     prevAdver = null;
     advertiseWaiting = false;
     timerValid = true;
+  }
+
+  void timerStart() {
+    duration = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      //if (timerValid && counter > 15) {
+      if (timerValid) {
+        DateTime nowTime = DateTime.now();
+        if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
+          debugPrint("Scan Cut !!!");
+          //debugPrint("Scan Length : ${scanResultList.length}");
+          timerValid = false;
+          scanDone = true;
+          scanTime = nowTime;
+        }
+      }
+    });
+  }
+
+  void timerStop() {
+    duration.cancel();
   }
 }

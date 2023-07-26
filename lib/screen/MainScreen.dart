@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/screen/serve/Bar.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/screen/serve/Toast.dart';
+import 'package:ypass/service/scanService.dart';
 import 'package:ypass/service/ypassTaskSetting.dart';
 import '../constant/CustomColor.dart';
 import '../constant/YPassURL.dart';
@@ -69,6 +71,8 @@ class TopState extends State<Top> {
   bool basicActive = false;
   UserDBUtil db = UserDBUtil();
   YPassTaskSetting taskSetting = YPassTaskSetting();
+  ScanService service = ScanService();
+  Timer? serviceTimer;
 
   @override
   void initState() {
@@ -90,11 +94,20 @@ class TopState extends State<Top> {
       if (!foreIsRun) {
         debugPrint("Off 있었네?");
         taskSetting.stopForegroundTask();
+        if (serviceTimer == null) {
+        } else {
+          serviceTimer!.cancel();
+        }
+        service.onClose();
       } else {
         debugPrint("On 있었네?");
-        taskSetting.setTopKey(widget.topKey);
-        taskSetting.setContext(context);
         taskSetting.startForegroundTask();
+        service.onStart().then((value) {
+          serviceTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+            debugPrint("Timer Printasdf");
+            service.onEvent();
+          });
+        });
       }
       Future.delayed(const Duration(milliseconds: 1000)).then((value) {
         basicActive = false;
@@ -146,10 +159,17 @@ class TopState extends State<Top> {
           inActive = true;
           if (foreIsRun) {
             foreIsRun = false;
+            serviceTimer!.cancel();
+            service.onClose();
             taskSetting.stopForegroundTask();
           } else {
             foreIsRun = true;
-            taskSetting.setContext(context);
+            service.onStart().then((value) {
+              serviceTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
+                debugPrint("Timer Print");
+                service.onEvent();
+              });
+            });
             taskSetting.startForegroundTask();
           }
           SettingDataUtil().setStateOnOff(foreIsRun);
