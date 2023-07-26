@@ -157,6 +157,7 @@ class TopState extends State<Top> {
       } else {
         if (!inActive) {
           inActive = true;
+          basicActive = true;
           if (foreIsRun) {
             foreIsRun = false;
             serviceTimer!.cancel();
@@ -164,18 +165,19 @@ class TopState extends State<Top> {
             taskSetting.stopForegroundTask();
           } else {
             foreIsRun = true;
+            taskSetting.startForegroundTask();
             service.onStart().then((value) {
               serviceTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
                 debugPrint("Timer Print");
                 service.onEvent();
               });
             });
-            taskSetting.startForegroundTask();
           }
           SettingDataUtil().setStateOnOff(foreIsRun);
           setState(() {});
           Future.delayed(const Duration(milliseconds: 1000)).then((value) {
             inActive = false;
+            basicActive = false;
           });
         } else {
           CustomToast().showToast("잠시만 기다려 주십시오.");

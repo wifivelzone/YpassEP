@@ -112,7 +112,7 @@ class BleScanService {
         //성능 설정
         scanMode: ScanMode.lowLatency,
         //중복 scan 가능 설정
-        allowDuplicates: false,
+        allowDuplicates: true,
         //UUID filter 설정
         withServices: [Guid("00003559-0000-1000-8000-00805F9B34FB")],
         //시간초 설정 (4초)
