@@ -101,12 +101,21 @@ class TopState extends State<Top> {
         service.onClose();
       } else {
         debugPrint("On 있었네?");
+        taskSetting.setTopKey(widget.topKey);
+        taskSetting.setContext(context);
         taskSetting.startForegroundTask();
-        service.onStart().then((value) {
-          serviceTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-            debugPrint("Timer Printasdf");
-            service.onEvent();
-          });
+        taskSetting.checkForegroundTask().then((value) {
+          if (!value) {
+            if (isAnd) {
+              service.onStart().then((value) {
+                serviceTimer =
+                    Timer.periodic(const Duration(milliseconds: 500), (timer) {
+                  debugPrint("Timer Printasdf");
+                  service.onEvent();
+                });
+              });
+            }
+          }
         });
       }
       Future.delayed(const Duration(milliseconds: 1000)).then((value) {
@@ -160,18 +169,25 @@ class TopState extends State<Top> {
           basicActive = true;
           if (foreIsRun) {
             foreIsRun = false;
-            serviceTimer!.cancel();
-            service.onClose();
+            if (!isAnd) {
+              serviceTimer!.cancel();
+              service.onClose();
+            }
             taskSetting.stopForegroundTask();
           } else {
             foreIsRun = true;
+            taskSetting.setTopKey(widget.topKey);
+            taskSetting.setContext(context);
             taskSetting.startForegroundTask();
-            service.onStart().then((value) {
-              serviceTimer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-                debugPrint("Timer Print");
-                service.onEvent();
+            if (!isAnd) {
+              service.onStart().then((value) {
+                serviceTimer =
+                    Timer.periodic(const Duration(milliseconds: 500), (timer) {
+                  debugPrint("Timer Print");
+                  service.onEvent();
+                });
               });
-            });
+            }
           }
           SettingDataUtil().setStateOnOff(foreIsRun);
           setState(() {});

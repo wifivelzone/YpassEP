@@ -47,7 +47,7 @@ class YPassTaskSetting {
         //interval (millisecond)마다 push 가능 (이걸 통해 onEvent로 주기적으로 BLE 스캔 작동시킴)
         interval: 500,  //12000
         //1번만 push설정
-        isOnceEvent: true,
+        isOnceEvent: false,
         allowWakeLock: true,
       ),
     );
@@ -89,6 +89,9 @@ class YPassTaskSetting {
         callback: startCallback,
       );
     }
+  }
+  Future<bool> checkForegroundTask() {
+    return FlutterForegroundTask.isRunningService;
   }
 
   //foreground task 정지
