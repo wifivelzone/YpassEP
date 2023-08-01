@@ -106,7 +106,7 @@ class TopState extends State<Top> {
         taskSetting.startForegroundTask();
         taskSetting.checkForegroundTask().then((value) {
           if (!value) {
-            if (isAnd) {
+            if (!isAnd) {
               service.onStart().then((value) {
                 serviceTimer =
                     Timer.periodic(const Duration(milliseconds: 500), (timer) {
