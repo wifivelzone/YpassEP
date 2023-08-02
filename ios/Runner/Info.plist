@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>kr.co.wifive.InOutSystemGwanJeo</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -53,19 +57,21 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Need BLE permission</string>
+	<string>자동문을 열기 위해서 블루투스를 허용해주셔야 합니다.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Need BLE permission</string>
+	<string>자동문을 열기 위해서 블루투스를 허용해주셔야 합니다.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>서비스에 빠른 이용을 위해 주소록에 접근합니다.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>서비스를 위해 로컬 네트워크에 대한 권한이 필요합니다.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Always and when in use!</string>
+	<string>사용자가 문 앞에 있음을 파악하고 문열림 서비스를 사용하시려면 항상 허용을 해주셔야 합니다.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Can I have location always?</string>
+	<string>사용자가 문 앞에 있음을 파악하고 문열림 서비스를 사용하시려면 항상 허용을 해주셔야 합니다.</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Older devices need location.</string>
+	<string>사용자가 문 앞에 있음을 파악하고 문열림 서비스를 사용하시려면 항상 허용을 해주셔야 합니다.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need location when in use</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>appTrackingTransparency</string>
+	<string>사용자가 문 앞에 있음을 파악하기 위해서 항상 허용하셔야 합니다.</string>
 	<key>PermissionGroupCriticalAlerts</key>
 	<string>criticalAlerts</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -86,16 +92,10 @@
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
