@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:ypass/constant/APPInfo.dart';
 
 import 'package:ypass/realm/SettingDBUtil.dart';
@@ -16,7 +17,6 @@ import '../constant/CustomColor.dart';
 import '../constant/YPassURL.dart';
 import '../http/HttpPostData.dart' as http;
 
-
 import 'package:upgrader/upgrader.dart';
 
 class MainScreen extends StatefulWidget {
@@ -28,6 +28,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final GlobalKey<TopState> _topKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +39,10 @@ class _MainScreenState extends State<MainScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Bar(barSize: 5.0),
-              Top(key: _topKey, topKey: _topKey,),
+              Top(
+                key: _topKey,
+                topKey: _topKey,
+              ),
               const Bar(barSize: 5.0),
               const _Middle(),
               const Bar(barSize: 5.0),
@@ -58,6 +62,7 @@ class _MainScreenState extends State<MainScreen> {
 
 class Top extends StatefulWidget {
   final GlobalKey<TopState> topKey;
+
   const Top({Key? key, required this.topKey}) : super(key: key);
 
   @override
@@ -66,7 +71,9 @@ class Top extends StatefulWidget {
 
 class TopState extends State<Top> {
   bool isAnd = Platform.isAndroid;
-  bool foreIsRun = SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff(); // on off 버튼
+  bool foreIsRun = SettingDataUtil().isEmpty()
+      ? false
+      : SettingDataUtil().getStateOnOff(); // on off 버튼
   bool inActive = false;
   bool basicActive = false;
   UserDBUtil db = UserDBUtil();
@@ -79,12 +86,28 @@ class TopState extends State<Top> {
     super.initState();
     db.getDB();
     taskSetting.init();
+    AndroidAlarmManager.initialize();
     FlutterBluePlus.instance.isOn;
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @pragma('vm:entry-point')
+  static Future<void> callback() async {
+    bool foreIsRun =
+        SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff();
+    YPassTaskSetting taskSetting = YPassTaskSetting();
+
+    taskSetting.init();
+    debugPrint("알람 실행 : $foreIsRun");
+    if (foreIsRun) {
+      taskSetting.stopForegroundTask();
+      await Future.delayed(const Duration(seconds: 1));
+      taskSetting.startForegroundTask();
+    }
   }
 
   @override
@@ -94,11 +117,10 @@ class TopState extends State<Top> {
       if (!foreIsRun) {
         debugPrint("Off 있었네?");
         taskSetting.stopForegroundTask();
-        if (serviceTimer == null) {
-        } else {
-          serviceTimer!.cancel();
+        serviceTimer?.cancel();
+        if (!isAnd) {
+          service.onClose();
         }
-        service.onClose();
       } else {
         debugPrint("On 있었네?");
         taskSetting.setTopKey(widget.topKey);
@@ -154,6 +176,7 @@ class TopState extends State<Top> {
       ),
     );
   }
+
   void onClickOnOffButton() {
     FlutterBluePlus.instance.isOn.then((isOn) {
       debugPrint("Running Check : $foreIsRun");
@@ -170,11 +193,20 @@ class TopState extends State<Top> {
           if (foreIsRun) {
             foreIsRun = false;
             if (!isAnd) {
-              serviceTimer!.cancel();
+              serviceTimer?.cancel();
               service.onClose();
+            } else {
+              AndroidAlarmManager.cancel(123);
             }
             taskSetting.stopForegroundTask();
           } else {
+            AndroidAlarmManager.periodic(
+              const Duration(hours: 3),
+              123,
+              callback,
+              exact: true,
+              wakeup: true
+            ).then((value) => debugPrint("run check : $value"));
             foreIsRun = true;
             taskSetting.setTopKey(widget.topKey);
             taskSetting.setContext(context);
@@ -207,6 +239,7 @@ class TopState extends State<Top> {
 
 /** ---------------------------------------------------- */
 /** --------------------   중간 부분  --------------------- */
+
 /// -------------------------------------------------------
 
 class _Middle extends StatelessWidget {
@@ -316,7 +349,8 @@ class _MiddleButtonImg extends StatelessWidget {
           debugPrint("통신 결과 : $result");
         }
       } else {
-        CustomToast().showToast("\"집으로 호출\"기능은 20초에 한번씩만 사용가능합니다. ${20 - (sec ~/ 1000)}초 후에 다시 사용 가능합니다.");
+        CustomToast().showToast(
+            "\"집으로 호출\"기능은 20초에 한번씩만 사용가능합니다. ${20 - (sec ~/ 1000)}초 후에 다시 사용 가능합니다.");
         debugPrint("20초 제한");
       }
       debugPrint("1");
@@ -348,7 +382,6 @@ class _MiddleButtonImg extends StatelessWidget {
   //   Navigator.of(context!).pushNamed('/updateUser');
   // }
 
-
   // 문의 버튼 클릭시
   Future<void> clickedQuestionBtn() async {
     if (await isKakaoTalkInstalled()) {
@@ -363,11 +396,11 @@ class _MiddleButtonImg extends StatelessWidget {
     }
     // debugPrint("4");
   }
-
 }
 
 /** ---------------------------------------------------- */
 /** --------------------   하단 부분  --------------------- */
+
 /// -------------------------------------------------------
 
 class Bottom extends StatelessWidget {
@@ -390,8 +423,9 @@ class Bottom extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         TextButton(
             onPressed: () => {
-              Navigator.of(context).pushNamed('/terms', arguments: PRIVACY_TERMS_OF_SERVICE) // 약관 페이지로 이동
-            },
+                  Navigator.of(context).pushNamed('/terms',
+                      arguments: PRIVACY_TERMS_OF_SERVICE) // 약관 페이지로 이동
+                },
             style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -404,7 +438,8 @@ class Bottom extends StatelessWidget {
         TextButton(
           onPressed: () => {
             //TODO: 약관 화면 표시
-            Navigator.of(context).pushNamed('/terms', arguments: YPASS_TERMS_OF_SERVICE) // 약관 페이지로 이동
+            Navigator.of(context).pushNamed('/terms',
+                arguments: YPASS_TERMS_OF_SERVICE) // 약관 페이지로 이동
           },
           style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
@@ -424,5 +459,4 @@ class Bottom extends StatelessWidget {
       throw Exception('Could not launch $url');
     }
   }*/
-
 }

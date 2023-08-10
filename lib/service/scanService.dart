@@ -56,7 +56,11 @@ class ScanService {
       debugPrint("Update UserData");
       debugPrint("phoneNumber : ${find.phoneNumber}");
       debugPrint("갱신 시작");
-      await UserDataRequest().setUserData(find.phoneNumber);
+      try {
+        await UserDataRequest().setUserData(find.phoneNumber);
+      } catch (e) {
+        debugPrint("error : $e");
+      }
     } else {
       debugPrint("Not Update Time");
     }
@@ -83,7 +87,7 @@ class ScanService {
     } else {
       bleCheckCount++;
       String temp = await checkNetwork();
-      debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
+      // debugPrint("Network Check : $netCheck, NetState Check : $netState, now : $temp");
       if (netState != temp) {
         netState = temp;
         netCheck = netState != "인터넷 연결 안됨";
@@ -101,8 +105,7 @@ class ScanService {
           await Future.delayed(const Duration(microseconds: 100));
           //스캔 결과 따라 Clober search
           if (ble.scanDone && !ble.connecting) {
-            debugPrint("List Check : ${ble.cloberList}");
-            debugPrint("BLE Scan Success!!");
+            // debugPrint("BLE Scan Success!!");
             await ble.searchClober();
           }
 
@@ -111,37 +114,36 @@ class ScanService {
           if (ble.searchDone && !ble.connecting) {
             if (ble.findClober()) {
               if (isAnd) {
-                debugPrint("IsAndroid from Foreground");
+                // debugPrint("IsAndroid from Foreground");
                 try {
-                  if (!ble.advertiseWaiting) {
-                    await ble.writeBle();
-                  }
+                  await ble.writeBle();
                 } catch (e) {
-                  debugPrint("Error log : ${e.toString()}");
+                  // debugPrint("Error log : ${e.toString()}");
                 }
               } else {
-                debugPrint("IsiOS from Foreground");
+                // debugPrint("IsiOS from Foreground");
                 try {
                   await ble.connect().then((value) {
                     ble.disconnect();
                   });
                 } catch (e) {
                   ble.disconnect();
-                  debugPrint("Connect Error!!!");
+                  // debugPrint("Connect Error!!!");
                 }
               }
             } else {
-              debugPrint("Clober not Found");
+              // debugPrint("Clober not Found");
             }
           }
         }
       } catch (e) {
+        debugPrint("error : $e");
         rebootWaiting = true;
         ble.stopScan();
         ble.disposeBle();
         ble.disconnect();
         ble.initBle();
-        StatisticsReporter().sendError('Scan 전 설정 오류.', db.getUser().phoneNumber);
+        StatisticsReporter().sendError('Scan 전 설정 오류 $e.', db.getUser().phoneNumber);
         Future.delayed(const Duration(milliseconds: 500)).then((value) {
           rebootWaiting = false;
         });
@@ -149,9 +151,9 @@ class ScanService {
     }
   }
 
-  void onClose() {
-    ble.stopScan();
-    ble.disposeBle();
-    ble.disconnect();
+  Future<void> onClose() async {
+    await ble.stopScan();
+    await ble.disposeBle();
+    await ble.disconnect();
   }
 }

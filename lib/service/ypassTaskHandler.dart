@@ -58,8 +58,10 @@ class YPassTaskHandler extends TaskHandler {
   Future<void> onDestroy(DateTime timestamp, SendPort? sendPort) async {
     await FlutterForegroundTask.clearAllData();
     if (isAnd) {
-      service.onClose();
+      await service.onClose();
     }
+    await Future.delayed(const Duration(milliseconds: 50));
+    debugPrint("다 끝나고?");
   }
 
   //push안에 버튼을 눌렀을 때 (여기선 버튼 구현 안함)

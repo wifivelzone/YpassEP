@@ -95,7 +95,7 @@ class UserDataRequest {
         debugPrint('통신error');
         debugPrint('Response Body : ${response.body}');
         String result;
-        result = await reporter.sendError("승강기 통신 실패", phoneNumber);
+        result = await reporter.sendError("유저 정보 서버 통신 실패", phoneNumber);
         debugPrint("통신error : $result");
 
         return false;

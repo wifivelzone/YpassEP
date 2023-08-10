@@ -35,8 +35,6 @@ class BleScanService {
   bool scanDone = false;
   bool searchDone = false;
   bool connecting = false;
-  bool advertiseSuccess = false;
-  bool advertiseWaiting = false;
   bool isAnd = Platform.isAndroid;
 
   //현재 확인 중인 clober의 값들
@@ -77,17 +75,10 @@ class BleScanService {
 
   //initble의 스캔 여부 확인하는 listen 종료 (안해주면 더미로 남음)
   disposeBle() {
-    if (subscription != null) {
-      subscription!.cancel();
-    }
-    if (resStream != null) {
-      resStream!.cancel();
-    }
-    if(!isAnd) {
-      if (valueStream != null) {
-        valueStream!.cancel();
-      }
-    }
+    subscription?.cancel();
+    resStream?.cancel();
+    valueStream?.cancel();
+    debugPrint("dispose Scan");
   }
 
   //스캔 시작 .then이나 스캔 성공 여부 확인용 Future<bool>
@@ -96,7 +87,7 @@ class BleScanService {
     cloberList.clear();
     Future<bool>? returnValue;
     //이미 스캔 중인지 확인
-    debugPrint("Is Scanning? : $_isScanning");
+    // debugPrint("Is Scanning? : $_isScanning");
     if (!_isScanning) {
       scanRestart = false;
       Future.delayed(const Duration(seconds: 1), (){
@@ -148,11 +139,10 @@ class BleScanService {
   }
 
   //스캔 중단
-  void stopScan() {
-    flutterBlue.stopScan();
-    if (resStream != null) {
-      resStream!.cancel();
-    }
+  Future<void> stopScan() async {
+    await flutterBlue.stopScan();
+    resStream?.cancel();
+    debugPrint("stop Scan");
   }
   void stopListen() {
     if (resStream != null) {
@@ -167,7 +157,7 @@ class BleScanService {
 
   //scan 결과 중에 clober 찾기
   Future<bool> searchClober() async {
-    debugPrint("Start Search!!");
+    // debugPrint("Start Search!!");
     Future<bool>? returnValue;
     isEv = false;
     int forwardRssi = -100;
@@ -175,7 +165,7 @@ class BleScanService {
     //기존 RSSI MAX 값들 초기화
     clearMax();
     List<ScanResult> scanResultListCopy = List.from(scanResultList);
-    debugPrint("Length Check : ${scanResultList.length}");
+    // debugPrint("Length Check : ${scanResultList.length}");
     Map<String, List> cloberListCopy = Map.from(cloberList);
     outCloberList.clear();
     skippedCloberList.clear();
@@ -183,6 +173,10 @@ class BleScanService {
     for (int i = 0; i < scanResultListCopy.length; i++) {
       ScanResult res = scanResultListCopy[i];
       //ScanResult.advertisementData.manufactureData에 회사 확인이나 CID 등등 값들 있음 (공유되는 Clober 이미지 참고)
+      int recordTime = DateTime.now().millisecondsSinceEpoch - res.timeStamp.millisecondsSinceEpoch;
+      if (recordTime > 2*1000) {
+        continue;
+      }
       var manu = res.advertisementData.manufacturerData;
       //map의 형태로 반환됨
       if(manu.keys.toList().isNotEmpty){
@@ -201,31 +195,50 @@ class BleScanService {
         List cidlist = [manu[a]?[4], manu[a]?[5], manu[a]?[6], manu[a]?[7]];
 
         if(listEquals(code, coop) && a == 13657){
-          debugPrint("yes Clober");
+          // debugPrint("yes Clober");
         } else {
-          debugPrint("no Clober");
+          // debugPrint("no Clober");
           returnValue = Future.value(false);
-          debugPrint("==================");
+          // debugPrint("==================");
           continue;
         }
 
         //clober 종류 확인 (출입용 + 방향)
         List code2 = [manu[a]?[2], manu[a]?[3]];
-        debugPrint("출입 확인 : ${code2.toString()}");
-        debugPrint("CID 확인 : ${cidlist.toString()}");
+        // debugPrint("출입 확인 : ${code2.toString()}");
+        // debugPrint("CID 확인 : ${cidlist.toString()}");
         if(listEquals(code2, [1, 1])) {
-          debugPrint("현재 key값 : [${manu[a]?[8]},${manu[a]?[9]}]");
+          // debugPrint("manu Check : $manu");
+          if (manu[a]!.length < 19) {
+            // debugPrint("short manu pass");
+            continue;
+          }
+          // debugPrint("현재 key값 : [${manu[a]?[8]},${manu[a]?[9]}]");
+
+          // debugPrint("manu Check : ${manu[a]}");
+          List<int> adverCheck = List.from(manu[a]!.sublist(10,19));
+          // debugPrint("new List Check : $adverCheck");
+
+          if (prevAdver != null) {
+            // debugPrint("prev List check : $prevAdver");
+            if (listEquals(adverCheck, prevAdver)) {
+              // debugPrint("Adv 성공!");
+              await FlutterBlePeripheral().stop();
+              evCall();
+            }
+          }
           if (manu[a]?[8] == 0) {
-            debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
+            // debugPrint("invalid Clober. 너무 멀거나, 움직임 필요");
+            // debugPrint("==================");
             continue;
           }
           //정면 Clober는 RSSI 평균 계산 후 후면 Clober RSSI 평균이 있으면 진행, 아니면 ScanResultList마지막에 다시 추가하고 continue
           //이미 후면 Clober RSSI가 있는 정면 Clober만 진행시킴으로 Clober가 여러개여도 구분 가능
-          debugPrint("ID Check : ${res.device.id}");
-          debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
+          // debugPrint("ID Check : ${res.device.id}");
+          // debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
           int sum = 0;
           List? tempList = cloberListCopy[res.device.id.toString()];
-          debugPrint("Length Check : ${tempList?.length}");
+          // debugPrint("Length Check : ${tempList?.length}");
           if (tempList != null) {
             for (int a in tempList) {
               sum += a;
@@ -236,25 +249,25 @@ class BleScanService {
           bool isGS = manu[a]![6] == 2 && manu[a]![7] > 25 && manu[a]![7] < 45;
           int restTime = DateTime.now().millisecondsSinceEpoch - lastEv.millisecondsSinceEpoch;
           if (restTime < 3*1000 && !isGS){
-            debugPrint("But Cooldown ... (3 sec / ${restTime~/1000})");
+            // debugPrint("But Cooldown ... (3 sec / ${restTime~/1000})");
             continue;
           }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
           if (!isAnd && outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
-            debugPrint("Before Input South!!");
-            debugPrint("==================");
+            // debugPrint("Before Input South!!");
+            // debugPrint("==================");
             //두번 skip은 짝인 1.3 Clober가 없다고 판단 pass
             if (skippedCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] != null) {
-              debugPrint("Arleady Skipped Clober!!");
-              debugPrint("==================");
+              // debugPrint("Arleady Skipped Clober!!");
+              // debugPrint("==================");
               continue;
             }
             //단 경산용 EV Clober는 따로 처리 (정면 밖에 없음)
             //경산 EV 쿨타임 5분
             int restGSTime = DateTime.now().millisecondsSinceEpoch - lastGS.millisecondsSinceEpoch;
             if (isGS) {
-              debugPrint("But EvClober");
+              // debugPrint("But EvClober");
               if (restGSTime < 5*60*1000) {
                 //유저 설정 확인
                 SettingDataUtil setdb = SettingDataUtil();
@@ -271,7 +284,7 @@ class BleScanService {
                   continue;
                 }
               } else {
-                debugPrint("But EVCooldown ... (5 minute / ${restGSTime~/1000})");
+                // debugPrint("But EVCooldown ... (5 minute / ${restGSTime~/1000})");
               }
             } else {
               //없으면 지금의 Clober를 list 맨 뒤로 보내고 continue (후면 인식되면 정면 되게)
@@ -287,19 +300,19 @@ class BleScanService {
             } else {
               backRssi = outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"]?.first;
             }
-            debugPrint("Input North");
-            debugPrint("Fore : $forwardRssi, Back : $backRssi");
+            // debugPrint("Input North");
+            // debugPrint("Fore : $forwardRssi, Back : $backRssi");
           }
           //정면
         } else if (listEquals(code2, [1, 3])) {
           if (isAnd) {
-            debugPrint("Not Use in Android");
+            // debugPrint("Not Use in Android");
             continue;
           }
           //후면 Clober는 RSSI 평균 값만 저장하고 continue
           //outCloberList에 Clober ID를 key값으로 RSSI 평균을 저장함(정면, 후면 Clober ID가 같음)
-          debugPrint("ID Check : ${res.device.id}");
-          debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
+          // debugPrint("ID Check : ${res.device.id}");
+          // debugPrint("Get List : ${cloberListCopy[res.device.id.toString()]}");
           int sum = 0;
           List? tempList = cloberListCopy[res.device.id.toString()];
           if (tempList != null) {
@@ -308,15 +321,15 @@ class BleScanService {
             }
           }
           backRssi = sum~/tempList!.length;
-          debugPrint("Input South");
+          // debugPrint("Input South");
           outCloberList.addEntries({"${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}" : [backRssi]}.entries);
-          debugPrint("==================");
+          // debugPrint("==================");
           continue;
           //후면
         } else {
           //출입용 아니면 그냥 pass
-          debugPrint("Not Input Pass");
-          debugPrint("==================");
+          // debugPrint("Not Input Pass");
+          // debugPrint("==================");
           continue;
         }
         cid = "";
@@ -341,21 +354,21 @@ class BleScanService {
         cid += cidlist[3].toRadixString(16).toString();
 
         if (db.findCloberByCIDIsEmpty(cid)) {
-          debugPrint("접근할 수 없는 Clober 입니다. CID : $cid");
+          // debugPrint("접근할 수 없는 Clober 입니다. CID : $cid");
           continue;
         }
         rssi = (forwardRssi + backRssi)/2;
         //스캔된 device 값 확인 (clober라면)
-        debugPrint("==================");
-        debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");
-        debugPrint("==================");
+        // debugPrint("==================");
+        // debugPrint("cid : $cid\nrssi : $rssi\nbat : $bat");
+        // debugPrint("==================");
         //RSSI 최대값 비교
         //우선 isEv를 읽어 이게 EV용 Clober인지 확인
         double correctRssi = Platform.isAndroid ? -75 : -80;
         correctRssi = correctRssi - SettingDataUtil().getUserSetRange();
-        debugPrint("보정된 RSSI : $correctRssi");
+        // debugPrint("보정된 RSSI : $correctRssi");
         if (isEv && rssi > maxRssi && rssi > correctRssi) {
-          debugPrint("New Max with Ev");
+          // debugPrint("New Max with Ev");
           maxCid = cid;
           maxRssi = rssi;
           maxBat = bat;
@@ -365,7 +378,7 @@ class BleScanService {
         } else if ((rssi > maxRssi) && code2[0] == 1 && rssi > correctRssi) {
           //EV용 Clober가 이미 인식되어 있더라도
           //다른 Clober가 max 갱신되면 isEv = false
-          debugPrint("New Max");
+          // debugPrint("New Max");
           maxCid = cid;
           maxRssi = rssi;
           maxBat = bat;
@@ -374,18 +387,18 @@ class BleScanService {
           searchDone = true;
           returnValue = Future.value(true);
         } else {
-          debugPrint("Not Max");
+          // debugPrint("Not Max");
         }
       } else {
-        debugPrint("Pass");
+        // debugPrint("Pass");
         returnValue = Future.value(false);
       }
     }
 
     scanDone = false;
-    debugPrint("Search Done? : $searchDone");
+    // debugPrint("Search Done? : $searchDone");
     if (db.findCloberByCIDIsEmpty(maxCid)) {
-      debugPrint("접근할 수 없는 Clober 입니다. CID : $maxCid");
+      // debugPrint("접근할 수 없는 Clober 입니다. CID : $maxCid");
       searchDone = false;
     } else {
       var temp = db.findCloberByCID(maxCid);
@@ -393,12 +406,12 @@ class BleScanService {
     }
     if (!searchDone) {
       if (isEv) {
-        debugPrint("경산 Ev Search");
+        // debugPrint("경산 Ev Search");
         callEvGyeongSan();
       } else {
-        debugPrint("Search 실패");
+        // debugPrint("Search 실패");
         timerValid = true;
-        debugPrint("Time Valid True");
+        // debugPrint("Time Valid True");
       }
     }
     return returnValue ?? Future.value(false);
@@ -612,15 +625,11 @@ class BleScanService {
   }
 
   //connect된 BLE 끊기
-  void disconnect() {
+  Future<void> disconnect() async {
     debugPrint("Disconnecting...");
     if (connecting) {
       connecting = false;
-      if(!isAnd) {
-        if (valueStream != null) {
-          valueStream!.cancel();
-        }
-      }
+      valueStream?.cancel();
       maxR.device.disconnect();
     }
   }
@@ -640,20 +649,6 @@ class BleScanService {
     debugPrint('Key1 Check : $k1');
     debugPrint('Key2 Check : $k2');
 
-    List<int> adverCheck = List.from(readData[a]!.sublist(10,19));
-    debugPrint("new List Check : $adverCheck");
-
-    if (prevAdver != null) {
-      debugPrint("prev List check : $prevAdver");
-      if (listEquals(adverCheck, prevAdver)) {
-        debugPrint("Adv 성공!");
-        await FlutterBlePeripheral().stop();
-        advertiseSuccess = true;
-        advertiseWaiting = true;
-        evCall();
-        return ;
-      }
-    }
     advEnc = AdvertisingEnc(k1.toString(),k2.toString(),finds2.userid);
     advEnc.startEncryption();
     prevAdver = advEnc.result;
@@ -693,7 +688,6 @@ class BleScanService {
   }
 
   Future<void> evCall() async {
-    advertiseSuccess = false;
     try {
       String result;
       result = await http.cloberPass(1, cid, maxRssi.toString());
@@ -718,7 +712,6 @@ class BleScanService {
       valueStream?.cancel();
     }
     prevAdver = null;
-    advertiseWaiting = false;
     timerValid = true;
   }
 
@@ -728,7 +721,7 @@ class BleScanService {
       if (timerValid) {
         DateTime nowTime = DateTime.now();
         if (nowTime.millisecondsSinceEpoch-scanTime.millisecondsSinceEpoch > 1000) {
-          debugPrint("Scan Cut !!!");
+          // debugPrint("Scan Cut !!!");
           //debugPrint("Scan Length : ${scanResultList.length}");
           timerValid = false;
           scanDone = true;

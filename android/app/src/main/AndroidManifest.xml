@@ -21,6 +21,9 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         tools:node="replace" />
@@ -34,47 +37,62 @@
     <uses-permission-sdk-23
         android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:node="remove" />
+
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-   <application
-        android:label="와이패스"
+    <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:label="와이패스">
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-<!--                <data android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" android:host="oauth"/>-->
-<!--                <data android:host="kakaolink"-->
-<!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
-<!--                &lt;!&ndash; 카카오스토리 &ndash;&gt;-->
-<!--                <data android:host="kakaostory"-->
-<!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!--                <data android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" android:host="oauth"/>-->
+                <!--                <data android:host="kakaolink"-->
+                <!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
+                <!--                &lt;!&ndash; 카카오스토리 &ndash;&gt;-->
+                <!--                <data android:host="kakaostory"-->
+                <!--                    android:scheme="kakao83ce8d6e03a7823d0beffa856d0d9e9d" />-->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
-       <service
-           android:name="com.pravera.flutter_foreground_task.service.ForegroundService" />
+        <service android:name="com.pravera.flutter_foreground_task.service.ForegroundService" />
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <service
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmBroadcastReceiver"
+            android:exported="false" />
+        <receiver
+            android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
+            android:enabled="false"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
