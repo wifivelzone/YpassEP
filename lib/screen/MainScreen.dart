@@ -265,6 +265,7 @@ class _Middle extends StatelessWidget {
 class _MiddleButtonImg extends StatelessWidget {
   BuildContext? context;
   UserDBUtil userDBUtil = UserDBUtil();
+  bool isAnd = Platform.isAndroid;
 
   int evTime = 0;
 
@@ -406,9 +407,9 @@ class _MiddleButtonImg extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pushNamed('/manual',
-                        arguments: YPASS_USER_MANUAL);
+                        arguments: isAnd ? YPASS_USER_MANUAL_AND : YPASS_USER_MANUAL_IOS);
                   },
-                  child: const Text("메뉴얼로"),
+                  child: const Text("메뉴얼로", style: TextStyle(color: Colors.black),),
                 ),
                 const Divider(),
                 TextButton(
@@ -424,7 +425,7 @@ class _MiddleButtonImg extends StatelessWidget {
                       CustomToast().showToast('카카오톡을 설치해 주세요');
                     }
                   },
-                  child: const Text("카카오톡 문의로"),
+                  child: const Text("카카오톡 문의로", style: TextStyle(color: Colors.black),),
                 ),
               ],
             ),
