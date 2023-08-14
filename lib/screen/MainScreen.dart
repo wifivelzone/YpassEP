@@ -200,10 +200,12 @@ class TopState extends State<Top> {
             }
             taskSetting.stopForegroundTask();
           } else {
-            AndroidAlarmManager.periodic(
-                    const Duration(seconds: 5), 123, callback,
-                    exact: true, wakeup: true)
-                .then((value) => debugPrint("run check : $value"));
+            if (isAnd) {
+              AndroidAlarmManager.periodic(
+                      const Duration(seconds: 5), 123, callback,
+                      exact: true, wakeup: true)
+                  .then((value) => debugPrint("run check : $value"));
+            }
             foreIsRun = true;
             taskSetting.setTopKey(widget.topKey);
             taskSetting.setContext(context);
