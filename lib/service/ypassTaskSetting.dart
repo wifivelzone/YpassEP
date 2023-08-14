@@ -7,6 +7,14 @@ import 'package:ypass/service/ypassTaskHandler.dart';
 import 'package:ypass/screen/MainScreen.dart';
 
 class YPassTaskSetting {
+  static final YPassTaskSetting _instance = YPassTaskSetting._internal();
+
+  factory YPassTaskSetting() {
+    return _instance;
+  }
+
+  YPassTaskSetting._internal();
+
   ReceivePort? _receivePort;
   late BuildContext context;
   late GlobalKey<TopState> topKey;

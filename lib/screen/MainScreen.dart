@@ -99,14 +99,14 @@ class TopState extends State<Top> {
   static Future<void> callback() async {
     bool foreIsRun =
         SettingDataUtil().isEmpty() ? false : SettingDataUtil().getStateOnOff();
-    YPassTaskSetting taskSetting = YPassTaskSetting();
 
-    taskSetting.init();
+    YPassTaskSetting().init();
     debugPrint("알람 실행 : $foreIsRun");
+    debugPrint("알람 시간 : ${DateTime.now()}");
     if (foreIsRun) {
-      taskSetting.stopForegroundTask();
+      YPassTaskSetting().stopForegroundTask();
       await Future.delayed(const Duration(seconds: 1));
-      taskSetting.startForegroundTask();
+      YPassTaskSetting().startForegroundTask();
     }
   }
 
@@ -201,12 +201,9 @@ class TopState extends State<Top> {
             taskSetting.stopForegroundTask();
           } else {
             AndroidAlarmManager.periodic(
-              const Duration(hours: 3),
-              123,
-              callback,
-              exact: true,
-              wakeup: true
-            ).then((value) => debugPrint("run check : $value"));
+                    const Duration(seconds: 5), 123, callback,
+                    exact: true, wakeup: true)
+                .then((value) => debugPrint("run check : $value"));
             foreIsRun = true;
             taskSetting.setTopKey(widget.topKey);
             taskSetting.setContext(context);
@@ -317,7 +314,9 @@ class _MiddleButtonImg extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
               child: TextButton(
-                onPressed: clickedQuestionBtn,
+                onPressed: () {
+                  clickedQuestionBtn(context);
+                },
                 child: Image.asset('asset/img/question.png'),
               ),
             ),
@@ -383,17 +382,52 @@ class _MiddleButtonImg extends StatelessWidget {
   // }
 
   // 문의 버튼 클릭시
-  Future<void> clickedQuestionBtn() async {
-    if (await isKakaoTalkInstalled()) {
-      Uri url = await TalkApi.instance.channelChatUrl('_cZBEK');
-      try {
-        await launchBrowserTab(url);
-      } catch (error) {
-        debugPrint('카카오톡 채널 채팅 실패 $error');
-      }
-    } else {
-      CustomToast().showToast('카카오톡을 설치해 주세요');
-    }
+  Future<void> clickedQuestionBtn(BuildContext context) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: const Column(
+              children: [
+                Text("문의 하기"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/manual',
+                        arguments: YPASS_USER_MANUAL);
+                  },
+                  child: const Text("메뉴얼로"),
+                ),
+                const Divider(),
+                TextButton(
+                  onPressed: () async {
+                    if (await isKakaoTalkInstalled()) {
+                      Uri url = await TalkApi.instance.channelChatUrl('_cZBEK');
+                      try {
+                        await launchBrowserTab(url);
+                      } catch (error) {
+                        debugPrint('카카오톡 채널 채팅 실패 $error');
+                      }
+                    } else {
+                      CustomToast().showToast('카카오톡을 설치해 주세요');
+                    }
+                  },
+                  child: const Text("카카오톡 문의로"),
+                ),
+              ],
+            ),
+          );
+        });
     // debugPrint("4");
   }
 }
