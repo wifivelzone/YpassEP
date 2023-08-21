@@ -202,7 +202,7 @@ class TopState extends State<Top> {
           } else {
             if (isAnd) {
               AndroidAlarmManager.periodic(
-                      const Duration(seconds: 5), 123, callback,
+                      const Duration(hours: 3), 123, callback,
                       exact: true, wakeup: true)
                   .then((value) => debugPrint("run check : $value"));
             }
