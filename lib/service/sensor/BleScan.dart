@@ -254,7 +254,7 @@ class BleScanService {
           }
 
           //후면 Clober RSSI가 저장되어 있는지 확인
-          if (!isAnd && outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
+          if (isAnd && !isAnd && outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"] == null) {
             // debugPrint("Before Input South!!");
             // debugPrint("==================");
             //두번 skip은 짝인 1.3 Clober가 없다고 판단 pass
@@ -295,7 +295,7 @@ class BleScanService {
           } else {
             //후면 RSSI 평균이 있으면 읽어와서 back에 넣어줌 forward는 계산
             forwardRssi = sum~/tempList!.length;
-            if (isAnd) {
+            if (isAnd || !isAnd) {
               backRssi = forwardRssi;
             } else {
               backRssi = outCloberList["${manu[a]![4]}.${manu[a]![5]}.${manu[a]![6]}.${manu[a]![7]}"]?.first;
@@ -305,7 +305,7 @@ class BleScanService {
           }
           //정면
         } else if (listEquals(code2, [1, 3])) {
-          if (isAnd) {
+          if (isAnd || !isAnd) {
             // debugPrint("Not Use in Android");
             continue;
           }
