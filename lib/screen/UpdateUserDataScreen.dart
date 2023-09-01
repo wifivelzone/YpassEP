@@ -9,6 +9,7 @@ import '../constant/Exception.dart';
 import '../http/StatisticsReporter.dart';
 import '../http/UserDataRequest.dart';
 import '../realm/UserDBUtil.dart';
+import '../realm/db/IdArr.dart';
 
 // 사용자 정보 수정 페이지
 class UpdateUserDataScreen extends StatefulWidget {
@@ -19,6 +20,24 @@ class UpdateUserDataScreen extends StatefulWidget {
 }
 
 class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    // daeguTest();
+  }
+
+  void daeguTest() {
+    UserDBUtil userDB = UserDBUtil();
+
+    userDB.deleteDB(); // 기존 데이터 삭제
+    userDB.createUserData("010-0000-0000", "대구 테스트 102동 902호", "0", "2023-08-24 17:15:01", "2023-09-23 17:15:01", !("대구 테스트 102동 902호".toString().contains('동'))); // 유저 데이터 저장
+    //  IdArr (cloberid, userid, pk) 저장
+    for (var idArrValue in testIdArr) {
+      userDB.createIDArr(IdArr(idArrValue['cloberid'].toString().toLowerCase(), idArrValue['userid']!, idArrValue['pk']!));
+    }
+    CustomToast().showToast("대구용 DB input 완료.");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -261,3 +280,141 @@ class _InputText extends StatelessWidget {
     );
   }
 }
+
+
+var testIdArr = [
+  {
+    "userid":"0101010b356b",
+    "pk":"Q7dcUMxkz1",
+    "cloberid":"01010303"
+  },
+  {
+    "userid":"0101010b3c13",
+    "pk":"CnQ1RlSkVN",
+    "cloberid":"01010304"
+  },
+  {
+    "userid":"0101010b4238",
+    "pk":"ZWqy2kR0oe",
+    "cloberid":"01010305"
+  },
+  {
+    "userid":"0101010b485e",
+    "pk":"EfqK92J3hs",
+    "cloberid":"01010306"
+  },
+  {
+    "userid":"0101010b4f05",
+    "pk":"pEDx7NGLfT",
+    "cloberid":"01010307"
+  },
+  {
+    "userid":"0101010b552b",
+    "pk":"OpQiGj2efd",
+    "cloberid":"01010308"
+  },
+  {
+    "userid":"0101010b5b51",
+    "pk":"72cz8PfVDW",
+    "cloberid":"01010309"
+  },
+  {
+    "userid":"0101010b6177",
+    "pk":"Hut46PqVBs",
+    "cloberid":"0101030a"
+  },
+  {
+    "userid":"0101010b681e",
+    "pk":"kK32RsEeGU",
+    "cloberid":"0101030b"
+  },
+  {
+    "userid":"0101010b746a",
+    "pk":"DZy9f2pe8F",
+    "cloberid":"0101030d"
+  },
+  {
+    "userid":"0101010b7b11",
+    "pk":"Aen4WFcfsh",
+    "cloberid":"0101030e"
+  },
+  {
+    "userid":"0101010c0237",
+    "pk":"Wd1pXEmtb6",
+    "cloberid":"0101030f"
+  },
+  {
+    "userid":"0101010b6e44",
+    "pk":"IZ83Eu5NKt",
+    "cloberid":"0101030c"
+  },
+  {
+    "userid":"0101010c085d",
+    "pk":"RMp651VtQK",
+    "cloberid":"01010310"
+  },
+  {
+    "userid":"0101010c0f04",
+    "pk":"ZcR7Og8zne",
+    "cloberid":"01010311"
+  },
+  {
+    "userid":"0101010c152a",
+    "pk":"is52qAHKcv",
+    "cloberid":"01010312"
+  },
+  {
+    "userid":"0101010c1b50",
+    "pk":"beVKRoLtnH",
+    "cloberid":"01010313"
+  },
+  {
+    "userid":"0101010c2176",
+    "pk":"gpOYz5WHTn",
+    "cloberid":"01010314"
+  },
+  {
+    "userid":"0101010c281d",
+    "pk":"VQFuixHP6S",
+    "cloberid":"01010315"
+  },
+  {
+    "userid":"0101010c2e43",
+    "pk":"ie5M9DaFJg",
+    "cloberid":"01010316"
+  },
+  {
+    "userid":"0101010c3469",
+    "pk":"impJSqj29R",
+    "cloberid":"01010317"
+  },
+  {
+    "userid":"0101010c3b10",
+    "pk":"PIGHVNMtBC",
+    "cloberid":"01010318"
+  },
+  {
+    "userid":"0101010c4136",
+    "pk":"DJ2NwhxrSK",
+    "cloberid":"01010319"
+  },
+  {
+    "userid":"0101010c475c",
+    "pk":"XEJ7hrOksC",
+    "cloberid":"0101031a"
+  },
+  {
+    "userid":"0101010c4e03",
+    "pk":"5wsJtXz8nU",
+    "cloberid":"0101031b"
+  },{
+    "userid":"0101010c5429",
+    "pk":"19eEQsH4CF",
+    "cloberid":"0101031c"
+  },
+  {
+    "userid":"0101010c5a4f",
+    "pk":"nB4IA1Kv0X",
+    "cloberid":"0101031d"
+  }
+];

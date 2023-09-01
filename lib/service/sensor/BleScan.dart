@@ -64,6 +64,7 @@ class BleScanService {
   late Encryption enc;
   late AdvertisingEnc advEnc;
   List<int>? prevAdver;
+  late String preMaxCid;
   UserDBUtil db = UserDBUtil();
 
   //현재 스캔 중인지 확인함
@@ -682,6 +683,7 @@ class BleScanService {
         advertiseData: advertiseData,
         advertiseSettings: advertiseSettings
     );
+    preMaxCid = maxCid;
     timerValid = true;
 
     debugPrint("response : $response");
@@ -699,7 +701,12 @@ class BleScanService {
           .phoneNumber;
       String httpResult;
 
-      httpResult = await http.evCall(maxCid, phoneNumber);
+      if (isAnd) {
+        debugPrint("test : $preMaxCid");
+        httpResult = await http.evCall(preMaxCid, phoneNumber);
+      } else {
+        httpResult = await http.evCall(maxCid, phoneNumber);
+      }
       debugPrint("통신 결과 : $httpResult");
       //최신 lastInCloberID 갱신
       SettingDataUtil set = SettingDataUtil();
