@@ -31,7 +31,7 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
     UserDBUtil userDB = UserDBUtil();
 
     userDB.deleteDB(); // 기존 데이터 삭제
-    userDB.createUserData("010-0000-0000", "대구 테스트 102동 902호", "0", "2023-08-24 17:15:01", "2023-09-23 17:15:01", !("대구 테스트 102동 902호".toString().contains('동'))); // 유저 데이터 저장
+    userDB.createUserData("010-0000-0000", "대구 테스트 102동 902호", "0", "2023-09-07 17:15:01", "2023-10-23 17:15:01", !("대구 테스트 102동 902호".toString().contains('동'))); // 유저 데이터 저장
     //  IdArr (cloberid, userid, pk) 저장
     for (var idArrValue in testIdArr) {
       userDB.createIDArr(IdArr(idArrValue['cloberid'].toString().toLowerCase(), idArrValue['userid']!, idArrValue['pk']!));

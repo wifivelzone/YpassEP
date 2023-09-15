@@ -7,6 +7,7 @@ import 'package:ypass/service/sensor/BleScan.dart';
 import 'package:ypass/service/scanService.dart';
 import 'package:ypass/service/ypassTaskSetting.dart';
 
+
 //foreground task 시작
 @pragma('vm:entry-point')
 void startCallback() {
@@ -24,22 +25,29 @@ class YPassTaskHandler extends TaskHandler {
 
   ScanService service = ScanService();
   BleScanService ble = BleScanService();
+
   //gps는 더미 코드
   //LocationService gps = LocationService();
 
   YPassTaskSetting taskSetting = YPassTaskSetting();
+  bool starting = false;
+
   //알림창 기본 설정
   @override
   Future<void> onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
     if (isAnd) {
-      service.onStart();
+      await service.onStart();
     }
+    starting = true;
   }
 
   //push가 올 때마다 실행
   @override
   Future<void> onEvent(DateTime timestamp, SendPort? sendPort) async {
+    if (!starting) {
+      return;
+    }
     if (isAnd) {
       if (!await ble.flutterBlue.isOn) {
         debugPrint("블루투스 꺼졌다.");
@@ -48,8 +56,9 @@ class YPassTaskHandler extends TaskHandler {
           _sendPort?.send('bluetooth off');
           taskSetting.stopForegroundTask();
         }
+      } else {
+        service.onEvent();
       }
-      service.onEvent();
     }
   }
 

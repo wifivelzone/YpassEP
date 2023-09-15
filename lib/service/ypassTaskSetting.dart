@@ -1,10 +1,13 @@
 import 'dart:isolate';
 
+import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'package:ypass/service/ypassTaskHandler.dart';
 import 'package:ypass/screen/MainScreen.dart';
+
+import '../realm/SettingDBUtil.dart';
 
 class YPassTaskSetting {
   static final YPassTaskSetting _instance = YPassTaskSetting._internal();
@@ -36,7 +39,7 @@ class YPassTaskSetting {
         channelId: 'notification_channel_id',
         channelName: 'Foreground Notification',
         channelDescription:
-        'This notification appears when the foreground service is running.',
+            'This notification appears when the foreground service is running.',
         channelImportance: NotificationChannelImportance.LOW,
         priority: NotificationPriority.LOW,
         //push 아이콘은 앱 아이콘 따라감(기본설정)
@@ -66,7 +69,7 @@ class YPassTaskSetting {
     //permission check
     if (!await FlutterForegroundTask.canDrawOverlays) {
       final isGranted =
-      await FlutterForegroundTask.openSystemAlertWindowSettings();
+          await FlutterForegroundTask.openSystemAlertWindowSettings();
       if (!isGranted) {
         debugPrint('SYSTEM_ALERT_WINDOW permission denied!');
         return false;
@@ -84,11 +87,7 @@ class YPassTaskSetting {
     //foreground task가 이미 작동 중인지 check
     if (await FlutterForegroundTask.isRunningService) {
       debugPrint("Foreground Already Running");
-      return FlutterForegroundTask.startService(
-        notificationTitle: 'Foreground Service is running',
-        notificationText: '',
-        callback: startCallback,
-      );
+      return FlutterForegroundTask.restartService();
     } else {
       debugPrint("Foreground Start Running");
       return FlutterForegroundTask.startService(
@@ -98,6 +97,7 @@ class YPassTaskSetting {
       );
     }
   }
+
   Future<bool> checkForegroundTask() {
     return FlutterForegroundTask.isRunningService;
   }
@@ -127,7 +127,13 @@ class YPassTaskSetting {
         } else if (message == "bluetooth off") {
           debugPrint("스캔 끌게");
           //debugPrint("작동 체크 : ${Top.of(context)}");
-          topKey.currentState?.onClickOnOffButton();
+          try {
+            topKey.currentState?.onClickOnOffButton();
+          } catch (e) {
+            debugPrint("백그라운드 예외 처리");
+            AndroidAlarmManager.cancel(123);
+            SettingDataUtil().setStateOnOff(false);
+          }
         }
       } else if (message is DateTime) {
         debugPrint('timestamp: ${message.toString()}');

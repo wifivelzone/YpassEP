@@ -107,6 +107,7 @@ class TopState extends State<Top> {
       YPassTaskSetting().stopForegroundTask();
       await Future.delayed(const Duration(seconds: 1));
       YPassTaskSetting().startForegroundTask();
+      await Future.delayed(const Duration(seconds: 1));
     }
   }
 
@@ -474,7 +475,6 @@ class Bottom extends StatelessWidget {
         ),
         TextButton(
           onPressed: () => {
-            //TODO: 약관 화면 표시
             Navigator.of(context).pushNamed('/terms',
                 arguments: YPASS_TERMS_OF_SERVICE) // 약관 페이지로 이동
           },
