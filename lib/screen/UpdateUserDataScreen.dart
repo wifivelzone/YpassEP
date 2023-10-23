@@ -24,7 +24,7 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
   @override
   void initState() {
     super.initState();
-    // daeguTest();
+    daeguTest();
   }
 
   void daeguTest() {
