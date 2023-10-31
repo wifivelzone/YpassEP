@@ -541,6 +541,7 @@ class BleScanService {
           debugPrint("Readable Check : ${c.properties.read}");
           debugPrint("Notify Check : ${c.properties.notify}");
           await c.setNotifyValue(true);
+          await char1.setNotifyValue(true);
           //write 이후 characteristic의 response를 얻는 listener
           valueStream = c.onValueChangedStream.listen((value) async {
             //loading은 바로 해제
