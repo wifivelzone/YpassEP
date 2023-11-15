@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -15,7 +16,10 @@ import 'package:ypass/service/scanService.dart';
 import 'package:ypass/service/ypassTaskSetting.dart';
 import '../constant/CustomColor.dart';
 import '../constant/YPassURL.dart';
+import '../http/AES256.dart';
 import '../http/HttpPostData.dart' as http;
+import 'package:http/http.dart' as httpa;
+import 'package:ypass/http/NetworkState.dart' as ns;
 
 import 'package:upgrader/upgrader.dart';
 
@@ -483,12 +487,110 @@ class Bottom extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               minimumSize: Size.zero),
           child: const Text('와이패스 이용약관', style: TextStyle(color: Colors.black)),
-        )
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        TextButton(
+          onPressed: () => {
+            _showDialog(context)
+          },
+          style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              minimumSize: Size.zero),
+          child: const Text('약관 철회', style: TextStyle(color: Colors.black)),
+        ),
       ]),
       const SizedBox(
         height: 15,
       )
     ]);
+  }
+
+
+  void _showDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // 다이얼로그 내용을 정의합니다.
+        return AlertDialog(
+          title: Text('안내'),
+          content: Text('이용 약관을 철회하시겠습니다까?'),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('철회'),
+              onPressed: () {
+                withdrawalOfTermsAndConditions(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> withdrawalOfTermsAndConditions(BuildContext context) async {
+    final httpa.Client client = httpa.Client();
+    final String delUrl = 'https://wifivecloud.co.kr:8000/delYpassEPlog'; // Replace with your API URL
+
+    if (await ns.checkNetwork() != '인터넷 연결 안됨') {
+      try {
+        var phone = UserDBUtil().getUser().phoneNumber;
+        phone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+
+        if (phone.length == 10) {
+          phone = phone.substring(0, 3) + phone.substring(3, 6) + phone.substring(6, 10);
+        }
+
+        final Map<String, String> data = {
+
+          'phone': AES256.encryptAES(phone), // Replace with your AES encryption logic
+        };
+
+        final Map<String, dynamic> requestBody = {
+          'data': jsonEncode(data),
+        };
+
+
+        debugPrint("Jsondata : $requestBody");
+        final response = await client.post(
+          Uri.parse(delUrl),
+          body: jsonEncode(requestBody),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          UserDBUtil().deleteDB();
+          SettingDataUtil().deleteSettingData();
+          Navigator.pushReplacementNamed(context, '/');
+
+          // Successful response handling
+          // You can handle the response data here
+          debugPrint('Request successful');
+        } else {
+          // Error handling
+          debugPrint('Request failed with status: ${response.statusCode}');
+          // debugPrint('Request failed with status: ${response.}');
+        }
+      } catch (e) {
+        debugPrint('err : $e');
+      } finally {
+        client.close();
+      }
+    } else {
+      debugPrint('network don\'t connect');
+      // Handle the case when there's no network connectivity
+    }
+
   }
 /*
   Future<void> _launchUrl(url) async {

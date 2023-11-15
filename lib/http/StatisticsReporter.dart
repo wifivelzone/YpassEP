@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:ypass/http/NetworkState.dart' as ns;
 import 'package:ypass/realm/UserDBUtil.dart';
@@ -18,7 +19,9 @@ class StatisticsReporter {
 
     if (netState != '인터넷 연결 안됨') {
 
-      var jsonData = (jsonDecode(jsonDecode(resBody).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+      // var jsonData = (jsonDecode(jsonDecode(resBody).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+      var jsonData = jsonDecode(resBody) as Map<String, dynamic>;
+      debugPrint('json Data : $jsonData');
       var listArr = jsonData['listArr'][0];
       String brand;
       if (Platform.isIOS) {
@@ -33,7 +36,7 @@ class StatisticsReporter {
               "phoneNumber": phoneNumber,
               "num": listArr['num'],
               "addr": listArr['addr'],
-              "type": listArr['type'],
+              "type": '1',
               "sDate": listArr['sDate'],
               "eDate": listArr['eDate'],
               "idArr": jsonEncode(listArr['idArr']).toString(),

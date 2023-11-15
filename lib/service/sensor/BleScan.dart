@@ -704,11 +704,11 @@ class BleScanService {
 
       if (isAnd) {
         debugPrint("test : $preMaxCid");
-        httpResult = await http.evCall(preMaxCid, phoneNumber);
+        // httpResult = await http.evCall(preMaxCid, phoneNumber);
       } else {
-        httpResult = await http.evCall(maxCid, phoneNumber);
+        // httpResult = await http.evCall(maxCid, phoneNumber);
       }
-      debugPrint("통신 결과 : $httpResult");
+      // debugPrint("통신 결과 : $httpResult");
       //최신 lastInCloberID 갱신
       SettingDataUtil set = SettingDataUtil();
       set.setLastInCloberID(maxCid);

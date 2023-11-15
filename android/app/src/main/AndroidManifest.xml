@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.wifive.inoutappgwanjeo">
+    package="com.wifive.ypassep">
     <!--
     Internet permissions do not affect the `permission_handler` plugin, but are required if your app needs access to
     the internet.

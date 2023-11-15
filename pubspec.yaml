@@ -57,6 +57,10 @@ dependencies:
   webview_flutter: ^3.0.0
   flutter_ble_peripheral: ^1.2.0
   android_alarm_manager_plus: ^3.0.2
+  package_rename: ^1.5.1
+  encrypt: ^5.0.3
+  intl: ^0.18.1
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +78,7 @@ dev_dependencies:
 #
 #flutter_native_splash:
 #  image: asset/img/
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -252,3 +257,17 @@ flutter_native_splash:
 #  info_plist_files:
 #    - 'ios/Runner/Info-Debug.plist'
 #    - 'ios/Runner/Info-Release.plist'
+
+
+
+package_rename_config:
+  android:
+    app_name: # (String) The display name of the android app
+    package_name: com.wifive.ypassep # (String) The package name of the android app
+    override_old_package: # (Optional) (String) Use this to delete the old folder structure of MainActivity or to use the existing code with the new package name
+    lang: # (Optional) (String) The android development language {kotlin(default) or java}
+
+  ios:
+    app_name: # (String) The display name of the ios app
+    bundle_name: # (String) The bundle name of the ios app
+    package_name: # (String) The product bundle identifier of the ios app

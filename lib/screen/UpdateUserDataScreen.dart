@@ -6,6 +6,7 @@ import 'package:ypass/screen/serve/Toast.dart';
 import 'package:ypass/screen/serve/TopBar.dart';
 
 import '../constant/Exception.dart';
+import '../http/HttpPostData.dart';
 import '../http/StatisticsReporter.dart';
 import '../http/UserDataRequest.dart';
 import '../realm/UserDBUtil.dart';
@@ -24,7 +25,7 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
   @override
   void initState() {
     super.initState();
-    daeguTest();
+    // daeguTest();
   }
 
   void daeguTest() {
@@ -36,7 +37,7 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
     for (var idArrValue in testIdArr) {
       userDB.createIDArr(IdArr(idArrValue['cloberid'].toString().toLowerCase(), idArrValue['userid']!, idArrValue['pk']!));
     }
-    CustomToast().showToast("대구용 DB input 완료.");
+    // CustomToast().showToast("대구용 DB input 완료.");
   }
 
   @override
@@ -143,6 +144,29 @@ class _MiddleState extends State<_Middle> {
               child: const Text('정보수정', style: TextStyle(color: Colors.white),),
             ),
           ) : const Padding(padding: EdgeInsets.all(1)),
+
+          const Padding(padding: EdgeInsets.all(15)),
+          SizedBox(
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () {
+
+                debugPrint('phone5 : ${UserDBUtil().getUser().phoneNumber}');
+                _showDialog(context); // 회원 탈퇴 안내 다이얼로그
+              },
+              style: ElevatedButton.styleFrom(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10))
+                ),
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('회원 탈퇴', style: TextStyle(color: Colors.white),),
+            ),
+          ),
         ],
       ),
     );
@@ -247,6 +271,35 @@ class _MiddleState extends State<_Middle> {
 
       return false;
     }
+  }
+
+
+  void _showDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // 다이얼로그 내용을 정의합니다.
+        return AlertDialog(
+          title: Text('안내'),
+          content: Text('회원 탈퇴시, 사용자님의 모든 데이터는 삭제 됩니다. 탈퇴 이후 이용하시려면 해당 관리실에 다시 등록해 주시기 바랍니다.'),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('탈퇴'),
+              onPressed: () {
+                debugPrint('phone4 : ${UserDBUtil().getUser().phoneNumber}');
+                delUserData(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 

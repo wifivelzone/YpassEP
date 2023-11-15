@@ -7,6 +7,7 @@ import 'package:ypass/realm/db/IdArr.dart';
 import 'package:ypass/realm/db/UserData.dart';
 import 'package:ypass/screen/serve/Toast.dart';
 
+import 'AES256.dart';
 import 'NetworkState.dart';
 import 'StatisticsReporter.dart';
 import 'package:http/http.dart' as http;
@@ -42,12 +43,18 @@ class UserDataRequest {
     if (netState != '인터넷 연결 안됨') {
       // 010AAAABBBB를 010-AAAA-BBBB형태로 전환
       String userPhoneNumber = '${phoneNumber.substring(0,3)}-${phoneNumber.substring(3,7)}-${phoneNumber.substring(7)}';
+      var AESPhonNumber = AES256.encryptAES(phoneNumber);
+      debugPrint("AES : $AESPhonNumber");
 
-      Map<String, dynamic> sendData = {"data":"{'phone':'$userPhoneNumber'}"}; // 서버에 전송할 파라미터값
+      // Map<String, dynamic> sendData = {"data":"{'phone':'76c63c0322c56eba3ac8872ad9a4fe56'}"}; // 서버에 전송할 파라미터값
+      // Map<String, dynamic> sendData = {"data":"{'phone':'010-2728-3301'}"}; // 서버에 전송할 파라미터값
+      Map<String, dynamic> sendData = {"data":"{'phone':'$AESPhonNumber'}"}; // 서버에 전송할 파라미터값
+      // Map<String, dynamic> sendData = {"phone":"$AESPhonNumber"}; // 서버에 전송할 파라미터값
 
       // 서버에 데이터 요청
       http.Response response = await http.post(
-          Uri.parse("https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval"),
+          // Uri.parse("https://xphub.xperp.co.kr/_clober/xpclober_api.svc/clober-approval"),
+          Uri.parse("https://wifivecloud.co.kr:8000/GETUSERINFO"),
           body: json.encode(sendData),
           headers: JSON_HEADERS
       ).timeout(const Duration(seconds: 10));
@@ -61,7 +68,8 @@ class UserDataRequest {
         // var test2 = test.toString().replaceAll('\'', '\"');
         // var test3 = jsonDecode(test2) as Map<String, dynamic>;
         // 위 내용과 jsonData과 동일
-        var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+        // var jsonData = (jsonDecode(jsonDecode(response.body).toString().replaceAll('\'', '"'))) as Map<String, dynamic>;
+        var jsonData = jsonDecode(response.body) as Map<String, dynamic>;
 
 
         if (jsonData['result'] == 0 || jsonData['result'] == '0') {
@@ -75,7 +83,7 @@ class UserDataRequest {
         UserDBUtil userDB = UserDBUtil();
 
         userDB.deleteDB(); // 기존 데이터 삭제
-        userDB.createUserData(phoneNumber, listArr['addr'], listArr['type'], listArr['sDate'], listArr['eDate'], !(listArr['addr'].toString().contains('동'))); // 유저 데이터 저장
+        userDB.createUserData(phoneNumber, listArr['addr'], '1', listArr['sDate'], listArr['eDate'], !(listArr['addr'].toString().contains('동'))); // 유저 데이터 저장
         //  IdArr (cloberid, userid, pk) 저장
         for (var idArrValue in listArr['idArr']) {
           userDB.createIDArr(IdArr(idArrValue['cloberid'].toString().toLowerCase(), idArrValue['userid'], idArrValue['pk']));
@@ -83,7 +91,7 @@ class UserDataRequest {
 
         debugPrint("999999");
         String result;
-        result = await reporter.sendReport(response.body, userPhoneNumber);
+        result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
         debugPrint("통신 결과 : $result");
 
         debugPrint("10101010");
@@ -95,7 +103,7 @@ class UserDataRequest {
         debugPrint('통신error');
         debugPrint('Response Body : ${response.body}');
         String result;
-        result = await reporter.sendError("유저 정보 서버 통신 실패", phoneNumber);
+        result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
         debugPrint("통신error : $result");
 
         return false;

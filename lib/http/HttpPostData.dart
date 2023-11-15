@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,8 @@ import 'package:ypass/realm/SettingDBUtil.dart';
 import 'package:ypass/realm/UserDBUtil.dart';
 import 'package:ypass/constant/YPassURL.dart';
 import 'package:ypass/constant/APPInfo.dart';
+
+import 'AES256.dart';
 
 var client = HttpClient();
 StatisticsReporter reporter = StatisticsReporter();
@@ -269,5 +272,68 @@ Future<String> evCallGyeongSan(String phoneNumber, bool isInward, String cloberI
     }
   } else {
     return "네트워크 연결 실패";
+  }
+}
+
+Future<void> delUserData(BuildContext context) async {
+  debugPrint('phone3 : ${UserDBUtil().getUser().phoneNumber}');
+  final http.Client client = http.Client();
+  final String delUrl = 'https://wifivecloud.co.kr:8000/DELMEMBER'; // Replace with your API URL
+
+  if (await ns.checkNetwork() != '인터넷 연결 안됨') {
+    try {
+      var phone = UserDBUtil().getUser().phoneNumber;
+      debugPrint('phone1 : $phone');
+      phone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+      debugPrint('phone2 : $phone');
+
+      if (phone.length == 10) {
+        phone = phone.substring(0, 3) + phone.substring(3, 6) + phone.substring(6, 10);
+      }
+
+
+      var AESPhonNumber = AES256.encryptAES(phone);
+
+      final Map<String, String> data = {
+
+        'phone': AES256.encryptAES(phone), // Replace with your AES encryption logic
+      };
+
+      final Map<String, dynamic> requestBody = {
+        'data': jsonEncode(data),
+      };
+
+
+      Map<String, dynamic> sendData = {"data":"{'phone':'$AESPhonNumber'}"}; // 서버에 전송할 파라미터값
+      debugPrint("Jsondata : $requestBody");
+
+      final response = await client.post(
+        Uri.parse(delUrl),
+        body: jsonEncode(sendData),
+        headers: {
+          "content-type": "application/json"
+        },
+      );
+
+      if (response.statusCode == 200) {
+        UserDBUtil().deleteDB();
+        SettingDataUtil().deleteSettingData();
+
+        Navigator.pushReplacementNamed(context, '/');
+        // Successful response handling
+        // You can handle the response data here
+        debugPrint('Request successful');
+      } else {
+        // Error handling
+        debugPrint('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('err : $e');
+    } finally {
+      client.close();
+    }
+  } else {
+    debugPrint('network don\'t connect');
+    // Handle the case when there's no network connectivity
   }
 }

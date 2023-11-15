@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,19 +49,9 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBkoYzWCwZ0vNTsC284DWwUZIq6DntK92E',
-    appId: '1:692410132364:web:cd5942cf9c07449d77d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    authDomain: 'ypassflutter.firebaseapp.com',
-    storageBucket: 'ypassflutter.appspot.com',
-    measurementId: 'G-04Q5P3VJJR',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c',
-    appId: '1:692410132364:android:697878729b04d9b177d8a9',
+    appId: '1:692410132364:android:cd4e82bdd6afba8577d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
@@ -63,23 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:8b676691aa74e31577d8a9',
+    appId: '1:692410132364:ios:3b3c4eca4b04a1fe77d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
-    androidClientId: '692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com',
-    iosClientId: '692410132364-vjucu0ldem20s2h63jk6hbb3r5pm6gro.apps.googleusercontent.com',
-    iosBundleId: 'com.wifive.inoutappgwanjeo',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:4363f13d2a1acc8677d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    storageBucket: 'ypassflutter.appspot.com',
-    androidClientId: '692410132364-5t67irdbb4acv834pa4fv3n2mgouttg7.apps.googleusercontent.com',
-    iosClientId: '692410132364-t0latesfobl00b8e06u0hk23lev1ssvi.apps.googleusercontent.com',
-    iosBundleId: 'com.wifive.inoutappgwanjeo',
+    androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
+    iosBundleId: 'kr.co.wifive.InOutSystemGwanJeo',
   );
 }
