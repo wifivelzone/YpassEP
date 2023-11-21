@@ -288,7 +288,8 @@ class _MiddleButtonImg extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
               child: TextButton(
-                onPressed: clickedEvCallBtn,
+                // onPressed: clickedEvCallBtn,
+                onPressed: (){},
                 child: Image.asset('asset/img/ev.png'),
               ),
             ),

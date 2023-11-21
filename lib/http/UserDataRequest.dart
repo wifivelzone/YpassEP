@@ -76,6 +76,8 @@ class UserDataRequest {
           CustomToast().showToast('등록된 사용자가 아닙니다. 관리실에 문의해주세요');
           return false;
         }
+
+        debugPrint("이건 또 뭐지? : $jsonData");
         var listArr = jsonData['listArr'][0];
 
         debugPrint("88888");
@@ -91,8 +93,8 @@ class UserDataRequest {
 
         debugPrint("999999");
         String result;
-        result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
-        debugPrint("통신 결과 : $result");
+        // result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
+        // debugPrint("통신 결과 : $result");
 
         debugPrint("10101010");
         return true;
@@ -103,8 +105,8 @@ class UserDataRequest {
         debugPrint('통신error');
         debugPrint('Response Body : ${response.body}');
         String result;
-        result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
-        debugPrint("통신error : $result");
+        // result = await reporter.sendReport(response.body.toString(), userPhoneNumber);
+        // debugPrint("통신error : $result");
 
         return false;
       }
