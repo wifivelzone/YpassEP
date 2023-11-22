@@ -61,7 +61,9 @@ class StatisticsReporter {
 
     if (netState != '인터넷 연결 안됨') {
       UserDBUtil db = UserDBUtil();
-
+      if (db.isEmpty()) {
+        return "통신error";
+      }
       String userAddr = db.getUser().addr;
 
       String brand = '휴대폰 브랜드';
