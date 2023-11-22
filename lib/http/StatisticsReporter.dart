@@ -73,6 +73,7 @@ class StatisticsReporter {
         brand = "android";
       }
 
+
       try {
         http.Response response = await http.post(
             Uri.parse(errorUrl),
