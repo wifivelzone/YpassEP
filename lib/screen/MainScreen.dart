@@ -517,7 +517,7 @@ class Bottom extends StatelessWidget {
         // 다이얼로그 내용을 정의합니다.
         return AlertDialog(
           title: Text('안내'),
-          content: Text('이용 약관을 철회하시겠습니다까?'),
+          content: Text('이용 약관을 철회하시겠습니까?'),
           actions: <Widget>[
             ElevatedButton(
               child: Text('취소'),
@@ -550,13 +550,11 @@ class Bottom extends StatelessWidget {
           phone = phone.substring(0, 3) + phone.substring(3, 6) + phone.substring(6, 10);
         }
 
-        final Map<String, String> data = {
 
-          'phone': AES256.encryptAES(phone), // Replace with your AES encryption logic
-        };
+        var AESPhonNumber = AES256.encryptAES(phone);
 
         final Map<String, dynamic> requestBody = {
-          'data': jsonEncode(data),
+          "data":"{'phone':'$AESPhonNumber'}"
         };
 
 
@@ -579,6 +577,7 @@ class Bottom extends StatelessWidget {
           debugPrint('Request successful');
         } else {
           // Error handling
+          Navigator.pushReplacementNamed(context, '/');
           debugPrint('Request failed with status: ${response.statusCode}');
           // debugPrint('Request failed with status: ${response.}');
         }

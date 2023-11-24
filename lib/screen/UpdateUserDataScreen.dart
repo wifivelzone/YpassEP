@@ -146,6 +146,8 @@ class _MiddleState extends State<_Middle> {
           ) : const Padding(padding: EdgeInsets.all(1)),
 
           const Padding(padding: EdgeInsets.all(15)),
+
+          UserDBUtil().isEmpty() ? const Padding(padding: EdgeInsets.all(1)) :
           SizedBox(
             width: MediaQuery
                 .of(context)
