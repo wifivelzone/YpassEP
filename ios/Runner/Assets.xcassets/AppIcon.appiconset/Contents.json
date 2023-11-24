@@ -1,109 +1,109 @@
 {
   "images" : [
     {
-      "filename" : "ypass40.png",
+      "filename" : "Icon-App-40x40@1x 1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "filename" : "ypass60.png",
+      "filename" : "Icon-App-20x20@3x 1.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
-      "filename" : "ypass58.png",
+      "filename" : "ypassep58.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
-      "filename" : "ypass87.png",
+      "filename" : "Icon-App-29x29@3x 1.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
-      "filename" : "ypass80.png",
+      "filename" : "ypassep80.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "ypass120.png",
+      "filename" : "Icon-App-40x40@3x 1.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
-      "filename" : "ypass120-1.png",
+      "filename" : "Icon-App-40x40@3x 2.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
-      "filename" : "ypass180.png",
+      "filename" : "ypassep180.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
     },
     {
-      "filename" : "ypass20.png",
+      "filename" : "Icon-App-20x20@1x 1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "20x20"
     },
     {
-      "filename" : "ypass40-1.png",
+      "filename" : "Icon-App-20x20@2x 1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
-      "filename" : "ypass29.png",
+      "filename" : "Icon-App-29x29@1x 1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "29x29"
     },
     {
-      "filename" : "ypass58-1.png",
+      "filename" : "Icon-App-29x29@2x 1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
-      "filename" : "ypass40-2.png",
+      "filename" : "ypassep40.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
     },
     {
-      "filename" : "ypass80-1.png",
+      "filename" : "Icon-App-40x40@2x 1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
-      "filename" : "ypass76.png",
+      "filename" : "Icon-App-76x76@1x 4.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "76x76"
     },
     {
-      "filename" : "ypass152.png",
+      "filename" : "Icon-App-76x76@2x 1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "76x76"
     },
     {
-      "filename" : "ypass167.png",
+      "filename" : "Icon-App-83.5x83.5@2x.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "83.5x83.5"
     },
     {
-      "filename" : "ypass1024.png",
+      "filename" : "ypassep.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
