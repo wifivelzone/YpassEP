@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,7 +53,6 @@ class DefaultFirebaseOptions {
     measurementId: 'G-04Q5P3VJJR',
   );
 
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c',
     appId: '1:692410132364:android:cd4e82bdd6afba8577d8a9',
@@ -77,11 +73,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:b37a932154ee4b2577d8a9',
+    appId: '1:692410132364:ios:d284e47d877f5c8177d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
     androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
-    iosBundleId: 'com.example.epmactest',
+    iosBundleId: 'com.example.eptest',
   );
 }
