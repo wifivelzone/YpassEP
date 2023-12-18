@@ -21,14 +21,14 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -56,6 +56,14 @@ class DefaultFirebaseOptions {
     measurementId: 'G-JH3V9DYHGY',
   );
 
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyDlKoELNTCpN_05L_K9Ejg-tFb20kRJ0Zw',
+    appId: '1:297704881058:android:e466f198584d22b38990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    storageBucket: 'epflutter.appspot.com',
+  );
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
     appId: '1:297704881058:ios:3244f50fbb317ede8990fb',
@@ -63,14 +71,5 @@ class DefaultFirebaseOptions {
     projectId: 'epflutter',
     storageBucket: 'epflutter.appspot.com',
     iosBundleId: 'kr.co.wifive.YpassEP',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
-    appId: '1:297704881058:ios:da91e8d2850d5f6a8990fb',
-    messagingSenderId: '297704881058',
-    projectId: 'epflutter',
-    storageBucket: 'epflutter.appspot.com',
-    iosBundleId: 'com.example.app',
   );
 }
