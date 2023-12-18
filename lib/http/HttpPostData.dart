@@ -29,7 +29,6 @@ late String netState;
 //inoutUser = 1
 Future<String> cloberPass(int pass, String cid, String maxRssi) async {
   netState = await ns.checkNetwork();
-
   if (netState != '인터넷 연결 안됨') {
     httpType = HttpType.tempUser;
     DeviceInfoPlugin device = DeviceInfoPlugin();
@@ -54,6 +53,7 @@ Future<String> cloberPass(int pass, String cid, String maxRssi) async {
       model = andInfo.model;
       brand = andInfo.brand;
     }
+
     //평균 RSSI = BLE 스캔시 얻은 max RSSI 값
     //마지막 0은 뭔지 확인 필요
     String rssi = "$maxRssi,$model,${-75.5-set.getUserSetRange()},$isAnd";
