@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -66,11 +63,23 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:8e78dcd08edb3a9a77d8a9',
+    appId: '1:692410132364:ios:d10493adac38dd6477d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
     androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
-    iosBundleId: 'kr.co.wifive.ypassep',
+    iosClientId: '692410132364-4eguqjhchmg274480rqq7c09vd1i7s8u.apps.googleusercontent.com',
+    iosBundleId: 'kr.co.wifive.YpassEP',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
+    appId: '1:692410132364:ios:1398aabbf00b569d77d8a9',
+    messagingSenderId: '692410132364',
+    projectId: 'ypassflutter',
+    storageBucket: 'ypassflutter.appspot.com',
+    androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
+    iosClientId: '692410132364-jsrsovg3l2d4ksbrk8mvg027rid3hsb6.apps.googleusercontent.com',
+    iosBundleId: 'com.example.app',
   );
 }
