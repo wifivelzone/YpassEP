@@ -66,11 +66,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:d10493adac38dd6477d8a9',
+    appId: '1:692410132364:ios:8e78dcd08edb3a9a77d8a9',
     messagingSenderId: '692410132364',
     projectId: 'ypassflutter',
     storageBucket: 'ypassflutter.appspot.com',
     androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
-    iosBundleId: 'kr.co.wifive.YpassEP',
+    iosBundleId: 'kr.co.wifive.ypassep',
   );
 }

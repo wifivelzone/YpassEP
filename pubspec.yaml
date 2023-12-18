@@ -269,7 +269,7 @@ package_rename_config:
 
   ios:
     app_name: # (String) The display name of the ios app
-    bundle_name: kr.co.wifive.YpassEP # (String) The bundle name of the ios app
+    bundle_name: kr.co.wifive.ypassep # (String) The bundle name of the ios app
     package_name: kr.co.wifive.YpassEP #com.wifive.ypassep
 
 
