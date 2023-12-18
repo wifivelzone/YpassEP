@@ -19,6 +19,15 @@ import Flutter
   }
 }
 
+override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    // NOTE: For logging
+    // let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
+    print("==== didRegisterForRemoteNotificationsWithDeviceToken ====")
+    print(deviceTokenString)
+    Messaging.messaging().apnsToken = deviceToken
+  }
+}
+
 // here
 func registerPlugins(registry: FlutterPluginRegistry) {
   GeneratedPluginRegistrant.register(with: registry)
