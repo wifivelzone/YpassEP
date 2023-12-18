@@ -47,29 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBbeEDFM2JdZKtE3GV1UKGlfP0rhm6FSPY',
-    appId: '1:297704881058:web:5ef32c9da3a60f508990fb',
-    messagingSenderId: '297704881058',
-    projectId: 'epflutter',
-    authDomain: 'epflutter.firebaseapp.com',
-    storageBucket: 'epflutter.appspot.com',
-    measurementId: 'G-JH3V9DYHGY',
+    apiKey: 'AIzaSyBkoYzWCwZ0vNTsC284DWwUZIq6DntK92E',
+    appId: '1:692410132364:web:cd5942cf9c07449d77d8a9',
+    messagingSenderId: '692410132364',
+    projectId: 'ypassflutter',
+    authDomain: 'ypassflutter.firebaseapp.com',
+    storageBucket: 'ypassflutter.appspot.com',
+    measurementId: 'G-04Q5P3VJJR',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDlKoELNTCpN_05L_K9Ejg-tFb20kRJ0Zw',
-    appId: '1:297704881058:android:e466f198584d22b38990fb',
-    messagingSenderId: '297704881058',
-    projectId: 'epflutter',
-    storageBucket: 'epflutter.appspot.com',
+    apiKey: 'AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c',
+    appId: '1:692410132364:android:cd4e82bdd6afba8577d8a9',
+    messagingSenderId: '692410132364',
+    projectId: 'ypassflutter',
+    storageBucket: 'ypassflutter.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
-    appId: '1:297704881058:ios:3244f50fbb317ede8990fb',
-    messagingSenderId: '297704881058',
-    projectId: 'epflutter',
-    storageBucket: 'epflutter.appspot.com',
+    apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
+    appId: '1:692410132364:ios:d10493adac38dd6477d8a9',
+    messagingSenderId: '692410132364',
+    projectId: 'ypassflutter',
+    storageBucket: 'ypassflutter.appspot.com',
+    androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
     iosBundleId: 'kr.co.wifive.YpassEP',
   );
 }
