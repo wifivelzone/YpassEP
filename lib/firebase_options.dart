@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -31,10 +28,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,6 +46,16 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyBbeEDFM2JdZKtE3GV1UKGlfP0rhm6FSPY',
+    appId: '1:297704881058:web:5ef32c9da3a60f508990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    authDomain: 'epflutter.firebaseapp.com',
+    storageBucket: 'epflutter.appspot.com',
+    measurementId: 'G-JH3V9DYHGY',
+  );
+
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
     appId: '1:297704881058:ios:3244f50fbb317ede8990fb',
@@ -59,5 +63,14 @@ class DefaultFirebaseOptions {
     projectId: 'epflutter',
     storageBucket: 'epflutter.appspot.com',
     iosBundleId: 'kr.co.wifive.YpassEP',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
+    appId: '1:297704881058:ios:da91e8d2850d5f6a8990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    storageBucket: 'epflutter.appspot.com',
+    iosBundleId: 'com.example.app',
   );
 }
