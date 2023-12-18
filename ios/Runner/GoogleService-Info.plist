@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>692410132364-4eguqjhchmg274480rqq7c09vd1i7s8u.apps.googleusercontent.com</string>
+	<string>297704881058-9rflcjt7jn5331crmvvc65cfcobeosvi.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.692410132364-4eguqjhchmg274480rqq7c09vd1i7s8u</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.297704881058-9rflcjt7jn5331crmvvc65cfcobeosvi</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA</string>
+	<string>AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc</string>
 	<key>GCM_SENDER_ID</key>
-	<string>692410132364</string>
+	<string>297704881058</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>kr.co.wifive.YpassEP</string>
 	<key>PROJECT_ID</key>
-	<string>ypassflutter</string>
+	<string>epflutter</string>
 	<key>STORAGE_BUCKET</key>
-	<string>ypassflutter.appspot.com</string>
+	<string>epflutter.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:692410132364:ios:d10493adac38dd6477d8a9</string>
+	<string>1:297704881058:ios:3244f50fbb317ede8990fb</string>
 </dict>
 </plist>

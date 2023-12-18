@@ -44,42 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBkoYzWCwZ0vNTsC284DWwUZIq6DntK92E',
-    appId: '1:692410132364:web:cd5942cf9c07449d77d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    authDomain: 'ypassflutter.firebaseapp.com',
-    storageBucket: 'ypassflutter.appspot.com',
-    measurementId: 'G-04Q5P3VJJR',
+    apiKey: 'AIzaSyBbeEDFM2JdZKtE3GV1UKGlfP0rhm6FSPY',
+    appId: '1:297704881058:web:5ef32c9da3a60f508990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    authDomain: 'epflutter.firebaseapp.com',
+    storageBucket: 'epflutter.appspot.com',
+    measurementId: 'G-JH3V9DYHGY',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBpR0islAQh9jPUfy5yqoY2SuRnTC0N6_c',
-    appId: '1:692410132364:android:cd4e82bdd6afba8577d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    storageBucket: 'ypassflutter.appspot.com',
+    apiKey: 'AIzaSyDlKoELNTCpN_05L_K9Ejg-tFb20kRJ0Zw',
+    appId: '1:297704881058:android:e466f198584d22b38990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    storageBucket: 'epflutter.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:d10493adac38dd6477d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    storageBucket: 'ypassflutter.appspot.com',
-    androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
-    iosClientId: '692410132364-4eguqjhchmg274480rqq7c09vd1i7s8u.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
+    appId: '1:297704881058:ios:3244f50fbb317ede8990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    storageBucket: 'epflutter.appspot.com',
+    iosClientId: '297704881058-9rflcjt7jn5331crmvvc65cfcobeosvi.apps.googleusercontent.com',
     iosBundleId: 'kr.co.wifive.YpassEP',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCa5g5ekgSLBVo5bN16Vhi7U1x44H1pjDA',
-    appId: '1:692410132364:ios:1398aabbf00b569d77d8a9',
-    messagingSenderId: '692410132364',
-    projectId: 'ypassflutter',
-    storageBucket: 'ypassflutter.appspot.com',
-    androidClientId: '692410132364-066uq0p3bg861u6nm58923aanlu4s6nm.apps.googleusercontent.com',
-    iosClientId: '692410132364-jsrsovg3l2d4ksbrk8mvg027rid3hsb6.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBcu8VBUv56tSdWdTOqdR4TSpS-_AQR9Fc',
+    appId: '1:297704881058:ios:da91e8d2850d5f6a8990fb',
+    messagingSenderId: '297704881058',
+    projectId: 'epflutter',
+    storageBucket: 'epflutter.appspot.com',
+    iosClientId: '297704881058-et8qnc6gghvkf1d70lakfucl4imi18e8.apps.googleusercontent.com',
     iosBundleId: 'com.example.app',
   );
 }
